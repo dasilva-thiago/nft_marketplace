@@ -147,3 +147,9 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Generated test and audit artifacts
+playwright-report/
+playwright-results/
+artifacts/
+.lighthouseci/
