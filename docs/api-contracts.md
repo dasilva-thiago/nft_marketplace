@@ -1,0 +1,123 @@
+# Contratos REST do desafio
+
+Esta documentação define o formato compartilhado entre a interface e o MSW. Todos os endpoints têm o prefixo `/api`; Axios é a única camada HTTP da aplicação. Respostas de sucesso retornam JSON direto (exceto `204` em remoção sem corpo). Erros usam o formato abaixo. O backend é simulado por MSW; não há blockchain nem gateway de pagamento.
+
+Os tipos TypeScript correspondentes ficam em `src/shared/api/contracts.ts`. Se um campo mudar, atualize tipo, handler e testes juntos.
+
+## Padrões comuns
+
+- Datas são ISO 8601 UTC.
+- IDs são strings estáveis de fixtures.
+- `page` começa em 1; `pageSize` é inteiro positivo. Resposta paginada contém `items`, `page`, `pageSize`, `totalItems`, `totalPages`.
+- Filtros são combináveis e serializados na URL. `sort` identifica o campo e `sortOrder` aceita `asc`/`desc`.
+- Preços, taxas, descontos e totais ETH trafegam como strings decimais, nunca números JSON. Quantidade/página/versão são inteiros.
+- Identidade de usuário vem da sessão simulada; o cliente não escolhe `userId` no corpo para operar recursos privados.
+- Sessão fica em cookie de demonstração; não guardar senha em localStorage/sessionStorage. Use apenas credenciais fictícias.
+- Todas as operações de escrita repetíveis devem ser seguras contra duplo clique; criação de pedido exige `Idempotency-Key`.
+
+### Erro comum
+
+```json
+{
+  "code": "VALIDATION_ERROR",
+  "message": "Revise os campos destacados.",
+  "fields": { "email": "Informe um e-mail válido." },
+  "requestId": "req-demo-001",
+  "retryable": false
+}
+```
+
+Códigos tipados: `VALIDATION_ERROR` (400), `SESSION_INVALID` (401), `FORBIDDEN` (403), `NOT_FOUND` (404), `AVAILABILITY_CONFLICT` (409), `CONFLICT` (409), `COUPON_INVALID`/`COUPON_EXPIRED` (422), `PAYMENT_REJECTED` (422) e `TRANSIENT_ERROR` (503, retryable). Timeout/desconexão podem não ter resposta HTTP; a UI precisa recuperar a operação sem repetir compra.
+
+## Recursos e operações
+
+### Sessão e conta
+
+| Método e rota | Entrada | Sucesso | Erros relevantes |
+|---|---|---|---|
+| `POST /api/auth/register` | `RegisterRequest` (`name`, `email`, `password`) | `201 Session`; email existente é conflito | 400 validação, 409 conflito |
+| `POST /api/auth/login` | `LoginRequest` | `200 Session` e cookie de sessão | 400 validação, 401 credencial/sessão inválida |
+| `GET /api/session` | — | `200 Session` | 401 ausente/expirada |
+| `POST /api/auth/logout` | — | `200 { "loggedOut": true }`, expira cookie | 401 pode ser tratado como sessão já encerrada |
+
+`Session` tem `user` (`id`, `name`, `email`, `avatarUrl`) e `expiresAt`. Use duas contas fictícias de teste documentadas no README; cada uma deve ter dados privados separados.
+
+### NFTs
+
+| Método e rota | Entrada | Sucesso | Erros relevantes |
+|---|---|---|---|
+| `GET /api/nfts` | query: `page`, `pageSize`, `search`, `sort`, `sortOrder` e filtros repetíveis | `PageResponse<NftSummary>` | 400 parâmetros inválidos, 503 falha transitória |
+| `GET /api/nfts/:nftId` | identificador na rota | `Nft` | 404 não encontrado |
+
+`NftSummary` contém `id`, `name`, `imageUrl`, `collection`, `priceEth`, `availableEditions`, `network` e `version`. `Nft` acrescenta `description`, `gallery`, edição atual/total e `attributes` (`trait`, `value`). Quantidade indisponível não é 404: é um conflito de disponibilidade na tentativa de carrinho/cotação.
+
+### Favoritos
+
+| Método e rota | Entrada | Sucesso | Erros relevantes |
+|---|---|---|---|
+| `GET /api/favorites` | sessão | `Favorite[]` | 401 |
+| `PUT /api/favorites/:nftId` | sem corpo | `Favorite` (operação idempotente) | 401, 404 NFT |
+| `DELETE /api/favorites/:nftId` | sem corpo | `204` | 401 |
+
+`Favorite` é vinculado ao usuário da sessão e NFT. Remover favorito inexistente pode responder 204 para ser idempotente.
+
+### Carrinho
+
+| Método e rota | Entrada | Sucesso | Erros relevantes |
+|---|---|---|---|
+| `GET /api/cart` | sessão ou visitante | `Cart` | 401 se sessão expirou em operação protegida |
+| `POST /api/cart/items` | `AddCartItemRequest` (`nftId`, `quantity`) | `Cart` atualizado | 400 quantidade; 404 NFT; 409 edição indisponível |
+| `PATCH /api/cart/items/:nftId` | `UpdateCartItemRequest` (`quantity`) | `Cart` atualizado | 400; 404 item; 409 estoque mudou |
+| `DELETE /api/cart/items/:nftId` | — | `Cart` atualizado | 404 item pode ser tratado idempotentemente |
+
+`Cart` contém `userId` ou `null`, `items` e `version`. Cada `CartLine` tem `nftId`, quantidade inteira e o resumo atual do NFT. Ao login, preservar/mesclar carrinho visitante segundo regra documentada e testada; não descartar itens silenciosamente.
+
+### Cotação e cupom
+
+| Método e rota | Entrada | Sucesso | Erros relevantes |
+|---|---|---|---|
+| `POST /api/quotes` | `QuoteRequest`: itens (`nftId`, `quantity`), `couponCode?`, `walletId?`, `network?` | `Quote` atual da API | 401, 404 NFT/carteira, 409 estoque, 422 cupom inválido/expirado |
+
+`Quote` contém `quoteId`, linhas cotadas (`QuoteLine`), cupom aplicado, `subtotalEth`, `discountEth`, `networkFeeEth`, `totalEth`, `createdAt`, `expiresAt`, `version`. Toda mudança de item, cupom, preço, disponibilidade, carteira ou rede requer cotação nova. Checkout não aceita cotação expirada ou antiga; divergência deve ser mostrada e exigir confirmação do usuário.
+
+### Pedidos
+
+| Método e rota | Entrada | Sucesso | Erros relevantes |
+|---|---|---|---|
+| `POST /api/orders` | Header `Idempotency-Key` obrigatório; corpo `CreateOrderRequest` (`quoteId`, `walletId`, `network`) | `201 OrderSnapshot`; mesma chave e mesmo conteúdo recuperam a mesma tentativa | 400 chave ausente; 401; 403; 409 chave com outro conteúdo/estoque; 422 pagamento recusado |
+| `GET /api/orders/:orderId` | sessão | `OrderSnapshot` | 401, 403 pedido de outro usuário, 404 |
+
+`OrderSnapshot` registra `id`, `userId`, estado `pending`/`confirmed`/`rejected`, linhas e cotação usadas como snapshot imutável, `transactionRef` (string simulada ou null), timestamps e `version`. Um timeout após criação não cancela necessariamente o pedido: consultar/recuperar pela chave antes de tentar enviar outra compra. Pedido confirmado ou recusado é terminal.
+
+### Perfil
+
+| Método e rota | Entrada | Sucesso | Erros relevantes |
+|---|---|---|---|
+| `GET /api/profile` | sessão | `CollectorProfile` | 401 |
+| `PATCH /api/profile` | `UpdateProfileRequest` (`name`, `avatarUrl?`) | perfil atualizado | 400 validação, 401 |
+| `PATCH /api/profile/password` | `ChangePasswordRequest` | `200 { "updated": true }` | 400 validação/senha atual, 401 |
+
+O avatar usa caminho/URL local de fixture no demo. Nunca armazenar senha em claro ou retornar senha nas respostas.
+
+### Carteiras
+
+| Método e rota | Entrada | Sucesso | Erros relevantes |
+|---|---|---|---|
+| `GET /api/wallets` | sessão | `Wallet[]` | 401 |
+| `POST /api/wallets` | `CreateWalletRequest` | `201 Wallet` | 400 validação/endereço/rede, 401, 409 conflito |
+| `PATCH /api/wallets/:walletId` | `UpdateWalletRequest` (campos alteráveis) | `Wallet` atualizado | 400 validação, 401, 404, 409 |
+
+`Wallet` tem `id`, `userId`, `label`, `address`, `network`, `isPrimary`, `version`. Principal/secundária e seleção de rede são dados simulados, não endereços reais necessários.
+
+## Eventos Socket.IO
+
+Formato comum: `VersionedEvent<T>` com `eventId`, `resourceId`, `version`, `occurredAt`, `payload`.
+
+- `nft.updated`: payload `NftUpdatedPayload` (`nftId`, `priceEth`, `availableEditions`). Atualiza listagem/detalhe/carrinho e invalida cotação.
+- `order.updated`: payload `OrderUpdatedPayload` (`orderId`, `status`, `transactionRef`). Atualiza o pedido; `confirmed`/`rejected` são terminais.
+
+Evento duplicado (mesmo `eventId`) ou mais antigo (versão menor) não modifica o estado. Após reconexão, consultar REST para conciliar. Liberar listener e subscription ao encerrar sessão.
+
+## Cobertura de contratos a implementar
+
+O arquivo `contracts.ts` estabelece os tipos; esta documentação estabelece o comportamento esperado. A implementação MSW ainda precisa adicionar handlers para todas as rotas, validação e persistência. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.
