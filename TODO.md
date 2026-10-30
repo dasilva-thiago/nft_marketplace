@@ -22,7 +22,9 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 ## Catálogo, detalhe e favoritos
 
-- [ ] Implementar a UI do Figma para destaques/catálogo, busca, filtros combináveis, ordenação, paginação e navegação para detalhe. Busca/filtros/ordenação/paginação compõem URL, sobrevivem a refresh e histórico; mudança de filtro reinicia página; parâmetros enviados à API correspondem à URL; tratar vazio, erros, respostas fora de ordem e cancelar/descartar respostas obsoletas.
+- [x] Primeira home funcional: hero, listagem de cards ligada à API, busca submetida, filtro de coleção, ordenação, paginação, estados loading/erro/vazio e parâmetros preservados na URL; testes cobrem filtro/busca/histórico em desktop e mobile.
+- [ ] Comparar e ajustar fidelidade dos frames Figma da home em 390/768/1440 px; substituir placeholder de arte pelos assets originais exportados e conferir com capturas lado a lado.
+- [ ] Completar refinamentos de catálogo: filtros combináveis de rede/traits na interface, histórico completo e estado de carregamento ao navegar entre páginas; validar descartar resposta obsoleta também pela UI.
 - [ ] Implementar detalhe com acesso direto, NFT inexistente, edição indisponível, limite de quantidade, galeria, quantidade, favorito e compra.
 - [ ] Persistir favoritos para autenticados; incluir ao menos uma mutation otimista com rollback.
 

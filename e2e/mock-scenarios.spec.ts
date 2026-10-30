@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 async function openDemo(page: import('@playwright/test').Page) {
   await page.goto('/');
-  await page.getByRole('heading', { name: 'Marketplace de NFTs' }).waitFor();
+  await page.getByRole('heading', { name: 'Peças em destaque' }).waitFor();
 }
 
 test('rate limit simulado devolve 429 e Retry-After; reset restaura o catálogo', async ({ page }) => {

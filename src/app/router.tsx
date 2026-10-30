@@ -5,10 +5,21 @@ import { PlaceholderPage } from '@/shared/ui/placeholder-page';
 
 interface RouterContext { queryClient: QueryClient }
 const rootRoute = createRootRouteWithContext<RouterContext>()({
-  component: () => <><header className="site-header"><Link to="/" className="wordmark">KURIO</Link><nav aria-label="Navegação principal"><Link to="/">Início</Link><Link to="/">Mercado</Link><Link to="/account/profile">Perfil</Link><Link to="/cart">Carrinho</Link></nav><Link to="/login" className="login-link">Entrar</Link></header><main><Outlet /></main></>,
+  component: () => <><header className="site-header"><Link to="/" search={{ page: 1, search: '', collection: '', sort: 'priceEth', sortOrder: 'asc' }} className="wordmark">KURIO</Link><nav aria-label="Navegação principal"><Link to="/" search={{ page: 1, search: '', collection: '', sort: 'priceEth', sortOrder: 'asc' }}>Início</Link><Link to="/" search={{ page: 1, search: '', collection: '', sort: 'priceEth', sortOrder: 'asc' }}>Mercado</Link><Link to="/account/profile">Perfil</Link><Link to="/cart">Carrinho</Link></nav><Link to="/login" className="login-link">Entrar</Link></header><main><Outlet /></main></>,
   notFoundComponent: () => <PlaceholderPage title="Página não encontrada" />,
 });
-const homeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: HomePage });
+const homeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  validateSearch: (search: Record<string, unknown>) => ({
+    page: typeof search.page === 'number' && Number.isInteger(search.page) && search.page > 0 ? search.page : 1,
+    search: typeof search.search === 'string' ? search.search : '',
+    collection: typeof search.collection === 'string' ? search.collection : '',
+    sort: search.sort === 'name' ? 'name' as const : 'priceEth' as const,
+    sortOrder: search.sortOrder === 'desc' ? 'desc' as const : 'asc' as const,
+  }),
+  component: HomePage,
+});
 const nftRoute = createRoute({ getParentRoute: () => rootRoute, path: '/nft/$nftId', component: () => <PlaceholderPage title="Detalhe do NFT" /> });
 const cartRoute = createRoute({ getParentRoute: () => rootRoute, path: '/cart', component: () => <PlaceholderPage title="Carrinho de NFTs" /> });
 const checkoutRoute = createRoute({ getParentRoute: () => rootRoute, path: '/checkout', component: () => <PlaceholderPage title="Pagamento" /> });

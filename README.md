@@ -1,6 +1,6 @@
 # NFT Marketplace — fundação arquitetural
 
-Repositório iniciado a partir do desafio frontend. A base técnica e o catálogo REST simulado estão preparados; **as telas do Figma e os fluxos de compra, conta e tempo real ainda não estão concluídos**. A home atual é uma página de scaffold e as rotas não-home são marcações explícitas.
+Repositório iniciado a partir do desafio frontend. A primeira versão funcional da home e o catálogo REST simulado já estão preparados; **a reprodução visual exata do Figma, a tela de detalhe e os fluxos de compra, conta e tempo real ainda não estão concluídos**. As rotas não-home permanecem marcações explícitas.
 
 ## Stack obrigatória
 
@@ -36,7 +36,7 @@ src/
 public/
   manus-routes.json    manifesto de rotas para o ambiente de preview
   mockServiceWorker.js gerado por `pnpm mocks:init`
-e2e/                   Playwright; smoke do scaffold, API de catálogo e cenários MSW
+e2e/                   Playwright; home, API de catálogo, URL/filtros e cenários MSW
 artifacts/             relatórios locais (ignorados pelo Git)
 ```
 
@@ -66,7 +66,7 @@ pnpm test:e2e:report
 pnpm audit:lighthouse
 ```
 
-Playwright já está configurado para Chromium desktop 1440 px e viewport mobile, com relatório HTML e trace em falhas. Há testes iniciais do scaffold, da API de catálogo e do reset/rate limit simulado; isso ainda não satisfaz a cobertura E2E exigida no desafio. Lighthouse CI já declara as duas rotas e três medições, mas só pode ser considerado evidência depois que as páginas funcionais estiverem implementadas. Consulte `TODO.md` para os requisitos pendentes.
+Playwright já está configurado para Chromium desktop 1440 px e viewport mobile, com relatório HTML e trace em falhas. Há testes da home, da API de catálogo, URL/busca/filtros/histórico e reset/rate limit simulado; isso ainda não satisfaz a cobertura E2E completa exigida no desafio. Lighthouse CI já declara as duas rotas e três medições, mas só pode ser considerado evidência depois que as páginas funcionais estiverem implementadas. Consulte `TODO.md` para os requisitos pendentes.
 
 ## Referências do desafio
 
