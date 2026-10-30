@@ -9,6 +9,7 @@ React + TypeScript + Vite; TanStack Router para rotas; TanStack Query para estad
 ## Estrutura
 
 Veja [`docs/architecture.md`](docs/architecture.md) para responsabilidades por camada, regras de dependência, isolamento de sessão/cache, precisão ETH e sincronização por Socket.IO.
+Para implementar o teste na ordem correta e verificar a conclusão de cada requisito do enunciado, siga o [roteiro completo de implementação](docs/implementation-roadmap.md).
 
 ```text
 src/
