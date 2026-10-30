@@ -1,16 +1,17 @@
 # NFT Marketplace — fundação arquitetural
 
-Repositório iniciado a partir do desafio frontend. Este commit estabelece a base técnica e as responsabilidades por camada; **não declara concluídos os fluxos de compra, conta, catálogo ou tempo real**. A primeira tela e as rotas não-home são marcações explícitas de scaffold.
+Repositório iniciado a partir do desafio frontend. A base técnica e o catálogo REST simulado estão preparados; **as telas do Figma e os fluxos de compra, conta e tempo real ainda não estão concluídos**. A home atual é uma página de scaffold e as rotas não-home são marcações explícitas.
 
 ## Stack obrigatória
 
-React + TypeScript + Vite; TanStack Router para rotas; TanStack Query para estado remoto; Axios como cliente REST; Socket.IO client para eventos; Tailwind CSS e componentes compatíveis com shadcn/ui; MSW para REST; Playwright para E2E; Lighthouse CI para auditorias. `big.js` dá suporte a valores ETH com strings decimais nos contratos e cálculo sem aritmética binária de ponto flutuante.
+React + TypeScript + Vite; TanStack Router para rotas; TanStack Query para estado remoto; Axios como cliente REST; Socket.IO client para eventos; Tailwind CSS e componentes compatíveis com shadcn/ui; MSW para REST; Zod para validação em runtime; Playwright para E2E; Lighthouse CI para auditorias. `big.js` dá suporte a valores ETH com strings decimais nos contratos e cálculo sem aritmética binária de ponto flutuante.
 
 ## Estrutura
 
 Veja [`docs/architecture.md`](docs/architecture.md) para responsabilidades por camada, regras de dependência, isolamento de sessão/cache, precisão ETH e sincronização por Socket.IO.
 Para implementar o teste na ordem correta e verificar a conclusão de cada requisito do enunciado, siga o [roteiro completo de implementação](docs/implementation-roadmap.md).
 Os formatos de dados e endpoints previstos para cada recurso estão no [contrato da API REST](docs/api-contracts.md); essa é a referência compartilhada para os próximos handlers MSW e chamadas Axios.
+O [plano extra de segurança](docs/security-hardening.md) separa o que é possível validar no frontend/mock (Zod e cenários 429) do que precisa de servidor real (JWT, cookie HttpOnly, Helmet e rate limit efetivo).
 
 ```text
 src/
@@ -25,7 +26,7 @@ src/
     profile/           perfil/avatar/senha (próxima implementação)
     wallets/           carteiras (próxima implementação)
   shared/              código transversal
-    api/               Axios e contratos HTTP tipados
+    api/               Axios, contratos HTTP e schemas Zod
     query/             QueryClient e política base de cache
     lib/               utilitários de domínio, incluindo ETH decimal
     ui/                componentes compartilhados
@@ -35,7 +36,7 @@ src/
 public/
   manus-routes.json    manifesto de rotas para o ambiente de preview
   mockServiceWorker.js gerado por `pnpm mocks:init`
-e2e/                   Playwright; no momento, somente smoke test do scaffold
+e2e/                   Playwright; smoke do scaffold, API de catálogo e cenários MSW
 artifacts/             relatórios locais (ignorados pelo Git)
 ```
 
@@ -48,11 +49,12 @@ Requer Node.js 20.19+ ou 22.12+ e pnpm. A cópia deste ambiente usa Node 22.
 ```bash
 pnpm install
 cp .env.example .env.local
-pnpm mocks:init
 pnpm dev
 ```
 
-A camada MSW é ativada com `VITE_ENABLE_MOCKS=true`, inclusive para builds de demonstração. Defina `VITE_API_BASE_URL` e `VITE_SOCKET_URL` para configurar os pontos REST e socket. **Ainda não há fixture/handler de negócio completo**; o mock inicial existe apenas para validar o bootstrap. Não utilizar dados reais ou credenciais.
+No PowerShell, use `Copy-Item .env.example .env.local` no lugar de `cp`.
+
+A camada MSW é ativada com `VITE_ENABLE_MOCKS=true`, inclusive para builds de demonstração. Defina `VITE_API_BASE_URL` e `VITE_SOCKET_URL` para configurar os pontos REST e socket. Os cenários selecionáveis são `default`, `empty`, `slow`, `out-of-order`, `rate-limited` e `unavailable`; `VITE_MOCK_DELAY_MS` adiciona latência. O endpoint de controle `/api/__mock/scenario` é exclusivo da demonstração/testes. Ele não é segurança de produção. O worker já está versionado: só execute `pnpm mocks:init` se atualizar a versão do MSW e precisar regenerá-lo. Use apenas credenciais fictícias.
 
 ## Comandos
 
@@ -64,7 +66,7 @@ pnpm test:e2e:report
 pnpm audit:lighthouse
 ```
 
-Playwright já está configurado para Chromium desktop 1440 px e viewport mobile, com relatório HTML e trace em falhas. A cobertura atual limita-se à tela-base; ela não satisfaz ainda a cobertura E2E exigida no desafio. Lighthouse CI já declara as duas rotas e três medições, mas só pode ser considerado evidência depois que as páginas funcionais estiverem implementadas. Consulte `TODO.md` para os requisitos pendentes.
+Playwright já está configurado para Chromium desktop 1440 px e viewport mobile, com relatório HTML e trace em falhas. Há testes iniciais do scaffold, da API de catálogo e do reset/rate limit simulado; isso ainda não satisfaz a cobertura E2E exigida no desafio. Lighthouse CI já declara as duas rotas e três medições, mas só pode ser considerado evidência depois que as páginas funcionais estiverem implementadas. Consulte `TODO.md` para os requisitos pendentes.
 
 ## Referências do desafio
 

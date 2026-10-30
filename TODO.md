@@ -6,13 +6,23 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 - [x] React, TypeScript, TanStack Router, TanStack Query, Axios, Socket.IO client, Tailwind, Playwright e configuração Lighthouse instalados/configurados. MSW v2 ativável por `VITE_ENABLE_MOCKS`; handlers de negócio ainda pendentes.
 - [x] Rotas tipadas declaradas para início, NFT, carrinho, checkout, pedido, login, cadastro, perfil e carteiras; rotas placeholder exceto home scaffold.
-- [x] Contratos iniciais tipados para paginação, NFT, cotação, pedido e evento versionado; ETH representado como string e utilitário decimal.
-- [ ] Completar API REST e MSW para sessão/conta (cadastro, login, consulta, logout, expiração), NFTs (listagem/detalhe), favoritos, carrinho, cotação, pedidos idempotentes, perfil e carteiras.
-- [ ] Erros simulados tipados para validação, sessão inválida, falta de permissão, não encontrado, conflito de disponibilidade e falha transitória; persistência coerente e reset total dos mocks.
+- [x] Contratos TypeScript documentados para sessão/conta, catálogo, favoritos, carrinho, cotação, pedidos, perfil, carteiras e eventos; ETH representado como string decimal.
+- [x] API simulada do catálogo: 12 NFTs locais variados, listagem, busca, filtros de coleção/rede/atributo, ordenação, paginação e detalhe/404, com validação Zod.
+- [ ] Completar handlers REST/MSW para sessão/conta (cadastro, login, consulta, logout, expiração), favoritos, carrinho, cotação, pedidos idempotentes, perfil e carteiras.
+- [x] Erros tipados e cenários iniciais de parâmetros inválidos, catálogo vazio/lento, respostas fora de ordem, HTTP 429 e 503, com controle e reset de cenário no MSW.
+- [ ] Completar cenários de sessão inválida, falta de permissão, conflito de disponibilidade, cupom, timeout/idempotência e persistência/reset de todos os recursos.
+
+## Esforço extra de segurança
+
+- [x] Documentar a diferença entre validação de demonstração e proteção real; adicionar Zod para query de catálogo, fixtures e respostas do catálogo.
+- [x] Simular HTTP 429 com `Retry-After` e testar reset; não representa rate limit de produção.
+- [ ] Aplicar schemas Zod aos demais domínios e tratar 429 na interface sem repetir mutations automaticamente.
+- [ ] Configurar cabeçalhos de segurança do deploy quando a plataforma for escolhida.
+- [ ] JWT, Helmet middleware e cookie HttpOnly exigem servidor real; não implementar como segredo/controle de segurança no bundle ou no mock do navegador.
 
 ## Catálogo, detalhe e favoritos
 
-- [ ] Implementar destaque, catálogo, busca, filtros combináveis, ordenação, paginação e navegação para detalhe. Busca/filtros/ordenação/paginação compõem URL, sobrevivem a refresh e histórico; mudança de filtro reinicia página; parâmetros enviados à API correspondem à URL; tratar vazio, erros, respostas fora de ordem e cancelar/descartar respostas obsoletas.
+- [ ] Implementar a UI do Figma para destaques/catálogo, busca, filtros combináveis, ordenação, paginação e navegação para detalhe. Busca/filtros/ordenação/paginação compõem URL, sobrevivem a refresh e histórico; mudança de filtro reinicia página; parâmetros enviados à API correspondem à URL; tratar vazio, erros, respostas fora de ordem e cancelar/descartar respostas obsoletas.
 - [ ] Implementar detalhe com acesso direto, NFT inexistente, edição indisponível, limite de quantidade, galeria, quantidade, favorito e compra.
 - [ ] Persistir favoritos para autenticados; incluir ao menos uma mutation otimista com rollback.
 
@@ -33,7 +43,8 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 ## Mocking e tempo real
 
-- [ ] Fixtures com variedade para filtros/paginação e pelo menos dois usuários; sucesso/vazio, latência variável, respostas fora de ordem, falha de conexão, 4xx/5xx, sessão expirada/sem permissão, conflito, cupom inválido/expirado, preço alterado, edição esgotada, timeout pós-criação/idempotência e pagamento confirmado/recusado.
+- [x] Fixtures de catálogo com variedade para filtros/paginação e cenários default/vazio/lento/fora de ordem/429/503; ainda não há fixtures de dois usuários nem dos demais domínios.
+- [ ] Fixtures para pelo menos dois usuários e cenários de falha de conexão, sessão expirada/sem permissão, conflito, cupom, preço/edição, timeout pós-criação/idempotência e pagamentos.
 - [ ] MSW ativo por configuração em desenvolvimento e build demo, state consistente em catálogo/favoritos/carrinho/perfil/carteiras/pedidos, persistência local para refresh e reset para cenário conhecido.
 - [ ] Simular eventos com integração Socket.IO compatível com MSW (avaliar `@mswjs/socket.io-binding`); exercitar `socket.io-client`; documentar transporte e limites. Componentes, hooks e Axios não incluem caminhos de negócio fictícios.
 - [ ] `nft.updated` atualiza catálogo/detalhe/carrinho; `order.updated` atualiza pedido. Eventos têm identidade estável, recurso e versão; duplicatas/antigos não regridem estado nem reaplicam efeitos; reconexão reconcilia via REST; limpar listeners/subscriptions; eventos de sessão antiga nunca alteram usuário atual.
@@ -47,7 +58,8 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 ## Testes, qualidade e deploy
 
-- [ ] Playwright E2E com mocks: catálogo/URL/histórico; detalhe inexistente; cadastro/login/expiração/logout/troca; favoritos/falha/recuperação; carrinho/quantidades/remoção/cupom/persistência/login; compra/recibo/recusa/duplo clique/timeout-idempotência; perfil/avatar/senha/carteiras/validação; atualização de preço/disponibilidade Socket.IO; evento antigo/duplicado/desconexão/retomada; teclado/foco/formulários; skeleton/falha/retry.
+- [x] Playwright inicial para smoke da home, catálogo via Axios/MSW (página/filtro/detalhe/404/parâmetros inválidos), Socket.IO binding e cenário 429/reset.
+- [ ] Completar E2E: catálogo/URL/histórico na interface; cadastro/login/expiração/logout/troca; favoritos/falha/recuperação; carrinho; compra/recibo/recusa/idempotência; perfil/carteiras; eventos/reconexão; teclado/foco; skeleton/falha/retry.
 - [ ] Cada teste inicia isolado; controlar relógio/latência/eventos sensíveis ao tempo; observar UI e resultado; REST por handlers MSW e tempo real por socket.io-client. Chromium desktop/mobile; visual regressão de início/detalhe/carrinho/pagamento com baselines versionadas; entregar relatório HTML e traces.
 - [ ] Lighthouse otimizado em início e detalhe, desktop/mobile, três medições por cenário; reportar medianas: Performance ≥90, Accessibility ≥95, Best Practices ≥95, SEO ≥90; reportar LCP/CLS/TBT e justificar déficits; versionar configuração, relatórios HTML/JSON, ferramentas e ambiente.
 - [ ] README completo com setup, variáveis, credenciais fictícias, cenários/reset, comandos, contratos, transporte/limitações Socket.IO/MSW, cache/retries e fluxos de falha. Código, lockfile, assets, mocks, fixtures, testes e configs entregues.

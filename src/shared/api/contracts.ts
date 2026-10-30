@@ -13,6 +13,7 @@ export type ApiErrorCode =
   | 'COUPON_INVALID'
   | 'COUPON_EXPIRED'
   | 'PAYMENT_REJECTED'
+  | 'RATE_LIMITED'
   | 'TRANSIENT_ERROR';
 
 export interface ApiError {

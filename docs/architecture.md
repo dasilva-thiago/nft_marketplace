@@ -4,7 +4,7 @@
 
 A aplicação é uma SPA React + TypeScript para o desafio NFT Marketplace. A arquitetura coloca todos os dados de negócio atrás de contratos REST tipados e uma API simulada MSW. Socket.IO é uma via de atualização em tempo real separada, que deve reconciliar os recursos com REST após reconexão. A carteira, a cotação e o pagamento são simulações — não há conexão blockchain, extensão de carteira nem gateway.
 
-O scaffold inicial contém configuração e diretórios por domínio, roteamento, cliente Axios, QueryClient, contratos iniciais, utilitário decimal, cliente Socket.IO, habilitação opt-in do MSW, manifesto de rotas, componentes visuais-base, build e smoke test. Os fluxos de domínio e seus handlers ainda são pendentes e estão identificados em `TODO.md`; rotas existentes não significam fluxos prontos.
+O projeto contém configuração e diretórios por domínio, roteamento, cliente Axios, QueryClient, contratos REST documentados, schemas Zod de catálogo, utilitário decimal, cliente Socket.IO, habilitação opt-in do MSW, catálogo simulado de leitura com busca/filtros/ordenação/paginação/detalhe, cenários iniciais e testes de integração. Os fluxos visuais e os handlers de sessão, favoritos, carrinho, cotação, pedido, perfil e carteiras ainda estão pendentes em `TODO.md`; rotas existentes não significam fluxos prontos.
 
 ## Direção das dependências
 

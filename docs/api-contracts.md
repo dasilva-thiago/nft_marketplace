@@ -12,7 +12,7 @@ Os tipos TypeScript correspondentes ficam em `src/shared/api/contracts.ts`. Se u
 - Filtros são combináveis e serializados na URL. `sort` identifica o campo e `sortOrder` aceita `asc`/`desc`.
 - Preços, taxas, descontos e totais ETH trafegam como strings decimais, nunca números JSON. Quantidade/página/versão são inteiros.
 - Identidade de usuário vem da sessão simulada; o cliente não escolhe `userId` no corpo para operar recursos privados.
-- Sessão fica em cookie de demonstração; não guardar senha em localStorage/sessionStorage. Use apenas credenciais fictícias.
+- A sessão ainda será implementada como parte do mock; não guardar senha em localStorage/sessionStorage. `HttpOnly` só será alegado quando um servidor real puder emitir o cookie. Use apenas credenciais fictícias.
 - Todas as operações de escrita repetíveis devem ser seguras contra duplo clique; criação de pedido exige `Idempotency-Key`.
 
 ### Erro comum
@@ -27,7 +27,7 @@ Os tipos TypeScript correspondentes ficam em `src/shared/api/contracts.ts`. Se u
 }
 ```
 
-Códigos tipados: `VALIDATION_ERROR` (400), `SESSION_INVALID` (401), `FORBIDDEN` (403), `NOT_FOUND` (404), `AVAILABILITY_CONFLICT` (409), `CONFLICT` (409), `COUPON_INVALID`/`COUPON_EXPIRED` (422), `PAYMENT_REJECTED` (422) e `TRANSIENT_ERROR` (503, retryable). Timeout/desconexão podem não ter resposta HTTP; a UI precisa recuperar a operação sem repetir compra.
+Códigos tipados: `VALIDATION_ERROR` (400), `SESSION_INVALID` (401), `FORBIDDEN` (403), `NOT_FOUND` (404), `AVAILABILITY_CONFLICT` (409), `CONFLICT` (409), `COUPON_INVALID`/`COUPON_EXPIRED` (422), `PAYMENT_REJECTED` (422), `RATE_LIMITED` (429, respeitar `Retry-After`) e `TRANSIENT_ERROR` (503, retryable). Timeout/desconexão podem não ter resposta HTTP; a UI precisa recuperar a operação sem repetir compra.
 
 ## Recursos e operações
 
@@ -109,6 +109,17 @@ O avatar usa caminho/URL local de fixture no demo. Nunca armazenar senha em clar
 
 `Wallet` tem `id`, `userId`, `label`, `address`, `network`, `isPrimary`, `version`. Principal/secundária e seleção de rede são dados simulados, não endereços reais necessários.
 
+## Controle de cenário MSW (somente demonstração/teste)
+
+Estas rotas são interceptadas pelo service worker, não fazem parte da API de produção e existem para tornar testes repetíveis.
+
+| Método e rota | Entrada | Sucesso |
+|---|---|---|
+| `PUT /api/__mock/scenario` | `{ "scenario": "default" | "empty" | "slow" | "out-of-order" | "rate-limited" | "unavailable" }` | `{ "scenario": "..." }` |
+| `POST /api/__mock/reset` | — | `{ "scenario": "...", "reset": true }` |
+
+O cenário escolhido afeta apenas os handlers MSW em memória. Controle global é serializado no Playwright para evitar que um teste contamine outro. Não expor controles desse tipo em uma API real.
+
 ## Eventos Socket.IO
 
 Formato comum: `VersionedEvent<T>` com `eventId`, `resourceId`, `version`, `occurredAt`, `payload`.
@@ -120,4 +131,4 @@ Evento duplicado (mesmo `eventId`) ou mais antigo (versão menor) não modifica 
 
 ## Cobertura de contratos a implementar
 
-O arquivo `contracts.ts` estabelece os tipos; esta documentação estabelece o comportamento esperado. A implementação MSW ainda precisa adicionar handlers para todas as rotas, validação e persistência. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.
+O arquivo `contracts.ts` estabelece os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs já têm handlers MSW, validação e testes de integração; os demais recursos ainda precisam de handlers, validação e persistência. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.

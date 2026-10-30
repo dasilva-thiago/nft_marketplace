@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-labelledby="title desc">
+  <title id="title">Prévia temporária de NFT</title>
+  <desc id="desc">Forma geométrica âmbar sobre fundo escuro; substituir pela arte exportada do Figma.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#261a15"/><stop offset="1" stop-color="#100c0b"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f3bb78"/><stop offset="1" stop-color="#b96c30"/></linearGradient>
+  </defs>
+  <rect width="640" height="640" rx="12" fill="url(#bg)"/>
+  <circle cx="320" cy="286" r="158" fill="#34231a" stroke="#80502e" stroke-width="2"/>
+  <path d="m320 151 111 64v128l-111 64-111-64V215z" fill="url(#gold)" opacity=".88"/>
+  <path d="m320 151 111 64-111 65-111-65zm-111 64v128l111 64V280zm222 0v128l-111 64V280z" fill="#e99a45" stroke="#ffe0b5" stroke-opacity=".5" stroke-width="3"/>
+  <text x="320" y="492" text-anchor="middle" fill="#d4b79c" font-family="monospace" font-size="20" letter-spacing="4">NFT ART PREVIEW</text>
+  <text x="320" y="527" text-anchor="middle" fill="#786254" font-family="monospace" font-size="13">PLACEHOLDER — EXPORT FIGMA ASSETS</text>
+</svg>

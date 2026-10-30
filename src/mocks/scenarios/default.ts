@@ -1,5 +1,5 @@
 export const defaultScenario = {
   id: 'default',
-  description: 'Cenário padrão determinístico; ampliar com catálogo variado, pelo menos dois usuários e reset integral.',
+  description: 'Cenário padrão determinístico do catálogo; demais domínios e usuários múltiplos ainda serão adicionados.',
   latencyMs: 0,
 };

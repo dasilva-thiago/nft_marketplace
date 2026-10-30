@@ -1,7 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './e2e', fullyParallel: true, forbidOnly: Boolean(process.env.CI), retries: process.env.CI ? 1 : 0,
+  // Os cenários MSW são estado de demonstração compartilhado; rodar em série evita contaminação entre testes.
+  testDir: './e2e', fullyParallel: false, workers: 1, forbidOnly: Boolean(process.env.CI), retries: process.env.CI ? 1 : 0,
   reporter: [['html', { open: 'never' }], ['list']], outputDir: 'playwright-results',
   use: { baseURL: 'http://127.0.0.1:5173', trace: 'retain-on-failure', screenshot: 'only-on-failure' },
   projects: [
