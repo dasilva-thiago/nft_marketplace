@@ -46,7 +46,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [x] Pedido com chave de idempotência: mesma chave/conteúdo recupera o mesmo pedido; chave reutilizada com conteúdo diferente retorna conflito. Mutation sem retry automático e E2E de replay/conflito.
 - [x] Recuperação pós-timeout/reconexão por chave de idempotência; o checkout persiste a chave na sessão, oferece recuperação explícita e o E2E prova que não há segunda compra.
 - [x] Remoção seletiva do carrinho após pedido confirmado: o backend simulado subtrai somente as quantidades compradas e preserva linhas/quantidades restantes.
-- [ ] Transições de `pending` via evento ainda precisam ser concluídas; os estados `confirmed`, `pending` e `rejected` já são simulados por cenários determinísticos e snapshots consultáveis por refresh.
+- [x] Transições de `pending` via evento realtime atualizam o snapshot e a confirmação visual; eventos antigos não regridem o cache após reconexão. Os estados `confirmed`, `pending` e `rejected` são simulados por cenários determinísticos e snapshots consultáveis por refresh.
 
 ## Mocking e tempo real
 
@@ -56,7 +56,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [x] Simular eventos com integração Socket.IO compatível com MSW usando `@mswjs/socket.io-binding`; exercitar `socket.io-client`; documentar transporte e limites. Componentes, hooks e Axios não incluem caminhos de negócio fictícios.
 - [x] `nft.updated` atualiza catálogo/detalhe/carrinho; `order.updated` atualiza pedido. Eventos têm identidade estável, recurso e versão; duplicatas/antigos não regridem estado nem reaplicam efeitos; reconexão reconcilia via REST; listeners/subscriptions são limpos; eventos de sessão antiga não alteram usuário atual.
 - [x] Cenário ponta a ponta de alteração de NFT no carrinho: a UI informa, atualiza o resumo, recota via REST e bloqueia a cotação antiga até revisão explícita.
-- [ ] Queda com pedido pendente → reconexão/refresh recupera estado sem segunda compra; estados confirmados/recusados são terminais.
+- [x] Pedido pendente → evento realtime/reconexão atualiza ou reconcilia o estado sem segunda compra; estados confirmados/recusados são terminais.
 
 ## Interface e acessibilidade
 

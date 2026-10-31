@@ -87,19 +87,24 @@ export function connectMarketplaceRealtime(userId: string, queryClient: QueryCli
     );
     if (!parsed.success || !event || typeof event !== 'object' || !('version' in event)) return;
     const version = event.version;
-    if (typeof version !== 'number' || !accept(`order:${parsed.data.orderId}`, version)) return;
-    queryClient.setQueryData<OrderSnapshot | undefined>(
-      orderKeys.detail(userId, parsed.data.orderId),
-      (current) =>
-        current
-          ? {
-              ...current,
-              status: parsed.data.status,
-              transactionRef: parsed.data.transactionRef,
-              updatedAt: new Date().toISOString(),
-              version,
-            }
-          : current,
+    const orderKey = orderKeys.detail(userId, parsed.data.orderId);
+    const current = queryClient.getQueryData<OrderSnapshot>(orderKey);
+    if (
+      typeof version !== 'number' ||
+      (current && version <= current.version) ||
+      !accept(`order:${parsed.data.orderId}`, version)
+    )
+      return;
+    queryClient.setQueryData<OrderSnapshot | undefined>(orderKey, (current) =>
+      current
+        ? {
+            ...current,
+            status: parsed.data.status,
+            transactionRef: parsed.data.transactionRef,
+            updatedAt: new Date().toISOString(),
+            version,
+          }
+        : current,
     );
   };
 

@@ -142,7 +142,7 @@ Formato comum: `VersionedEvent<T>` com `eventId`, `resourceId`, `version`, `occu
 - `nft.updated`: payload `NftUpdatedPayload` (`nftId`, `priceEth`, `availableEditions`). Atualiza listagem/detalhe/carrinho e invalida cotação.
 - `order.updated`: payload `OrderUpdatedPayload` (`orderId`, `status`, `transactionRef`). Atualiza o pedido; `confirmed`/`rejected` são terminais.
 
-Evento duplicado (mesmo `eventId`) ou mais antigo (versão menor) não modifica o estado. Após reconexão, consultar REST para conciliar. Liberar listener e subscription ao encerrar sessão.
+Evento duplicado (mesmo `eventId`) ou mais antigo (versão menor) não modifica o estado. A tela de pedido anuncia a transição de `pending` para `confirmed` ou `rejected`; após reconexão, consultar REST para conciliar e nunca permitir uma segunda compra. Liberar listener e subscription ao encerrar sessão.
 
 ## Cobertura de contratos a implementar
 

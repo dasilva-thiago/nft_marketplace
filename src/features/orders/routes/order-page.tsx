@@ -49,7 +49,11 @@ export function OrderPage() {
         <Link to="/" search={homeSearch} className="modal-close" aria-label="Fechar">
           <X size={14} />
         </Link>
-        <div className={`order-success${isRejected ? ' is-rejected' : ''}`}>
+        <div
+          className={`order-success${isRejected ? ' is-rejected' : ''}`}
+          aria-live="polite"
+          aria-atomic="true"
+        >
           {isConfirmed ? <Check size={25} /> : <span aria-hidden="true">!</span>}
           <span>
             {isConfirmed ? (
@@ -99,7 +103,7 @@ export function OrderPage() {
           <span>
             Status
             <br />
-            <strong>{order.status}</strong>
+            <strong aria-live="polite">{order.status}</strong>
           </span>
         </div>
         <h2>Detalhes da transação</h2>
