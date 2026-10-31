@@ -8,6 +8,8 @@ O projeto contém configuração e diretórios por domínio, roteamento, cliente
 
 As referências visuais do Figma são a fonte primária e estão catalogadas em `docs/visual-reference-inventory.md`. A composição deve permanecer fiel ao Figma em 390/768/1440 px; correções necessárias de acessibilidade, responsividade, conteúdo ou comportamento devem ser registradas nesta arquitetura. Não há frame mobile correspondente para confirmação, perfil e carteiras; essas três variantes usam adaptações responsivas conservadoras da composição desktop, e toda diferença inevitável é documentada aqui.
 
+A largura de 768 px possui uma verificação E2E dedicada em `e2e/responsive-768.spec.ts`. A auditoria cobre início, detalhe do NFT e carrinho e confirma que documento e corpo permanecem dentro do viewport, sem overflow horizontal. Como não foi reproduzida uma quebra objetiva nessa largura, nenhuma alteração estrutural foi aplicada fora das regras responsivas existentes.
+
 ## Estrutura arquitetural aplicada
 
 A composição da aplicação está centralizada em `src/app`: `config/env.ts` concentra as variáveis de ambiente e `providers/app-providers.tsx` fornece o `QueryClient` à árvore do Router. O roteamento continua em um único registro em `src/app/router.tsx`; páginas e fluxos permanecem nas respectivas features.
