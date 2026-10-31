@@ -16,4 +16,13 @@ export const ordersApi = {
     const response = await http.get<unknown>(`/orders/${orderId}`, { signal });
     return OrderSnapshotSchema.parse(response.data);
   },
+
+  async recover(idempotencyKey: string, signal?: AbortSignal): Promise<OrderSnapshot> {
+    if (!idempotencyKey.trim()) throw new Error('Idempotency-Key é obrigatório.');
+    const response = await http.get<unknown>(
+      `/orders/by-idempotency/${encodeURIComponent(idempotencyKey)}`,
+      { signal },
+    );
+    return OrderSnapshotSchema.parse(response.data);
+  },
 };

@@ -44,3 +44,16 @@ export function useCreateOrderMutation() {
     },
   });
 }
+
+export function useRecoverOrderMutation() {
+  const queryClient = useQueryClient();
+  const sessionQuery = useSessionQuery();
+  const userId = sessionQuery.data?.user.id;
+  return useMutation({
+    mutationFn: (idempotencyKey: string) => ordersApi.recover(idempotencyKey),
+    retry: false,
+    onSuccess: (order) => {
+      if (userId) queryClient.setQueryData(orderKeys.detail(userId, order.id), order);
+    },
+  });
+}

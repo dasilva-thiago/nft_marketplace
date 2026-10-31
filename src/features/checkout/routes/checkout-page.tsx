@@ -3,18 +3,40 @@ import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useSessionQuery } from '@/features/auth/queries';
 import { useCartQuery, useQuoteQuery } from '@/features/cart/queries';
-import { useCreateOrderMutation } from '@/features/orders/queries';
+import { useCreateOrderMutation, useRecoverOrderMutation } from '@/features/orders/queries';
 import { useNftRealtimeUpdate } from '@/realtime/realtime-signal';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
+
+const CHECKOUT_IDEMPOTENCY_STORAGE_KEY = 'kurio.checkout.idempotency-key';
+
+function getCheckoutIdempotencyKey(): string {
+  if (typeof window === 'undefined') return `checkout-${crypto.randomUUID()}`;
+  const stored = window.sessionStorage.getItem(CHECKOUT_IDEMPOTENCY_STORAGE_KEY);
+  if (stored) return stored;
+  const key = `checkout-${crypto.randomUUID()}`;
+  window.sessionStorage.setItem(CHECKOUT_IDEMPOTENCY_STORAGE_KEY, key);
+  return key;
+}
+
+function isRequestTimeout(error: unknown): boolean {
+  return Boolean(
+    error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      (error as { code?: unknown }).code === 'ECONNABORTED',
+  );
+}
 
 export function CheckoutPage() {
   const navigate = useNavigate({ from: '/checkout' });
   const sessionQuery = useSessionQuery();
   const cartQuery = useCartQuery();
   const createOrderMutation = useCreateOrderMutation();
+  const recoverOrderMutation = useRecoverOrderMutation();
   const [network, setNetwork] = useState('Ethereum');
   const [walletId, setWalletId] = useState('metamask');
-  const [idempotencyKey] = useState(() => `checkout-${crypto.randomUUID()}`);
+  const [idempotencyKey] = useState(getCheckoutIdempotencyKey);
+  const [timedOut, setTimedOut] = useState(false);
   const cart = cartQuery.data;
   const quoteRequest = useMemo(
     () => ({
@@ -50,11 +72,26 @@ export function CheckoutPage() {
 
   async function submitOrder() {
     if (!quoteQuery.data || quoteNeedsReview || quoteQuery.isFetching) return;
-    const order = await createOrderMutation.mutateAsync({
-      input: { quoteId: quoteQuery.data.quoteId, walletId, network },
-      idempotencyKey,
-    });
-    await navigate({ to: '/orders/$orderId', params: { orderId: order.id } });
+    try {
+      const order = await createOrderMutation.mutateAsync({
+        input: { quoteId: quoteQuery.data.quoteId, walletId, network },
+        idempotencyKey,
+      });
+      window.sessionStorage.removeItem(CHECKOUT_IDEMPOTENCY_STORAGE_KEY);
+      await navigate({ to: '/orders/$orderId', params: { orderId: order.id } });
+    } catch (error) {
+      if (isRequestTimeout(error)) setTimedOut(true);
+    }
+  }
+
+  async function recoverOrder() {
+    try {
+      const order = await recoverOrderMutation.mutateAsync(idempotencyKey);
+      window.sessionStorage.removeItem(CHECKOUT_IDEMPOTENCY_STORAGE_KEY);
+      await navigate({ to: '/orders/$orderId', params: { orderId: order.id } });
+    } catch {
+      // A recuperação possui feedback pelo estado da mutation e não cria uma nova tentativa.
+    }
   }
 
   return (
@@ -178,7 +215,28 @@ export function CheckoutPage() {
               />
               <span>Coinbase Wallet · {network}</span>
             </label>
-            {quoteNeedsReview ? (
+            {timedOut ? (
+              <div className="form-error" role="alert" aria-live="assertive">
+                <strong>Tempo limite da rede atingido</strong>
+                <span>
+                  O pedido pode ter sido criado, mas a resposta não chegou. Recupere a tentativa
+                  existente antes de enviar uma nova compra.
+                </span>
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => void recoverOrder()}
+                  disabled={recoverOrderMutation.isPending}
+                >
+                  {recoverOrderMutation.isPending ? 'Recuperando…' : 'Recuperar pedido'}
+                </button>
+                {recoverOrderMutation.isError ? (
+                  <span>
+                    Não foi possível recuperar agora. Tente novamente sem alterar a chave.
+                  </span>
+                ) : null}
+              </div>
+            ) : quoteNeedsReview ? (
               <div className="form-error" role="alert" aria-live="assertive">
                 <strong>A cotação foi alterada</strong>
                 <span>
@@ -210,6 +268,7 @@ export function CheckoutPage() {
               disabled={
                 !quoteQuery.data ||
                 quoteNeedsReview ||
+                timedOut ||
                 quoteQuery.isFetching ||
                 createOrderMutation.isPending ||
                 !cart?.items.length

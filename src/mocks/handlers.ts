@@ -50,7 +50,12 @@ import {
   resetMockFavoritesState,
 } from './db/favorites-state';
 import { getQuoteForUser, resetMockQuotesState, saveQuoteForUser } from './db/quotes-state';
-import { createOrderForUser, getOrderForUser, resetMockOrdersState } from './db/orders-state';
+import {
+  createOrderForUser,
+  getOrderByIdempotencyKey,
+  getOrderForUser,
+  resetMockOrdersState,
+} from './db/orders-state';
 import { getProfileForUser, resetMockProfileState, updateProfileForUser } from './db/profile-state';
 import {
   createWalletForUser,
@@ -593,7 +598,15 @@ export const handlers = [
         apiError('CONFLICT', 'A chave de idempotência já foi usada com outro pedido.'),
         { status: 409 },
       );
+    if (getMockScenario() === 'order-timeout' && result.kind === 'created') await delay(10_500);
     return HttpResponse.json(result.order, { status: result.kind === 'created' ? 201 : 200 });
+  }),
+  http.get('/api/orders/by-idempotency/:idempotencyKey', ({ request, params }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const key = decodeURIComponent(String(params.idempotencyKey));
+    const order = getOrderByIdempotencyKey(currentSession.session.user.id, key);
+    return order ? HttpResponse.json(order) : notFoundResponse('Pedido não encontrado.');
   }),
   http.get('/api/orders/:orderId', ({ request, params }) => {
     const currentSession = getSessionFromRequest(request);

@@ -49,6 +49,13 @@ export function getOrderForUser(userId: string, orderId: string): OrderSnapshot 
   return order?.userId === userId ? order : undefined;
 }
 
+export function getOrderByIdempotencyKey(
+  userId: string,
+  idempotencyKey: string,
+): OrderSnapshot | undefined {
+  return idempotency.get(userId)?.get(idempotencyKey)?.order;
+}
+
 export function resetMockOrdersState(): void {
   orders.clear();
   idempotency.clear();
