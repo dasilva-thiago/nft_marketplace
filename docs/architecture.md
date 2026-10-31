@@ -4,7 +4,9 @@
 
 A aplicação é uma SPA React + TypeScript para o desafio NFT Marketplace. A arquitetura coloca todos os dados de negócio atrás de contratos REST tipados e uma API simulada MSW. Socket.IO é uma via de atualização em tempo real separada, que deve reconciliar os recursos com REST após reconexão. A carteira, a cotação e o pagamento são simulações — não há conexão blockchain, extensão de carteira nem gateway.
 
-O projeto contém configuração e diretórios por domínio, roteamento, cliente Axios, QueryClient, contratos REST documentados, schemas Zod de catálogo e autenticação, utilitário decimal, cliente Socket.IO, habilitação opt-in do MSW, catálogo simulado de leitura com busca/filtros/ordenação/paginação/detalhe, sessão simulada com dois usuários, cenários reproduzíveis e testes de integração. Os fluxos visuais e os handlers de favoritos, carrinho, cotação, pedido, perfil e carteiras ainda estão pendentes em `TODO.md`; rotas existentes não significam fluxos prontos.
+O projeto contém configuração e diretórios por domínio, roteamento, cliente Axios, QueryClient, contratos REST documentados, schemas Zod de catálogo e autenticação, utilitário decimal, cliente Socket.IO, habilitação opt-in do MSW, catálogo simulado de leitura com busca/filtros/ordenação/paginação/detalhe, sessão simulada com dois usuários, cenários reproduzíveis e testes de integração. As telas visuais de início, autenticação, detalhe, carrinho, pagamento, confirmação, perfil e carteiras estão implementadas; handlers de favoritos, carrinho, cotação, pedido, perfil e carteiras continuam pendentes em `TODO.md`, portanto rotas visuais não significam fluxos de domínio concluídos.
+
+As screenshots fornecidas pelo usuário são a referência visual primária e estão catalogadas em `docs/visual-reference-inventory.md`. A composição deve permanecer fiel ao Figma em 390/768/1440 px; correções necessárias de acessibilidade, responsividade, conteúdo ou comportamento devem ser registradas nesta arquitetura. O pacote recebido não contém referências mobile para confirmação, perfil e carteiras; após reproduzir as telas fornecidas, essas três variantes serão adaptações responsivas conservadoras da composição desktop, conforme autorização do usuário, e toda diferença inevitável será documentada aqui.
 
 ## Direção das dependências
 
@@ -49,6 +51,14 @@ No escopo deste desafio, eventos do MSW precisam chegar ao `socket.io-client` pe
 TanStack Router é a fonte das rotas e parâmetros de catálogo. Busca, filtros combináveis, ordenação e paginação ficam na URL; atualizar filtro reinicia a página. Rotas privadas precisam carregar sessão e preservar a URL de retorno quando exigem login. Todas as páginas previstas suportam acesso direto e refresh; fallback 404 não pode ser confundido com recurso inexistente.
 
 O design de referência é o export do Figma: base escura marrom/preta e acentos âmbar, navegação e cards compactos, formulários coerentes com as telas desktop/mobile. Tokens exatos e assets de NFT/fontes precisam ser exportados do arquivo fonte se disponíveis. Não usar a prancha inteira exportada como se fosse asset de produto. Em breakpoints 390/768/1440, skeletons reservam geometria, interações têm foco visível, diálogos controlam foco e feedback de mudança de rede é anunciado semanticamente.
+
+### Rodada visual implementada
+
+As referências recebidas foram usadas como fonte visual primária. Login e cadastro desktop são apresentados como modal sobre uma cena de marketplace; em mobile, o shell vira uma tela dedicada. Detalhe, carrinho, checkout, confirmação, perfil e carteiras usam os mesmos tokens âmbar/marrom, grids, formulários e footer editorial. Capturas reais foram conferidas em 390 px e 1440 px; a largura 768 px ainda precisa de uma rodada específica de regressão visual.
+
+O ZIP não contém assets individuais das artes nem fontes exportadas. As imagens continuam em `/public/placeholders/nft-placeholder.svg`, sem recortar a screenshot inteira como asset de produto. Essa substituição é deliberada e deve ser removida somente quando os arquivos individuais forem disponibilizados.
+
+Não existem referências mobile de confirmação, perfil e carteiras. Por autorização do usuário, essas três variantes foram adaptadas responsivamente a partir da composição desktop: sidebar vira grid de navegação, formulários passam a uma coluna e a confirmação mantém o cartão central. Essas diferenças são adaptação de layout, não uma nova direção visual.
 
 ## Mocking e testes
 

@@ -5,7 +5,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 ## Base de arquitetura
 
 - [x] React, TypeScript, TanStack Router, TanStack Query, Axios, Socket.IO client, Tailwind, Playwright e configuração Lighthouse instalados/configurados. MSW v2 ativável por `VITE_ENABLE_MOCKS`; handlers de negócio ainda pendentes.
-- [x] Rotas tipadas declaradas para início, NFT, carrinho, checkout, pedido, login, cadastro, perfil e carteiras; rotas placeholder exceto home scaffold.
+- [x] Rotas tipadas declaradas para início, NFT, carrinho, checkout, pedido, login, cadastro, perfil e carteiras; as telas visuais principais já substituem os placeholders.
 - [x] Contratos TypeScript documentados para sessão/conta, catálogo, favoritos, carrinho, cotação, pedidos, perfil, carteiras e eventos; ETH representado como string decimal.
 - [x] API simulada do catálogo: 12 NFTs locais variados, listagem, busca, filtros de coleção/rede/atributo, ordenação, paginação e detalhe/404, com validação Zod.
 - [ ] Completar handlers REST/MSW para sessão/conta (cadastro, login, consulta, logout, expiração), favoritos, carrinho, cotação, pedidos idempotentes, perfil e carteiras.
@@ -33,9 +33,9 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 ## Catálogo, detalhe e favoritos
 
 - [x] Primeira home funcional: hero, listagem de cards ligada à API, busca submetida, filtro de coleção, ordenação, paginação, estados loading/erro/vazio e parâmetros preservados na URL; testes cobrem filtro/busca/histórico em desktop e mobile.
-- [ ] Comparar e ajustar fidelidade dos frames Figma da home em 390/768/1440 px; substituir placeholder de arte pelos assets originais exportados e conferir com capturas lado a lado.
+- [ ] Comparar e ajustar fidelidade dos frames Figma da home em 390/768/1440 px; a composição já foi conferida em capturas 390/1440, mas os assets originais ainda não foram fornecidos e o placeholder permanece documentado.
 - [ ] Completar refinamentos de catálogo: filtros combináveis de rede/traits na interface, histórico completo e estado de carregamento ao navegar entre páginas; validar descartar resposta obsoleta também pela UI.
-- [ ] Implementar detalhe com acesso direto, NFT inexistente, edição indisponível, limite de quantidade, galeria, quantidade, favorito e compra.
+- [x] Implementar a tela visual de detalhe com acesso direto, estado 404, galeria, edição, quantidade, favorito e ações de compra/adicionar; persistência e mutations permanecem pendentes.
 - [ ] Persistir favoritos para autenticados; incluir ao menos uma mutation otimista com rollback.
 
 ## Sessão e conta
@@ -64,7 +64,9 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 ## Interface e acessibilidade
 
-- [ ] Implementar frames desktop/mobile do Figma, desktop/tablet/mobile, inclusive perfil, carteiras e confirmação mobile sem frame específico. Conferir larguras 390/768/1440; preservar tipografia, cores, espaçamentos, hierarquia, imagens, proporções e composição; documentar substituições de asset e ajustes de acessibilidade.
+- [ ] Implementar os frames recebidos do Figma em desktop/tablet/mobile nas larguras 390/768/1440, preservando tipografia, cores, espaçamentos, hierarquia, imagens, proporções e composição; documentar em `docs/architecture.md` cada substituição de asset e ajuste de acessibilidade.
+- [ ] Reproduzir visualmente início, login, cadastro, detalhe do NFT, carrinho e pagamento nos pares desktop/mobile fornecidos; login e cadastro desktop devem permanecer modais sobre a home, enquanto mobile deve usar as telas dedicadas fornecidas.
+- [x] Reproduzir visualmente confirmação, perfil e carteiras nas referências desktop fornecidas; adaptar responsivamente as três variantes mobile sem screenshot, preservando a composição desktop e documentando a decisão em `docs/architecture.md`.
 - [ ] Skeleton shimmer em catálogo, detalhe e resumo do carrinho; preservar dimensões contra CLS e respeitar movimento reduzido.
 - [ ] Teclado/foco visível; foco em diálogos/drawers; semântica, labels e erros associados; alt text; contraste e estados que não dependem só de cor; feedback acessível para mutations/eventos; sem overflow indevido e sem perda de conteúdo com zoom.
 

@@ -6,6 +6,33 @@ Implementar a sessão e a conta mínima exigidas pelo desafio, usando MSW como s
 
 O escopo não inclui criar um backend real neste momento. JWT assinado, cookie `HttpOnly`, Helmet middleware e rate limit efetivo pertencem a um servidor/host real e serão documentados como próximos requisitos, sem simular uma garantia de segurança dentro do bundle Vite.
 
+## Nova fatia aprovada — reprodução visual das telas
+
+As screenshots fornecidas em `telas-nft-marketplace.zip` são a referência visual primária. A implementação deve reproduzir composição, hierarquia, tipografia, cores, bordas, espaçamentos, proporções, imagens, estados e navegação sem criar uma direção visual alternativa. Cada correção necessária para acessibilidade, responsividade, conteúdo ou comportamento será registrada em `docs/architecture.md` com o motivo.
+
+### Matriz de referência recebida
+
+| Fluxo | Desktop | Mobile | Estado da referência |
+| --- | --- | --- | --- |
+| Início | `desktop-inicio.png` | `mobile-inicio.png` | referência recebida |
+| Login | `desktop-login.png` | `mobile-login.png` | desktop em modal sobre a home; mobile em tela dedicada |
+| Cadastro | `desktop-cadastro.png` | `mobile-cadastro.png` | desktop em modal sobre a home; mobile em tela dedicada |
+| Detalhe do NFT | `desktop-detalhes.png` | `mobile-detalhes-do-nft.png` | referência recebida |
+| Carrinho | `desktop-carrinho.png` | `mobile-carrinho.png` | referência recebida |
+| Pagamento | `desktop-pagamento.png` | `mobile-pagamento.png` | referência recebida |
+| Confirmação | `desktop-confirmacao.png` | — | referência mobile ausente |
+| Perfil | `desktop-perfil.png` | — | referência mobile ausente |
+| Carteiras | `desktop-carteiras.png` | — | referência mobile ausente |
+
+As versões desktop e as seis telas com referência mobile foram reproduzidas primeiro. Para confirmação, perfil e carteiras mobile, que não possuem screenshot no Figma disponível, foi feita uma adaptação responsiva conservadora da composição desktop, preservando a mesma paleta, tipografia, espaçamento, hierarquia e componentes. A decisão e as diferenças inevitáveis estão registradas em `docs/architecture.md`.
+
+### Direção visual aprovada pela referência
+
+- Estética editorial de galeria NFT: fundo marrom quase preto, painéis chocolate, acentos âmbar/laranja e tipografia monoespaçada nos títulos e valores.
+- Desktop: navegação superior compacta, conteúdo em colunas, cards de imagem com cantos arredondados, sidebar de filtros/formulários e rodapé editorial.
+- Mobile: shell escuro com cantos amplos, navegação inferior fixa na home, cartões empilhados ou em grade de duas colunas, CTA de compra fixado dentro do fluxo e cabeçalhos compactos.
+- Elementos de demonstração do screenshot que não são produto, como linhas pontilhadas azuis, títulos “Desktop / Mobile” e marcações de exportação, não entram na aplicação.
+
 ## Abordagem de implementação
 
 1. **Contratos e schemas**
@@ -93,3 +120,10 @@ Todos os campos terão `label`, `autocomplete`, `required`, mensagens associadas
 ## Critérios de saída desta fatia
 
 A fatia só será considerada concluída quando os handlers, APIs Axios, schemas, telas, proteção/retorno, isolamento por usuário, documentação e testes estiverem presentes e as verificações `pnpm typecheck`, `pnpm build` e `pnpm test:e2e` forem executadas com resultado verdadeiro. Falhas ambientais serão reportadas separadamente e não serão convertidas em sucesso.
+
+## Saída da rodada visual
+
+- Telas conectadas: início, login, cadastro, detalhe, carrinho, pagamento, confirmação, perfil e carteiras.
+- Evidência visual: capturas reais conferidas em 390 px e 1440 px; a largura 768 px continua como próxima validação de regressão.
+- Evidência automatizada: `pnpm typecheck` passou; `pnpm build` passou; `pnpm test:e2e` passou com 30/30 testes.
+- Limitações mantidas de propósito: artes individuais/fontes do Figma não foram fornecidas, então o placeholder continua; carrinho, pagamento, pedido, perfil e carteiras ainda são composição visual e não têm handlers de domínio concluídos.

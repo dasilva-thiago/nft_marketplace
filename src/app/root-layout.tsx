@@ -1,4 +1,4 @@
-import { Link, Outlet } from '@tanstack/react-router';
+import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useLogoutMutation, useSessionQuery } from '@/features/auth/queries';
 
 const homeSearch = { page: 1, search: '', collection: '', sort: 'priceEth' as const, sortOrder: 'asc' as const };
@@ -6,10 +6,12 @@ const homeSearch = { page: 1, search: '', collection: '', sort: 'priceEth' as co
 export function RootLayout() {
   const sessionQuery = useSessionQuery();
   const logoutMutation = useLogoutMutation();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const isAuthRoute = pathname === '/login' || pathname === '/register';
 
   return (
     <>
-      <header className="site-header">
+      <header className={`site-header${isAuthRoute ? ' auth-route-header' : ''}`}>
         <Link to="/" search={homeSearch} className="wordmark">KURIO</Link>
         <nav aria-label="Navegação principal">
           <Link to="/" search={homeSearch}>Início</Link>
@@ -29,7 +31,7 @@ export function RootLayout() {
           ) : !sessionQuery.isPending ? <Link to="/login" search={{ returnTo: '/' }} className="login-link">Entrar</Link> : null}
         </div>
       </header>
-      <main><Outlet /></main>
+      <main className={isAuthRoute ? 'auth-route-main' : undefined}><Outlet /></main>
     </>
   );
 }

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
-import { ArrowDown, ArrowLeft, ArrowRight, Search, SlidersHorizontal, Sparkles } from 'lucide-react';
+import { ArrowDown, ArrowLeft, ArrowRight, Heart, Search, ShoppingCart, SlidersHorizontal, Sparkles, User } from 'lucide-react';
 import { catalogListQuery } from '@/features/catalog/queries';
 import type { PageRequest } from '@/shared/api/contracts';
+import { MarketingFooter } from '@/shared/ui/marketing-footer';
 
 const PAGE_SIZE = 6;
 const collections = ['Todas', 'Neo Apes', 'Pixel Friends', 'Neon Legends', 'Mythic Worlds'];
@@ -46,6 +47,7 @@ export function HomePage() {
   }
 
   return (
+    <>
     <div className="marketplace-page">
       <section className="market-hero" aria-labelledby="hero-title">
         <div className="hero-copy">
@@ -112,5 +114,8 @@ export function HomePage() {
         </div>
       </section>
     </div>
+    <MarketingFooter />
+    <nav className="mobile-bottom-nav" aria-label="Navegação mobile"><Link to="/" search={{ page: 1, search: '', collection: '', sort: 'priceEth', sortOrder: 'asc' }} className="is-active" aria-label="Início"><Sparkles size={17} /></Link><Link to="/" search={{ page: 1, search: '', collection: '', sort: 'priceEth', sortOrder: 'asc' }} aria-label="Favoritos"><Heart size={17} /></Link><Link to="/" search={{ page: 1, search: '', collection: '', sort: 'priceEth', sortOrder: 'asc' }} className="mobile-search" aria-label="Explorar"><Search size={20} /></Link><Link to="/cart" aria-label="Carrinho"><ShoppingCart size={17} /></Link><Link to="/account/profile" aria-label="Perfil"><User size={17} /></Link></nav>
+    </>
   );
 }
