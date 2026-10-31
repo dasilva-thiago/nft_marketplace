@@ -1,6 +1,6 @@
 # NFT Marketplace — fundação arquitetural
 
-Repositório iniciado a partir do desafio frontend. A home, o catálogo REST simulado, a conta/sessão, a tela de detalhe, favoritos e o núcleo autenticado de carrinho/cotação já estão preparados; **checkout efetivo, pedidos, perfil, carteiras e tempo real de negócio ainda não estão concluídos**. As rotas visuais existentes não significam que todos os fluxos de domínio estejam implementados.
+Repositório iniciado a partir do desafio frontend. A home, o catálogo REST simulado, a conta/sessão, a tela de detalhe, favoritos, o núcleo autenticado de carrinho/cotação e a primeira fatia de checkout/pedido idempotente já estão preparados; **estados avançados de pedido, perfil, carteiras e tempo real de negócio ainda não estão concluídos**. As rotas visuais existentes não significam que todos os fluxos de domínio estejam implementados.
 
 ## Stack obrigatória
 
@@ -21,8 +21,8 @@ src/
     auth/              sessão, login e cadastro
     favorites/         favoritos autenticados e mutation otimista
     cart/              carrinho autenticado, cupons e cotação
-    checkout/          revisão e envio de pedido (próxima implementação)
-    orders/            estado e recibo imutável (próxima implementação)
+    checkout/          revisão, cotação e envio idempotente
+    orders/            snapshot e consulta de pedido
     profile/           perfil/avatar/senha (próxima implementação)
     wallets/           carteiras (próxima implementação)
   shared/              código transversal
@@ -54,7 +54,7 @@ pnpm dev
 
 No PowerShell, use `Copy-Item .env.example .env.local` no lugar de `cp`.
 
-A camada MSW é ativada com `VITE_ENABLE_MOCKS=true`, inclusive para builds de demonstração. Defina `VITE_API_BASE_URL` e `VITE_SOCKET_URL` para configurar os pontos REST e socket. Os cenários selecionáveis são `default`, `empty`, `slow`, `out-of-order`, `rate-limited`, `unavailable` e `session-expired`; `VITE_MOCK_DELAY_MS` adiciona latência. O cenário selecionado pelo endpoint de controle `/api/__mock/scenario` é mantido na `sessionStorage` apenas para reproduzir refresh nos testes; o endpoint é exclusivo da demonstração/testes e não é segurança de produção. O worker já está versionado: só execute `pnpm mocks:init` se atualizar a versão do MSW e precisar regenerá-lo. Use apenas credenciais fictícias.
+A camada MSW é ativada com `VITE_ENABLE_MOCKS=true`, inclusive para builds de demonstração. Defina `VITE_API_BASE_URL` e `VITE_SOCKET_URL` para configurar os pontos REST e socket. Os cenários selecionáveis são `default`, `empty`, `slow`, `out-of-order`, `rate-limited`, `unavailable`, `session-expired`, `payment-pending` e `payment-rejected`; `VITE_MOCK_DELAY_MS` adiciona latência. Os dois últimos controlam o estado retornado pelo `POST /api/orders`. O cenário selecionado pelo endpoint de controle `/api/__mock/scenario` é mantido na `sessionStorage` apenas para reproduzir refresh nos testes; o endpoint é exclusivo da demonstração/testes e não é segurança de produção. O worker já está versionado: só execute `pnpm mocks:init` se atualizar a versão do MSW e precisar regenerá-lo. Use apenas credenciais fictícias.
 
 ## Comandos
 

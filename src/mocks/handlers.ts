@@ -10,6 +10,7 @@ import type {
 } from '@/shared/contracts';
 import {
   AddCartItemRequestSchema,
+  CreateOrderRequestSchema,
   LoginRequestSchema,
   PageRequestSchema,
   QuoteRequestSchema,
@@ -40,6 +41,8 @@ import {
   removeFavoriteForUser,
   resetMockFavoritesState,
 } from './db/favorites-state';
+import { getQuoteForUser, resetMockQuotesState, saveQuoteForUser } from './db/quotes-state';
+import { createOrderForUser, getOrderForUser, resetMockOrdersState } from './db/orders-state';
 
 const configuredDelay = appEnv.mockDelayMs;
 
@@ -283,6 +286,8 @@ export const handlers = [
     resetMockAuthState();
     resetMockCartState();
     resetMockFavoritesState();
+    resetMockQuotesState();
+    resetMockOrdersState();
     return HttpResponse.json({ scenario: getMockScenario(), reset: true });
   }),
   http.post('/api/auth/register', async ({ request }) => {
@@ -426,7 +431,48 @@ export const handlers = [
     if (!parsed.success) return validationResponse('Confira os itens da cotação.', parsed.error);
     const quote = buildQuote(parsed.data.items, parsed.data.couponCode);
     if ('error' in quote) return quote.error;
-    return HttpResponse.json(quote.value);
+    return HttpResponse.json(saveQuoteForUser(currentSession.session.user.id, quote.value));
+  }),
+  http.post('/api/orders', async ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const idempotencyKey = request.headers.get('idempotency-key')?.trim();
+    if (!idempotencyKey)
+      return HttpResponse.json(apiError('VALIDATION_ERROR', 'Idempotency-Key é obrigatório.'), {
+        status: 400,
+      });
+    const parsed = CreateOrderRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success) return validationResponse('Confira os dados do pedido.', parsed.error);
+    const quote = getQuoteForUser(currentSession.session.user.id, parsed.data.quoteId);
+    if (!quote) return notFoundResponse('Cotação não encontrada.');
+    if (Date.parse(quote.expiresAt) <= Date.now())
+      return HttpResponse.json(apiError('CONFLICT', 'A cotação expirou. Gere uma nova cotação.'), {
+        status: 409,
+      });
+    const result = createOrderForUser(
+      currentSession.session.user.id,
+      parsed.data,
+      quote,
+      idempotencyKey,
+      getMockScenario() === 'payment-pending'
+        ? 'pending'
+        : getMockScenario() === 'payment-rejected'
+          ? 'rejected'
+          : 'confirmed',
+    );
+    if (result.kind === 'conflict')
+      return HttpResponse.json(
+        apiError('CONFLICT', 'A chave de idempotência já foi usada com outro pedido.'),
+        { status: 409 },
+      );
+    return HttpResponse.json(result.order, { status: result.kind === 'created' ? 201 : 200 });
+  }),
+  http.get('/api/orders/:orderId', ({ request, params }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const order = getOrderForUser(currentSession.session.user.id, String(params.orderId));
+    if (!order) return notFoundResponse('Pedido não encontrado.');
+    return HttpResponse.json(order);
   }),
   http.get('/api/nfts', async ({ request }) => {
     const params = readPageRequest(new URL(request.url));

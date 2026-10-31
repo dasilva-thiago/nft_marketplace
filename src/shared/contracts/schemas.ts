@@ -151,3 +151,21 @@ export const QuoteSchema = z.object({
   expiresAt: z.string().datetime({ offset: true }),
   version: positiveInteger,
 });
+
+export const CreateOrderRequestSchema = z.object({
+  quoteId: z.string().min(1),
+  walletId: z.string().min(1),
+  network: z.string().min(1),
+});
+
+export const OrderSnapshotSchema = z.object({
+  id: z.string().min(1),
+  userId: z.string().min(1),
+  status: z.enum(['pending', 'confirmed', 'rejected']),
+  items: z.array(QuoteLineSchema),
+  quote: QuoteSchema,
+  transactionRef: z.string().nullable(),
+  createdAt: z.string().datetime({ offset: true }),
+  updatedAt: z.string().datetime({ offset: true }),
+  version: positiveInteger,
+});

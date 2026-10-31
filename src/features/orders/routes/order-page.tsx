@@ -1,92 +1,146 @@
-import { Link } from '@tanstack/react-router';
 import { Check, ExternalLink, X } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { catalogListQuery } from '@/features/catalog/queries';
+import { Link, useParams } from '@tanstack/react-router';
+import { useOrderQuery } from '@/features/orders/queries';
+
+const homeSearch = {
+  page: 1,
+  search: '',
+  collection: '',
+  network: '',
+  trait: '',
+  priceMin: '',
+  priceMax: '',
+  sort: 'priceEth' as const,
+  sortOrder: 'asc' as const,
+};
 
 export function OrderPage() {
-  const query = useQuery(
-    catalogListQuery({ page: 1, pageSize: 3, sort: 'priceEth', sortOrder: 'asc' }),
-  );
+  const { orderId } = useParams({ from: '/orders/$orderId' });
+  const query = useOrderQuery(orderId);
+  const order = query.data;
+
+  if (query.isPending)
+    return (
+      <section className="order-page">
+        <div className="order-modal visual-empty" aria-busy="true">
+          Recuperando pedido…
+        </div>
+      </section>
+    );
+
+  if (query.isError || !order)
+    return (
+      <section className="order-page">
+        <div className="order-modal visual-empty" role="alert">
+          <strong>Pedido não encontrado</strong>
+          <span>Consulte o histórico ou volte ao mercado.</span>
+          <Link to="/" search={homeSearch} className="primary-button">
+            Voltar ao mercado
+          </Link>
+        </div>
+      </section>
+    );
+
+  const isConfirmed = order.status === 'confirmed';
+  const isRejected = order.status === 'rejected';
   return (
     <section className="order-page">
       <div className="order-modal">
-        <button type="button" className="modal-close" aria-label="Fechar">
+        <Link to="/" search={homeSearch} className="modal-close" aria-label="Fechar">
           <X size={14} />
-        </button>
-        <div className="order-success">
-          <Check size={25} />
+        </Link>
+        <div className={`order-success${isRejected ? ' is-rejected' : ''}`}>
+          {isConfirmed ? <Check size={25} /> : <span aria-hidden="true">!</span>}
           <span>
-            THANK
-            <br />
-            YOU
+            {isConfirmed ? (
+              <>
+                THANK
+                <br />
+                YOU
+              </>
+            ) : isRejected ? (
+              <>
+                PAYMENT
+                <br />
+                FAILED
+              </>
+            ) : (
+              <>
+                ORDER
+                <br />
+                PENDING
+              </>
+            )}
           </span>
         </div>
-        <p className="order-lead">Seus NFTs agora estão na sua carteira</p>
+        <p className="order-lead">
+          {isConfirmed
+            ? 'Seus NFTs agora estão na sua carteira'
+            : isRejected
+              ? 'O pagamento não foi confirmado'
+              : 'Seu pedido está sendo processado'}
+        </p>
         <div className="order-meta">
           <span>
-            ID da transação
+            ID do pedido
             <br />
-            <strong>0xA91F...E82C</strong>
+            <strong>{order.id}</strong>
           </span>
           <span>
             Data
             <br />
-            <strong>29 Jul., 2026</strong>
+            <strong>{new Date(order.createdAt).toLocaleDateString('pt-BR')}</strong>
           </span>
           <span>
             Total
             <br />
-            <strong>26.846 ETH</strong>
+            <strong>{order.quote.totalEth} ETH</strong>
           </span>
           <span>
-            Carteira
+            Status
             <br />
-            <strong>MetaMask</strong>
+            <strong>{order.status}</strong>
           </span>
         </div>
         <h2>Detalhes da transação</h2>
-        {query.data?.items.map((item, index) => (
-          <div className="order-line" key={item.id}>
+        {order.items.map((item) => (
+          <div className="order-line" key={item.nftId}>
             <img src={item.imageUrl} alt="" />
             <div>
               <strong>{item.name}</strong>
-              <small>ID do token: #{item.id.slice(-4)}</small>
+              <small>
+                ID do token: #{item.nftId.slice(-4)} · quantidade {item.quantity}
+              </small>
             </div>
-            <span>(x {index + 2})</span>
-            <strong>{item.priceEth} ETH</strong>
+            <strong>{item.lineTotalEth} ETH</strong>
           </div>
         ))}
         <dl className="order-total">
           <div>
             <dt>Taxa de rede</dt>
-            <dd>0.016 ETH</dd>
+            <dd>{order.quote.networkFeeEth} ETH</dd>
           </div>
           <div>
             <dt>Total</dt>
-            <dd>26.846 ETH</dd>
+            <dd>{order.quote.totalEth} ETH</dd>
           </div>
         </dl>
         <p className="order-note">
-          Transação confirmada na Ethereum. A propriedade foi transferida para sua carteira
-          conectada e registrada na rede.
+          {isConfirmed
+            ? `Transação simulada confirmada: ${order.transactionRef}.`
+            : isRejected
+              ? 'Nenhum ativo foi removido do carrinho.'
+              : 'Não feche esta página; o estado poderá ser recuperado após reconexão.'}
         </p>
-        <Link
-          to="/"
-          search={{
-            page: 1,
-            search: '',
-            collection: '',
-            network: '',
-            trait: '',
-            priceMin: '',
-            priceMax: '',
-            sort: 'priceEth',
-            sortOrder: 'asc',
-          }}
-          className="primary-button"
-        >
-          <ExternalLink size={14} /> Ver no Etherscan
-        </Link>
+        {isConfirmed ? (
+          <Link to="/" search={homeSearch} className="primary-button">
+            <ExternalLink size={14} /> Ver no mercado
+          </Link>
+        ) : (
+          <Link to="/checkout" className="primary-button">
+            Tentar novamente
+          </Link>
+        )}
       </div>
     </section>
   );

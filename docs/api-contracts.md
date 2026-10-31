@@ -97,6 +97,8 @@ Os fixtures de demonstração aceitam `KURIO10`, que aplica 10% de desconto, e r
 
 `OrderSnapshot` registra `id`, `userId`, estado `pending`/`confirmed`/`rejected`, linhas e cotação usadas como snapshot imutável, `transactionRef` (string simulada ou null), timestamps e `version`. Um timeout após criação não cancela necessariamente o pedido: consultar/recuperar pela chave antes de tentar enviar outra compra. Pedido confirmado ou recusado é terminal.
 
+Atualmente o mock persiste a cotação por usuário, valida expiração no `POST /api/orders`, cria snapshots e guarda a associação entre usuário, chave de idempotência e conteúdo. O replay da mesma chave e payload retorna o mesmo pedido; a mesma chave com payload diferente retorna `409 CONFLICT`. Os cenários `payment-pending` e `payment-rejected` produzem snapshots com estado `pending` ou `rejected`, sem `transactionRef`; o cenário `default` produz `confirmed`. Timeout/reconexão e remoção seletiva dos itens do carrinho permanecem nas próximas etapas.
+
 ### Perfil
 
 | Método e rota                 | Entrada                                       | Sucesso                   | Erros relevantes               |
@@ -122,8 +124,8 @@ O avatar usa caminho/URL local de fixture no demo. Nunca armazenar senha em clar
 Estas rotas são interceptadas pelo service worker, não fazem parte da API de produção e existem para tornar testes repetíveis.
 
 | Método e rota              | Entrada                  | Sucesso                                |
-| -------------------------- | ------------------------ | -------------------------------------- | ------ | -------------- | -------------- | ---------------- | ----------------------- |
-| `PUT /api/__mock/scenario` | `{ "scenario": "default" | "empty"                                | "slow" | "out-of-order" | "rate-limited" | "unavailable" }` | `{ "scenario": "..." }` |
+| -------------------------- | ------------------------ | -------------------------------------- | ------ | -------------- | -------------- | ------------- | ----------------- | ----------------- | --------------------- | ----------------------- |
+| `PUT /api/__mock/scenario` | `{ "scenario": "default" | "empty"                                | "slow" | "out-of-order" | "rate-limited" | "unavailable" | "session-expired" | "payment-pending" | "payment-rejected" }` | `{ "scenario": "..." }` |
 | `POST /api/__mock/reset`   | —                        | `{ "scenario": "...", "reset": true }` |
 
 O cenário escolhido afeta apenas os handlers MSW em memória. Controle global é serializado no Playwright para evitar que um teste contamine outro. Não expor controles desse tipo em uma API real.
@@ -139,4 +141,4 @@ Evento duplicado (mesmo `eventId`) ou mais antigo (versão menor) não modifica 
 
 ## Cobertura de contratos a implementar
 
-Os contratos em `src/shared/contracts/` estabelecem os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs, sessão, favoritos e o núcleo autenticado de carrinho/cotação já têm handlers MSW, validação, API Axios, queries/mutations e testes de integração. Checkout, pedidos, perfil, carteiras, carrinho visitante/mesclagem e eventos de negócio ainda precisam de implementação. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.
+Os contratos em `src/shared/contracts/` estabelecem os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs, sessão, favoritos, cotação, criação/consulta inicial de pedidos e o núcleo autenticado de carrinho já têm handlers MSW, validação, API Axios, queries/mutations e testes de integração. Estados avançados de pedido, perfil, carteiras, carrinho visitante/mesclagem e eventos de negócio ainda precisam de implementação. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.

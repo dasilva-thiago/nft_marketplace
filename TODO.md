@@ -51,9 +51,9 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [x] Aplicar cupom na cotação API e tratar inválido/expirado; subtotal, desconto, taxa de rede e total vêm da API. ETH trafega em strings decimais e o teste cobre precisão arbitrária.
 - [ ] Persistir/mesclar carrinho visitante ao autenticar; a implementação atual protege o carrinho por sessão.
 - [ ] Refletir alteração de preço/disponibilidade enquanto aberto; informar alteração, atualizar resumo e invalidar cotação.
-- [ ] Checkout valida campos, permite revisão, usa carteiras e redes cadastradas e simula conexão/recusa/desconexão. Revalidar preço, disponibilidade, cupom e taxas antes de confirmar; mudança exige nova confirmação.
-- [ ] Pedido com chave de idempotência: mesma chave/conteúdo recupera o mesmo pedido; chave reutilizada com conteúdo diferente retorna conflito. Impedir duplicata por clique/reenvio após timeout.
-- [ ] Estados pendente/confirmado/recusado com recuperação após refresh/reconexão; confirmação apenas após sucesso simulado; falhas preservam itens; sucesso remove apenas itens/quantidades comprados; recibo usa snapshot imutável e referências de transação/explorer simuladas.
+- [x] Checkout protegido usa os itens do carrinho, gera nova cotação por carteira/rede, valida campos obrigatórios e confirma a compra pela API.
+- [x] Pedido com chave de idempotência: mesma chave/conteúdo recupera o mesmo pedido; chave reutilizada com conteúdo diferente retorna conflito. Mutation sem retry automático e E2E de replay/conflito.
+- [ ] Recuperação pós-timeout/reconexão, remoção seletiva do carrinho após sucesso e transições de `pending` via evento ainda precisam ser concluídas; os estados `confirmed`, `pending` e `rejected` já são simulados por cenários determinísticos e snapshots consultáveis por refresh.
 
 ## Mocking e tempo real
 
