@@ -6,7 +6,7 @@ A aplicação é uma SPA React + TypeScript para o desafio NFT Marketplace. A ar
 
 O projeto contém configuração e diretórios por domínio, roteamento, cliente Axios, QueryClient, contratos REST documentados, schemas Zod de catálogo e autenticação, utilitário decimal, cliente Socket.IO, habilitação opt-in do MSW, catálogo simulado de leitura com busca/filtros/ordenação/paginação/detalhe, sessão simulada com dois usuários, cenários reproduzíveis e testes de integração. As telas visuais de início, autenticação, detalhe, carrinho, pagamento, confirmação, perfil e carteiras estão implementadas; handlers de favoritos, carrinho, cotação, pedido, perfil e carteiras continuam pendentes em `TODO.md`, portanto rotas visuais não significam fluxos de domínio concluídos.
 
-As screenshots fornecidas pelo usuário são a referência visual primária e estão catalogadas em `docs/visual-reference-inventory.md`. A composição deve permanecer fiel ao Figma em 390/768/1440 px; correções necessárias de acessibilidade, responsividade, conteúdo ou comportamento devem ser registradas nesta arquitetura. O pacote recebido não contém referências mobile para confirmação, perfil e carteiras; após reproduzir as telas fornecidas, essas três variantes serão adaptações responsivas conservadoras da composição desktop, conforme autorização do usuário, e toda diferença inevitável será documentada aqui.
+As referências visuais do Figma são a fonte primária e estão catalogadas em `docs/visual-reference-inventory.md`. A composição deve permanecer fiel ao Figma em 390/768/1440 px; correções necessárias de acessibilidade, responsividade, conteúdo ou comportamento devem ser registradas nesta arquitetura. Não há frame mobile correspondente para confirmação, perfil e carteiras; essas três variantes usam adaptações responsivas conservadoras da composição desktop, e toda diferença inevitável é documentada aqui.
 
 ## Direção das dependências
 
@@ -54,11 +54,11 @@ O design de referência é o export do Figma: base escura marrom/preta e acentos
 
 ### Rodada visual implementada
 
-As referências recebidas foram usadas como fonte visual primária. Login e cadastro desktop são apresentados como modal sobre uma cena de marketplace; em mobile, o shell vira uma tela dedicada. Detalhe, carrinho, checkout, confirmação, perfil e carteiras usam os mesmos tokens âmbar/marrom, grids, formulários e footer editorial. Capturas reais foram conferidas em 390 px e 1440 px; a largura 768 px ainda precisa de uma rodada específica de regressão visual.
+As referências do Figma são a fonte visual primária. Login e cadastro desktop são apresentados como modal sobre uma cena de marketplace; em mobile, o shell vira uma tela dedicada. Detalhe, carrinho, checkout, confirmação, perfil e carteiras usam os mesmos tokens âmbar/marrom, grids, formulários e footer editorial. Capturas reais foram conferidas em 390 px e 1440 px; a largura 768 px ainda precisa de uma rodada específica de regressão visual.
 
-O ZIP não contém fontes exportadas. Os quatro assets aprovados pelo usuário em `/public/assets/monkey1.webp` até `/public/assets/monkey4.webp` são reutilizados deterministicamente nos fixtures de todas as coleções para que a home e as telas de catálogo não exibam placeholders. A reutilização preserva os contratos e não recorta a screenshot inteira como asset de produto.
+As fontes exportadas não estão disponíveis. Os quatro assets em `/public/assets/monkey1.webp` até `/public/assets/monkey4.webp` são reutilizados deterministicamente nos fixtures de todas as coleções para que a home e as telas de catálogo não exibam placeholders. A reutilização preserva os contratos e não recorta a screenshot inteira como asset de produto.
 
-Não existem referências mobile de confirmação, perfil e carteiras. Por autorização do usuário, essas três variantes foram adaptadas responsivamente a partir da composição desktop: sidebar vira grid de navegação, formulários passam a uma coluna e a confirmação mantém o cartão central. Essas diferenças são adaptação de layout, não uma nova direção visual.
+Não existem frames mobile de confirmação, perfil e carteiras. Essas três variantes foram adaptadas responsivamente a partir da composição desktop: sidebar vira grid de navegação, formulários passam a uma coluna e a confirmação mantém o cartão central. Essas diferenças são adaptação de layout, não uma nova direção visual.
 
 ## Mocking e testes
 

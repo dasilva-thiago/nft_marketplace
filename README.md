@@ -34,7 +34,6 @@ src/
   realtime/            ciclo de vida do Socket.IO e eventos versionados
   styles/              tokens e CSS/Tailwind
 public/
-  manus-routes.json    manifesto de rotas para o ambiente de preview
   mockServiceWorker.js gerado por `pnpm mocks:init`
 e2e/                   Playwright; home, API de catálogo, URL/filtros e cenários MSW
 artifacts/             relatórios locais (ignorados pelo Git)
@@ -83,4 +82,4 @@ Para reproduzir uma sessão expirada nos testes ou na demonstração, selecione 
 
 ## Referências do desafio
 
-O pacote `FrontendChallenge.zip` disponibilizado nesta conversa continha a prancha consolidada do Figma e seis SVGs de interface, mas não fontes/imagens NFT em arquivos individuais. Obtenha/exporte assets originais para produção, se disponíveis. O enunciado define os fluxos, integrações simuladas, falhas reproduzíveis, acessibilidade, testes e metas Lighthouse; veja o `TODO.md` e o plano fornecido na conversa para rastreabilidade detalhada.
+As referências visuais do Figma e os assets disponíveis devem ser tratados como material de referência, não como uma imagem única dentro da aplicação. Exporte assets originais para produção quando estiverem disponíveis. O enunciado define os fluxos, integrações simuladas, falhas reproduzíveis, acessibilidade, testes e metas Lighthouse; veja o `TODO.md` e o `plan.md` para rastreabilidade detalhada.

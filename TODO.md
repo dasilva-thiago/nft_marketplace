@@ -64,9 +64,9 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 ## Interface e acessibilidade
 
-- [ ] Implementar os frames recebidos do Figma em desktop/tablet/mobile nas larguras 390/768/1440, preservando tipografia, cores, espaçamentos, hierarquia, imagens, proporções e composição; documentar em `docs/architecture.md` cada substituição de asset e ajuste de acessibilidade.
-- [ ] Reproduzir visualmente início, login, cadastro, detalhe do NFT, carrinho e pagamento nos pares desktop/mobile fornecidos; login e cadastro desktop devem permanecer modais sobre a home, enquanto mobile deve usar as telas dedicadas fornecidas.
-- [x] Reproduzir visualmente confirmação, perfil e carteiras nas referências desktop fornecidas; adaptar responsivamente as três variantes mobile sem screenshot, preservando a composição desktop e documentando a decisão em `docs/architecture.md`.
+- [ ] Implementar os frames definidos pelo Figma em desktop/tablet/mobile nas larguras 390/768/1440, preservando tipografia, cores, espaçamentos, hierarquia, imagens, proporções e composição; documentar em `docs/architecture.md` cada substituição de asset e ajuste de acessibilidade.
+- [ ] Reproduzir visualmente início, login, cadastro, detalhe do NFT, carrinho e pagamento nos pares desktop/mobile definidos pelo Figma; login e cadastro desktop devem permanecer modais sobre a home, enquanto mobile deve usar as telas dedicadas.
+- [x] Reproduzir visualmente confirmação, perfil e carteiras nas referências desktop; adaptar responsivamente as três variantes mobile sem frame específico, preservando a composição desktop e documentando a decisão em `docs/architecture.md`.
 - [ ] Skeleton shimmer em catálogo, detalhe e resumo do carrinho; preservar dimensões contra CLS e respeitar movimento reduzido.
 - [ ] Teclado/foco visível; foco em diálogos/drawers; semântica, labels e erros associados; alt text; contraste e estados que não dependem só de cor; feedback acessível para mutations/eventos; sem overflow indevido e sem perda de conteúdo com zoom.
 

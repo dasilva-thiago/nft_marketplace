@@ -8,23 +8,23 @@ O escopo não inclui criar um backend real neste momento. JWT assinado, cookie `
 
 ## Nova fatia aprovada — reprodução visual das telas
 
-As screenshots fornecidas em `telas-nft-marketplace.zip` são a referência visual primária. A implementação deve reproduzir composição, hierarquia, tipografia, cores, bordas, espaçamentos, proporções, imagens, estados e navegação sem criar uma direção visual alternativa. Cada correção necessária para acessibilidade, responsividade, conteúdo ou comportamento será registrada em `docs/architecture.md` com o motivo.
+As referências visuais do Figma são a fonte primária de design. A implementação deve reproduzir composição, hierarquia, tipografia, cores, bordas, espaçamentos, proporções, imagens, estados e navegação sem criar uma direção visual alternativa. Cada correção necessária para acessibilidade, responsividade, conteúdo ou comportamento será registrada em `docs/architecture.md` com o motivo.
 
-### Matriz de referência recebida
+### Matriz de referência visual
 
 | Fluxo          | Desktop                   | Mobile                       | Estado da referência                                   |
 | -------------- | ------------------------- | ---------------------------- | ------------------------------------------------------ |
-| Início         | `desktop-inicio.png`      | `mobile-inicio.png`          | referência recebida                                    |
+| Início         | `desktop-inicio.png`      | `mobile-inicio.png`          | referência visual definida                             |
 | Login          | `desktop-login.png`       | `mobile-login.png`           | desktop em modal sobre a home; mobile em tela dedicada |
 | Cadastro       | `desktop-cadastro.png`    | `mobile-cadastro.png`        | desktop em modal sobre a home; mobile em tela dedicada |
-| Detalhe do NFT | `desktop-detalhes.png`    | `mobile-detalhes-do-nft.png` | referência recebida                                    |
-| Carrinho       | `desktop-carrinho.png`    | `mobile-carrinho.png`        | referência recebida                                    |
-| Pagamento      | `desktop-pagamento.png`   | `mobile-pagamento.png`       | referência recebida                                    |
+| Detalhe do NFT | `desktop-detalhes.png`    | `mobile-detalhes-do-nft.png` | referência visual definida                             |
+| Carrinho       | `desktop-carrinho.png`    | `mobile-carrinho.png`        | referência visual definida                             |
+| Pagamento      | `desktop-pagamento.png`   | `mobile-pagamento.png`       | referência visual definida                             |
 | Confirmação    | `desktop-confirmacao.png` | —                            | referência mobile ausente                              |
 | Perfil         | `desktop-perfil.png`      | —                            | referência mobile ausente                              |
 | Carteiras      | `desktop-carteiras.png`   | —                            | referência mobile ausente                              |
 
-As versões desktop e as seis telas com referência mobile foram reproduzidas primeiro. Para confirmação, perfil e carteiras mobile, que não possuem screenshot no Figma disponível, foi feita uma adaptação responsiva conservadora da composição desktop, preservando a mesma paleta, tipografia, espaçamento, hierarquia e componentes. A decisão e as diferenças inevitáveis estão registradas em `docs/architecture.md`.
+As versões desktop e as seis telas com referência mobile foram reproduzidas primeiro. Para confirmação, perfil e carteiras mobile, que não possuem frame correspondente no Figma disponível, foi feita uma adaptação responsiva conservadora da composição desktop, preservando a mesma paleta, tipografia, espaçamento, hierarquia e componentes. A decisão e as diferenças inevitáveis estão registradas em `docs/architecture.md`.
 
 ### Direção visual aprovada pela referência
 
@@ -126,17 +126,17 @@ A fatia só será considerada concluída quando os handlers, APIs Axios, schemas
 - Telas conectadas: início, login, cadastro, detalhe, carrinho, pagamento, confirmação, perfil e carteiras.
 - Evidência visual: capturas reais conferidas em 390 px e 1440 px; a largura 768 px continua como próxima validação de regressão.
 - Evidência automatizada: `pnpm typecheck` passou; `pnpm build` passou; `pnpm test:e2e` passou com 30/30 testes.
-- Limitações mantidas de propósito: fontes exportadas do Figma não foram fornecidas; os quatro assets aprovados de macacos são reutilizados nos fixtures para manter a unidade visual, enquanto carrinho, pagamento, pedido, perfil e carteiras ainda são composição visual e não têm handlers de domínio concluídos.
+- Limitações mantidas de propósito: fontes exportadas do Figma não estão disponíveis; os quatro assets de macacos são reutilizados nos fixtures para manter a unidade visual, enquanto carrinho, pagamento, pedido, perfil e carteiras ainda são composição visual e não têm handlers de domínio concluídos.
 
 ## Nova fatia aprovada — home e listagem de NFTs
 
 Esta é a próxima fatia autorizada. A referência primária é `desktop-inicio.png`/`mobile-inicio.png`, com validação adicional em 768 px. A home deve conter hero, busca, filtros, ordenação, paginação, cards, destaque, lançamentos/diário e footer; a listagem deve consultar somente o endpoint REST tipado, manter filtros combináveis/ordenação/página na URL e preservar Back/Forward/refresh.
 
-Não serão inventados assets de NFT: os quatro arquivos aprovados pelo usuário são reutilizados de forma determinística nos fixtures, sem gerar ou alterar pixels. Não serão adicionados filtros ou regras de negócio que não existam nos contratos; quando a referência visual mostrar um controle sem contrato funcional, ele deverá permanecer claramente demonstrativo ou ser documentado como pendência, nunca simular sucesso.
+Não serão inventados assets de NFT: os quatro arquivos disponíveis são reutilizados de forma determinística nos fixtures, sem gerar ou alterar pixels. Não serão adicionados filtros ou regras de negócio que não existam nos contratos; quando a referência visual mostrar um controle sem contrato funcional, ele deverá permanecer claramente demonstrativo ou ser documentado como pendência, nunca simular sucesso.
 
 ### Critérios de saída desta fatia
 
-- A composição de home/listagem reproduz as referências fornecidas em 390/768/1440 px sem usar a prancha inteira como asset.
+- A composição de home/listagem reproduz as referências visuais em 390/768/1440 px sem usar a prancha inteira como asset.
 - Busca, coleção, rede/traits quando suportados pelos contratos, ordenação e paginação são serializados na URL; alterar um filtro retorna à página 1.
 - Estados pending/skeleton, vazio, erro com retry e carregamento em background são preservados.
 - Os testes E2E cobrem filtros combinados, refresh, Back/Forward, paginação, vazio, erro/429 e resposta fora de ordem.
@@ -149,4 +149,4 @@ Os dados de catálogo continuam vindo dos contratos existentes. Para a cena defa
 
 ## Atualização — assets reais de macacos
 
-O repositório recebeu quatro assets aprovados pelo usuário em `public/assets/monkey1.webp` até `public/assets/monkey4.webp`. Eles foram integrados aos fixtures de todas as coleções visíveis, com reutilização determinística e sem alterar ids, nomes, preços, redes, traits ou contratos. Como todos os componentes de home, listagem, detalhe, carrinho e pedido consomem `imageUrl`/`gallery` dos contratos, a substituição se propaga para essas telas sem duplicar lógica de apresentação.
+O repositório contém quatro assets em `public/assets/monkey1.webp` até `public/assets/monkey4.webp`. Eles foram integrados aos fixtures de todas as coleções visíveis, com reutilização determinística e sem alterar ids, nomes, preços, redes, traits ou contratos. Como todos os componentes de home, listagem, detalhe, carrinho e pedido consomem `imageUrl`/`gallery` dos contratos, a substituição se propaga para essas telas sem duplicar lógica de apresentação.

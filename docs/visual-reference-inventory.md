@@ -1,8 +1,8 @@
 # Inventário visual de referência
 
-As referências foram fornecidas pelo usuário em `telas-nft-marketplace.zip`. Elas são usadas como fonte visual de implementação, mas não são assets de produto e não devem ser renderizadas como uma imagem única dentro da aplicação.
+As referências visuais do Figma são usadas como fonte de implementação, mas não são assets de produto e não devem ser renderizadas como uma imagem única dentro da aplicação.
 
-## Arquivos recebidos
+## Arquivos de referência
 
 | Arquivo                      |   Dimensão | Fluxo                 | Plataforma    |
 | ---------------------------- | ---------: | --------------------- | ------------- |
@@ -32,4 +32,4 @@ As referências foram fornecidas pelo usuário em `telas-nft-marketplace.zip`. E
 - O carrinho mobile usa linhas em cartões horizontais, resumo financeiro e CTA de checkout no fim do shell.
 - O pagamento mobile usa seleção de carteira/rede em cartões e CTA inferior.
 - As linhas pontilhadas azuis, títulos `Desktop / ...` e marcações de enquadramento são elementos do material de referência, não da interface do produto.
-- Não há referências mobile para confirmação, perfil ou carteiras. Essas três variantes exigem autorização antes de qualquer adaptação visual.
+- Não há frames mobile para confirmação, perfil ou carteiras. Essas três variantes usam adaptação responsiva conservadora da composição desktop, conforme registrado em `docs/architecture.md`.

@@ -1,6 +1,6 @@
 # Roteiro de implementação — NFT Marketplace
 
-Este roteiro segue o enunciado do desafio colado pelo usuário. O Figma define a apresentação; o enunciado define comportamentos, APIs, falhas, testes, qualidade e entrega. Não adicionar blockchain, extensões de carteira, gateways de pagamento ou páginas editoriais: estão fora do escopo. Não considerar uma rota, mock ou tela estática como funcionalidade concluída.
+Este roteiro segue o enunciado do desafio. O Figma define a apresentação; o enunciado define comportamentos, APIs, falhas, testes, qualidade e entrega. Não adicionar blockchain, extensões de carteira, gateways de pagamento ou páginas editoriais: estão fora do escopo. Não considerar uma rota, mock ou tela estática como funcionalidade concluída.
 
 ## Princípios que não podem ser flexibilizados
 
