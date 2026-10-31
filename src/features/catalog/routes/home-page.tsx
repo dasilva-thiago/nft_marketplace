@@ -18,6 +18,7 @@ import { useSessionQuery } from '@/features/auth/queries';
 import { useFavoritesQuery, useToggleFavoriteMutation } from '@/features/favorites/queries';
 import type { NftSummary, PageRequest } from '@/shared/contracts';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
+import { NftCardSkeleton } from '@/shared/ui/skeleton';
 
 const PAGE_SIZE = 9;
 const defaultHomeSearch = {
@@ -455,13 +456,9 @@ export function HomePage() {
                 <span className="results-sort-note">Preço em ETH</span>
               </div>
               {isPending && (
-                <div className="nft-grid" aria-label="Carregando catálogo">
+                <div className="nft-grid" aria-label="Carregando catálogo" aria-busy="true">
                   {Array.from({ length: PAGE_SIZE }, (_, index) => (
-                    <div className="nft-card-skeleton" key={index}>
-                      <div />
-                      <span />
-                      <span />
-                    </div>
+                    <NftCardSkeleton key={index} />
                   ))}
                 </div>
               )}

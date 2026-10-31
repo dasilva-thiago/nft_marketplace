@@ -10,6 +10,7 @@ import {
   useUpdateCartItemMutation,
 } from '@/features/cart/queries';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
+import { CartLineSkeleton, CartSummarySkeleton } from '@/shared/ui/skeleton';
 
 const homeSearch = {
   page: 1,
@@ -59,8 +60,10 @@ export function CartPage() {
               <span>Total</span>
             </div>
             {cartQuery.isPending ? (
-              <div className="visual-empty" aria-busy="true">
-                Carregando carrinho…
+              <div aria-label="Carregando carrinho" aria-busy="true">
+                {Array.from({ length: 3 }, (_, index) => (
+                  <CartLineSkeleton key={index} />
+                ))}
               </div>
             ) : cartQuery.isError ? (
               <div className="visual-empty" role="alert">
@@ -129,58 +132,62 @@ export function CartPage() {
               </p>
             ) : null}
           </div>
-          <aside className="cart-summary">
-            <h2>Resumo da carteira</h2>
-            <label>
-              Código promocional
-              <input
-                value={couponDraft}
-                onChange={(event) => setCouponDraft(event.target.value)}
-                placeholder="Digite o código promocional..."
-                aria-describedby="coupon-help"
-              />
-            </label>
-            <button
-              type="button"
-              className="apply-button"
-              disabled={!cart?.items.length || quoteQuery.isFetching}
-              onClick={() => setAppliedCoupon(couponDraft.trim() || undefined)}
-            >
-              Aplicar
-            </button>
-            <p id="coupon-help" className="field-help">
-              Cupom de demonstração: KURIO10.
-            </p>
-            <dl>
-              <div>
-                <dt>Subtotal</dt>
-                <dd>{quoteQuery.data?.subtotalEth ?? '0.000'} ETH</dd>
-              </div>
-              <div>
-                <dt>Desconto do lançamento</dt>
-                <dd>(-) {quoteQuery.data?.discountEth ?? '0.000'} ETH</dd>
-              </div>
-              <div>
-                <dt>Taxa de rede</dt>
-                <dd>{quoteQuery.data?.networkFeeEth ?? '0.000'} ETH</dd>
-              </div>
-              <div className="total">
-                <dt>Total</dt>
-                <dd>{quoteQuery.data?.totalEth ?? '0.000'} ETH</dd>
-              </div>
-            </dl>
-            <Link
-              to="/checkout"
-              className="primary-button"
-              disabled={!cart?.items.length}
-              aria-disabled={!cart?.items.length}
-            >
-              Conectar e finalizar
-            </Link>
-            <Link to="/" search={homeSearch} className="continue-link">
-              Continuar explorando
-            </Link>
-          </aside>
+          {cartQuery.isPending ? (
+            <CartSummarySkeleton />
+          ) : (
+            <aside className="cart-summary">
+              <h2>Resumo da carteira</h2>
+              <label>
+                Código promocional
+                <input
+                  value={couponDraft}
+                  onChange={(event) => setCouponDraft(event.target.value)}
+                  placeholder="Digite o código promocional..."
+                  aria-describedby="coupon-help"
+                />
+              </label>
+              <button
+                type="button"
+                className="apply-button"
+                disabled={!cart?.items.length || quoteQuery.isFetching}
+                onClick={() => setAppliedCoupon(couponDraft.trim() || undefined)}
+              >
+                Aplicar
+              </button>
+              <p id="coupon-help" className="field-help">
+                Cupom de demonstração: KURIO10.
+              </p>
+              <dl>
+                <div>
+                  <dt>Subtotal</dt>
+                  <dd>{quoteQuery.data?.subtotalEth ?? '0.000'} ETH</dd>
+                </div>
+                <div>
+                  <dt>Desconto do lançamento</dt>
+                  <dd>(-) {quoteQuery.data?.discountEth ?? '0.000'} ETH</dd>
+                </div>
+                <div>
+                  <dt>Taxa de rede</dt>
+                  <dd>{quoteQuery.data?.networkFeeEth ?? '0.000'} ETH</dd>
+                </div>
+                <div className="total">
+                  <dt>Total</dt>
+                  <dd>{quoteQuery.data?.totalEth ?? '0.000'} ETH</dd>
+                </div>
+              </dl>
+              <Link
+                to="/checkout"
+                className="primary-button"
+                disabled={!cart?.items.length}
+                aria-disabled={!cart?.items.length}
+              >
+                Conectar e finalizar
+              </Link>
+              <Link to="/" search={homeSearch} className="continue-link">
+                Continuar explorando
+              </Link>
+            </aside>
+          )}
         </div>
         <section className="cart-recommendations">
           <div className="section-line-title">Colecionadores também viram</div>

@@ -63,7 +63,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [ ] Implementar os frames definidos pelo Figma em desktop/tablet/mobile nas larguras 390/768/1440, preservando tipografia, cores, espaçamentos, hierarquia, imagens, proporções e composição; documentar em `docs/architecture.md` cada substituição de asset e ajuste de acessibilidade.
 - [ ] Reproduzir visualmente início, login, cadastro, detalhe do NFT, carrinho e pagamento nos pares desktop/mobile definidos pelo Figma; login e cadastro desktop devem permanecer modais sobre a home, enquanto mobile deve usar as telas dedicadas.
 - [x] Reproduzir visualmente confirmação, perfil e carteiras nas referências desktop; adaptar responsivamente as três variantes mobile sem frame específico, preservando a composição desktop e documentando a decisão em `docs/architecture.md`.
-- [ ] Skeleton shimmer em catálogo, detalhe e resumo do carrinho; preservar dimensões contra CLS e respeitar movimento reduzido.
+- [x] Skeleton shimmer em catálogo, detalhe e resumo do carrinho; preservar dimensões contra CLS e respeitar movimento reduzido.
 - [ ] Teclado/foco visível; foco em diálogos/drawers; semântica, labels e erros associados; alt text; contraste e estados que não dependem só de cor; feedback acessível para mutations/eventos; sem overflow indevido e sem perda de conteúdo com zoom.
 
 ## Testes, qualidade e deploy

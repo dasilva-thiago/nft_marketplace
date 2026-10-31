@@ -702,20 +702,23 @@ select:focus-visible {
   border: 1px solid #30231d;
   background: #171210;
 }
-.nft-card-skeleton div {
-  aspect-ratio: 1.08;
+.skeleton-shimmer {
+  display: block;
   background: linear-gradient(100deg, #211915 20%, #30231d 40%, #211915 60%);
   background-size: 200% 100%;
   animation: shimmer 1.4s linear infinite;
 }
-.nft-card-skeleton span {
-  display: block;
-  height: 9px;
-  width: 55%;
-  margin: 14px 12px 0;
-  background: #2b201b;
+.nft-card-skeleton-image {
+  aspect-ratio: 1.08;
 }
-.nft-card-skeleton span:last-child {
+.nft-card-skeleton-line {
+  height: 9px;
+  margin: 14px 12px 0;
+}
+.nft-card-skeleton-line-wide {
+  width: 55%;
+}
+.nft-card-skeleton-line-short {
   width: 35%;
   margin-top: 8px;
 }
@@ -1406,9 +1409,119 @@ select:focus-visible {
 }
 .detail-skeleton {
   min-height: 520px;
-  background: linear-gradient(100deg, #1a1210 20%, #302019 40%, #1a1210 60%);
-  background-size: 200% 100%;
-  animation: shimmer 1.4s linear infinite;
+}
+.detail-skeleton-thumbs {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+.detail-skeleton-thumbs .skeleton-shimmer {
+  aspect-ratio: 1;
+}
+.detail-skeleton-main-image {
+  aspect-ratio: 1 / 1.08;
+  border-radius: 5px;
+}
+.detail-skeleton-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.detail-skeleton-title {
+  width: 66%;
+  height: 25px;
+}
+.detail-skeleton-price {
+  width: 24%;
+  height: 14px;
+}
+.detail-skeleton-paragraph {
+  width: 100%;
+  height: 9px;
+  margin-top: 11px;
+}
+.detail-skeleton-paragraph-short {
+  width: 72%;
+  margin-top: -5px;
+}
+.detail-skeleton-edition {
+  width: 82%;
+  height: 32px;
+  margin-top: 9px;
+}
+.detail-skeleton-actions {
+  width: 100%;
+  height: 42px;
+  margin-top: 9px;
+}
+.detail-skeleton-attributes {
+  width: 90%;
+  height: 68px;
+  margin-top: 15px;
+}
+.cart-line-skeleton-image {
+  width: 52px;
+  height: 52px;
+  border-radius: 4px;
+}
+.cart-line-skeleton-name {
+  display: grid;
+  gap: 7px;
+}
+.cart-line-skeleton-line {
+  height: 9px;
+}
+.cart-line-skeleton-line-wide {
+  width: 72%;
+}
+.cart-line-skeleton-line-short {
+  width: 44%;
+}
+.cart-line-skeleton-value {
+  width: 55%;
+  height: 9px;
+}
+.cart-line-skeleton-value-total {
+  width: 68%;
+}
+.cart-line-skeleton-remove {
+  width: 24px;
+  height: 24px;
+}
+.cart-summary-skeleton {
+  display: grid;
+  gap: 14px;
+  min-height: 326px;
+}
+.cart-summary-skeleton-title {
+  width: 60%;
+  height: 14px;
+}
+.cart-summary-skeleton-input {
+  width: 100%;
+  height: 35px;
+}
+.cart-summary-skeleton-rows {
+  display: grid;
+  gap: 14px;
+  margin-top: 12px;
+}
+.cart-summary-skeleton-rows .skeleton-shimmer {
+  width: 100%;
+  height: 9px;
+}
+.cart-summary-skeleton-rows .skeleton-shimmer:nth-child(even) {
+  width: 82%;
+}
+.cart-summary-skeleton-total {
+  width: 100% !important;
+  height: 17px !important;
+  margin-top: 7px;
+}
+.cart-summary-skeleton-button {
+  width: 100%;
+  height: 39px;
+  margin-top: 7px;
 }
 .cart-layout,
 .checkout-layout {

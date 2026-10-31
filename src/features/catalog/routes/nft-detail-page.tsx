@@ -8,6 +8,7 @@ import { useSessionQuery } from '@/features/auth/queries';
 import { useFavoritesQuery, useToggleFavoriteMutation } from '@/features/favorites/queries';
 import { NftCard } from '@/shared/ui/nft-card';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
+import { Skeleton } from '@/shared/ui/skeleton';
 
 export function NftDetailPage() {
   const { nftId } = useParams({ from: '/nft/$nftId' });
@@ -44,8 +45,30 @@ export function NftDetailPage() {
 
   if (detailQuery.isPending)
     return (
-      <section className="visual-page-shell">
-        <div className="detail-skeleton" />
+      <section
+        className="visual-page-shell"
+        aria-busy="true"
+        aria-label="Carregando detalhe do NFT"
+      >
+        <div className="detail-layout detail-skeleton">
+          <div className="detail-gallery">
+            <div className="detail-thumbs detail-skeleton-thumbs">
+              {Array.from({ length: 4 }, (_, index) => (
+                <Skeleton key={index} />
+              ))}
+            </div>
+            <Skeleton className="detail-skeleton-main-image" />
+          </div>
+          <div className="detail-copy detail-skeleton-copy">
+            <Skeleton className="detail-skeleton-title" />
+            <Skeleton className="detail-skeleton-price" />
+            <Skeleton className="detail-skeleton-paragraph" />
+            <Skeleton className="detail-skeleton-paragraph detail-skeleton-paragraph-short" />
+            <Skeleton className="detail-skeleton-edition" />
+            <Skeleton className="detail-skeleton-actions" />
+            <Skeleton className="detail-skeleton-attributes" />
+          </div>
+        </div>
       </section>
     );
   if (detailQuery.isError || !nft)
