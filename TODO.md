@@ -45,7 +45,8 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [x] Checkout protegido usa os itens do carrinho, gera nova cotação por carteira/rede, valida campos obrigatórios e confirma a compra pela API.
 - [x] Pedido com chave de idempotência: mesma chave/conteúdo recupera o mesmo pedido; chave reutilizada com conteúdo diferente retorna conflito. Mutation sem retry automático e E2E de replay/conflito.
 - [x] Recuperação pós-timeout/reconexão por chave de idempotência; o checkout persiste a chave na sessão, oferece recuperação explícita e o E2E prova que não há segunda compra.
-- [ ] Remoção seletiva do carrinho após sucesso e transições de `pending` via evento ainda precisam ser concluídas; os estados `confirmed`, `pending` e `rejected` já são simulados por cenários determinísticos e snapshots consultáveis por refresh.
+- [x] Remoção seletiva do carrinho após pedido confirmado: o backend simulado subtrai somente as quantidades compradas e preserva linhas/quantidades restantes.
+- [ ] Transições de `pending` via evento ainda precisam ser concluídas; os estados `confirmed`, `pending` e `rejected` já são simulados por cenários determinísticos e snapshots consultáveis por refresh.
 
 ## Mocking e tempo real
 

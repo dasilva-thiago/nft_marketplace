@@ -1,5 +1,10 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { AddCartItemRequest, QuoteRequest, UpdateCartItemRequest } from '@/shared/contracts';
+import type {
+  AddCartItemRequest,
+  ConsumeCartRequest,
+  QuoteRequest,
+  UpdateCartItemRequest,
+} from '@/shared/contracts';
 import { useSessionQuery } from '@/features/auth/queries';
 import { catalogApi } from '@/features/catalog/api/catalog-api';
 import { addGuestItem, buildGuestCart, removeGuestItem, updateGuestItem } from './guest-cart';
@@ -86,6 +91,13 @@ export function useRemoveCartItemMutation() {
       removeGuestItem(nftId);
       return getGuestCart();
     },
+  );
+}
+
+export function useConsumeCartMutation() {
+  return useCartMutation(
+    (input: ConsumeCartRequest) => cartApi.consume(input),
+    async () => getGuestCart(),
   );
 }
 

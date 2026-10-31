@@ -11,6 +11,7 @@ import type {
 import {
   AddCartItemRequestSchema,
   ChangePasswordRequestSchema,
+  ConsumeCartRequestSchema,
   CreateWalletRequestSchema,
   CreateOrderRequestSchema,
   LoginRequestSchema,
@@ -555,6 +556,24 @@ export const handlers = [
         existing.nft = toNftSummary(nft);
       } else items.push({ nftId: nft.id, quantity, nft: toNftSummary(nft) });
     }
+    return HttpResponse.json(saveCartForUser({ ...cart, items, version: cart.version + 1 }));
+  }),
+  http.post('/api/cart/consume', async ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const parsed = ConsumeCartRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success)
+      return validationResponse('Confira os itens comprados para limpar o carrinho.', parsed.error);
+
+    const cart = getCartForUser(currentSession.session.user.id);
+    const purchased = new Map(parsed.data.items.map((item) => [item.nftId, item.quantity]));
+    const items = cart.items.flatMap((item) => {
+      const purchasedQuantity = purchased.get(item.nftId) ?? 0;
+      const remainingQuantity = item.quantity - purchasedQuantity;
+      if (remainingQuantity <= 0) return [];
+      const nft = nftFixtures.find((candidate) => candidate.id === item.nftId);
+      return [{ ...item, quantity: remainingQuantity, nft: nft ? toNftSummary(nft) : item.nft }];
+    });
     return HttpResponse.json(saveCartForUser({ ...cart, items, version: cart.version + 1 }));
   }),
   http.post('/api/quotes', async ({ request }) => {

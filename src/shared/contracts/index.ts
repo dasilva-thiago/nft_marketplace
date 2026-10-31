@@ -122,6 +122,10 @@ export interface MergeCartRequest {
   items: Array<{ nftId: string; quantity: number }>;
 }
 
+export interface ConsumeCartRequest {
+  items: Array<{ nftId: string; quantity: number }>;
+}
+
 export interface QuoteLine {
   nftId: string;
   name: string;

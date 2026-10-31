@@ -1,6 +1,7 @@
 import type {
   AddCartItemRequest,
   Cart,
+  ConsumeCartRequest,
   MergeCartRequest,
   Quote,
   QuoteRequest,
@@ -9,6 +10,7 @@ import type {
 import {
   AddCartItemRequestSchema,
   CartSchema,
+  ConsumeCartRequestSchema,
   MergeCartRequestSchema,
   QuoteRequestSchema,
   QuoteSchema,
@@ -42,6 +44,12 @@ export const cartApi = {
   async merge(input: MergeCartRequest): Promise<Cart> {
     const payload = MergeCartRequestSchema.parse(input);
     const response = await http.post<unknown>('/cart/merge', payload);
+    return CartSchema.parse(response.data);
+  },
+
+  async consume(input: ConsumeCartRequest): Promise<Cart> {
+    const payload = ConsumeCartRequestSchema.parse(input);
+    const response = await http.post<unknown>('/cart/consume', payload);
     return CartSchema.parse(response.data);
   },
 

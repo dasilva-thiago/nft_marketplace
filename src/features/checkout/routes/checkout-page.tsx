@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useSessionQuery } from '@/features/auth/queries';
-import { useCartQuery, useQuoteQuery } from '@/features/cart/queries';
+import { useCartQuery, useConsumeCartMutation, useQuoteQuery } from '@/features/cart/queries';
 import { useCreateOrderMutation, useRecoverOrderMutation } from '@/features/orders/queries';
 import { useNftRealtimeUpdate } from '@/realtime/realtime-signal';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
@@ -31,6 +31,7 @@ export function CheckoutPage() {
   const navigate = useNavigate({ from: '/checkout' });
   const sessionQuery = useSessionQuery();
   const cartQuery = useCartQuery();
+  const consumeCartMutation = useConsumeCartMutation();
   const createOrderMutation = useCreateOrderMutation();
   const recoverOrderMutation = useRecoverOrderMutation();
   const [network, setNetwork] = useState('Ethereum');
@@ -70,6 +71,22 @@ export function CheckoutPage() {
     if (quoteInvalidated && !quoteQuery.isFetching) void quoteQuery.refetch();
   }, [quoteInvalidated, quoteQuery.isFetching, quoteQuery.refetch]);
 
+  async function finalizeConfirmedOrder(
+    order: Awaited<ReturnType<typeof createOrderMutation.mutateAsync>>,
+  ) {
+    if (order.status === 'confirmed') {
+      try {
+        await consumeCartMutation.mutateAsync({
+          items: order.items.map(({ nftId, quantity }) => ({ nftId, quantity })),
+        });
+      } catch {
+        // O pedido permanece confirmado; o carrinho pode ser reconciliado ao retornar à loja.
+      }
+    }
+    window.sessionStorage.removeItem(CHECKOUT_IDEMPOTENCY_STORAGE_KEY);
+    await navigate({ to: '/orders/$orderId', params: { orderId: order.id } });
+  }
+
   async function submitOrder() {
     if (!quoteQuery.data || quoteNeedsReview || quoteQuery.isFetching) return;
     try {
@@ -77,8 +94,7 @@ export function CheckoutPage() {
         input: { quoteId: quoteQuery.data.quoteId, walletId, network },
         idempotencyKey,
       });
-      window.sessionStorage.removeItem(CHECKOUT_IDEMPOTENCY_STORAGE_KEY);
-      await navigate({ to: '/orders/$orderId', params: { orderId: order.id } });
+      await finalizeConfirmedOrder(order);
     } catch (error) {
       if (isRequestTimeout(error)) setTimedOut(true);
     }
@@ -87,8 +103,7 @@ export function CheckoutPage() {
   async function recoverOrder() {
     try {
       const order = await recoverOrderMutation.mutateAsync(idempotencyKey);
-      window.sessionStorage.removeItem(CHECKOUT_IDEMPOTENCY_STORAGE_KEY);
-      await navigate({ to: '/orders/$orderId', params: { orderId: order.id } });
+      await finalizeConfirmedOrder(order);
     } catch {
       // A recuperação possui feedback pelo estado da mutation e não cria uma nova tentativa.
     }
