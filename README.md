@@ -1,6 +1,6 @@
 # NFT Marketplace — fundação arquitetural
 
-Repositório iniciado a partir do desafio frontend. A home, o catálogo REST simulado, a conta/sessão, a tela de detalhe, favoritos, o núcleo autenticado de carrinho/cotação, checkout/pedido idempotente, perfil e carteiras já estão preparados; **estados avançados de pedido e tempo real de negócio ainda não estão concluídos**. As rotas visuais existentes não significam que todos os fluxos de domínio estejam implementados.
+Repositório iniciado a partir do desafio frontend. A home, o catálogo REST simulado, a conta/sessão, a tela de detalhe, favoritos, carrinho visitante/autenticado, cotação, checkout/pedido idempotente, perfil e carteiras já estão preparados; **estados avançados de pedido e tempo real de negócio ainda não estão concluídos**. As rotas visuais existentes não significam que todos os fluxos de domínio estejam implementados.
 
 ## Stack obrigatória
 

@@ -14,6 +14,7 @@ import {
   CreateWalletRequestSchema,
   CreateOrderRequestSchema,
   LoginRequestSchema,
+  MergeCartRequestSchema,
   PageRequestSchema,
   QuoteRequestSchema,
   RegisterRequestSchema,
@@ -499,6 +500,27 @@ export const handlers = [
     if (!currentSession) return unauthorizedResponse();
     const cart = getCartForUser(currentSession.session.user.id);
     const items = cart.items.filter((item) => item.nftId !== params.nftId);
+    return HttpResponse.json(saveCartForUser({ ...cart, items, version: cart.version + 1 }));
+  }),
+  http.post('/api/cart/merge', async ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const parsed = MergeCartRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success)
+      return validationResponse('Confira os itens do carrinho visitante.', parsed.error);
+    const cart = getCartForUser(currentSession.session.user.id);
+    const items = [...cart.items];
+    for (const guestItem of parsed.data.items) {
+      const nft = nftFixtures.find((item) => item.id === guestItem.nftId);
+      if (!nft) return notFoundResponse('NFT não encontrado durante o merge.');
+      const existing = items.find((item) => item.nftId === nft.id);
+      const quantity = (existing?.quantity ?? 0) + guestItem.quantity;
+      if (quantity > nft.availableEditions) return availabilityResponse(nft.name);
+      if (existing) {
+        existing.quantity = quantity;
+        existing.nft = toNftSummary(nft);
+      } else items.push({ nftId: nft.id, quantity, nft: toNftSummary(nft) });
+    }
     return HttpResponse.json(saveCartForUser({ ...cart, items, version: cart.version + 1 }));
   }),
   http.post('/api/quotes', async ({ request }) => {

@@ -118,6 +118,10 @@ export interface UpdateCartItemRequest {
   quantity: number;
 }
 
+export interface MergeCartRequest {
+  items: Array<{ nftId: string; quantity: number }>;
+}
+
 export interface QuoteLine {
   nftId: string;
   name: string;

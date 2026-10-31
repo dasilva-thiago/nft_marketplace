@@ -123,6 +123,10 @@ export const UpdateCartItemRequestSchema = z.object({
   quantity: positiveInteger,
 });
 
+export const MergeCartRequestSchema = z.object({
+  items: z.array(z.object({ nftId: z.string().min(1), quantity: positiveInteger })),
+});
+
 export const QuoteRequestSchema = z.object({
   items: z.array(z.object({ nftId: z.string().min(1), quantity: positiveInteger })).min(1),
   couponCode: z.string().trim().min(1).optional(),

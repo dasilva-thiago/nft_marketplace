@@ -73,10 +73,11 @@ Os handlers MSW mantêm favoritos isolados por usuário e validam a existência 
 | `POST /api/cart/items`          | `AddCartItemRequest` (`nftId`, `quantity`) | `Cart` atualizado | 400 quantidade; 404 NFT; 409 edição indisponível |
 | `PATCH /api/cart/items/:nftId`  | `UpdateCartItemRequest` (`quantity`)       | `Cart` atualizado | 400; 404 item; 409 estoque mudou                 |
 | `DELETE /api/cart/items/:nftId` | —                                          | `Cart` atualizado | 404 item pode ser tratado idempotentemente       |
+| `POST /api/cart/merge`          | `MergeCartRequest` (`items`)               | `Cart` atualizado | 400, 404 NFT, 409 estoque mudou                 |
 
 `Cart` contém `userId` ou `null`, `items` e `version`. Cada `CartLine` tem `nftId`, quantidade inteira e o resumo atual do NFT. Ao login, preservar/mesclar carrinho visitante segundo regra documentada e testada; não descartar itens silenciosamente.
 
-Na fatia atualmente implementada, o carrinho é protegido por sessão e mantém estado isolado por usuário no MSW. A persistência/mesclagem de carrinho visitante continua pendente.
+O carrinho visitante usa `localStorage` apenas para itens (`nftId` e quantidade), sem sessão ou credenciais. Após login/cadastro, `POST /api/cart/merge` soma as quantidades, valida disponibilidade e o cliente limpa o armazenamento visitante somente após a resposta bem-sucedida. O carrinho autenticado permanece isolado por usuário no MSW.
 
 ### Cotação e cupom
 

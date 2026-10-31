@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { LoginRequest, RegisterRequest, Session } from '@/shared/contracts';
 import { authApi } from './api/auth-api';
+import { cartApi } from '@/features/cart/api/cart-api';
+import { clearGuestCart, getGuestLines } from '@/features/cart/guest-cart';
 
 export const sessionQueryKey = ['session'] as const;
 
@@ -17,8 +19,14 @@ export function useLoginMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: LoginRequest) => authApi.login(input),
-    onSuccess: (session: Session) => {
+    onSuccess: async (session: Session) => {
       queryClient.setQueryData(sessionQueryKey, session);
+      const lines = getGuestLines();
+      if (lines.length) {
+        const cart = await cartApi.merge({ items: lines });
+        queryClient.setQueryData(['private', 'cart', session.user.id], cart);
+        clearGuestCart();
+      }
     },
   });
 }
@@ -27,8 +35,14 @@ export function useRegisterMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: RegisterRequest) => authApi.register(input),
-    onSuccess: (session: Session) => {
+    onSuccess: async (session: Session) => {
       queryClient.setQueryData(sessionQueryKey, session);
+      const lines = getGuestLines();
+      if (lines.length) {
+        const cart = await cartApi.merge({ items: lines });
+        queryClient.setQueryData(['private', 'cart', session.user.id], cart);
+        clearGuestCart();
+      }
     },
   });
 }

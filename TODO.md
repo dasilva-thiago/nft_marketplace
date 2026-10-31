@@ -40,7 +40,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 - [x] Adicionar/alterar/remover itens autenticados conforme disponibilidade de NFT/edição; handlers MSW isolam o carrinho por usuário e queries usam chave privada por identidade.
 - [x] Aplicar cupom na cotação API e tratar inválido/expirado; subtotal, desconto, taxa de rede e total vêm da API. ETH trafega em strings decimais e o teste cobre precisão arbitrária.
-- [ ] Persistir/mesclar carrinho visitante ao autenticar; a implementação atual protege o carrinho por sessão.
+- [x] Persistir carrinho visitante em armazenamento local e mesclar ao autenticar/cadastrar; quantidades são somadas, disponibilidade é validada e o armazenamento visitante só é limpo após sucesso.
 - [ ] Refletir alteração de preço/disponibilidade enquanto aberto; informar alteração, atualizar resumo e invalidar cotação.
 - [x] Checkout protegido usa os itens do carrinho, gera nova cotação por carteira/rede, valida campos obrigatórios e confirma a compra pela API.
 - [x] Pedido com chave de idempotência: mesma chave/conteúdo recupera o mesmo pedido; chave reutilizada com conteúdo diferente retorna conflito. Mutation sem retry automático e E2E de replay/conflito.

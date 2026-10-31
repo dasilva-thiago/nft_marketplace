@@ -1,6 +1,7 @@
 import type {
   AddCartItemRequest,
   Cart,
+  MergeCartRequest,
   Quote,
   QuoteRequest,
   UpdateCartItemRequest,
@@ -8,6 +9,7 @@ import type {
 import {
   AddCartItemRequestSchema,
   CartSchema,
+  MergeCartRequestSchema,
   QuoteRequestSchema,
   QuoteSchema,
   UpdateCartItemRequestSchema,
@@ -34,6 +36,12 @@ export const cartApi = {
 
   async removeItem(nftId: string): Promise<Cart> {
     const response = await http.delete<unknown>(`/cart/items/${nftId}`);
+    return CartSchema.parse(response.data);
+  },
+
+  async merge(input: MergeCartRequest): Promise<Cart> {
+    const payload = MergeCartRequestSchema.parse(input);
+    const response = await http.post<unknown>('/cart/merge', payload);
     return CartSchema.parse(response.data);
   },
 
