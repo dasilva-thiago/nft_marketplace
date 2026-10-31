@@ -119,10 +119,14 @@ export function HomePage() {
       await navigate({ to: '/login', search: { returnTo: '/' } });
       return;
     }
-    await favoriteMutation.mutateAsync({
-      nftId,
-      shouldFavorite: !favoriteIds.has(nftId),
-    });
+    try {
+      await favoriteMutation.mutateAsync({
+        nftId,
+        shouldFavorite: !favoriteIds.has(nftId),
+      });
+    } catch {
+      // A mutation otimista já restaura o snapshot anterior no onError.
+    }
   }
 
   const filters = useMemo<Record<string, string | string[]> | undefined>(() => {
@@ -324,6 +328,11 @@ export function HomePage() {
               <button type="submit">Buscar</button>
             </form>
           </div>
+          {favoriteMutation.isError && (
+            <p className="form-error" role="alert" aria-live="polite">
+              Não foi possível atualizar os favoritos. Sua alteração foi desfeita; tente novamente.
+            </p>
+          )}
           <div className="catalog-layout">
             <aside
               id="catalog-filters"

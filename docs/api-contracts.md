@@ -55,15 +55,17 @@ Na demonstração atual, o MSW implementa os quatro endpoints acima e valida req
 
 ### Favoritos
 
-| Método e rota                  | Entrada   | Sucesso                           | Erros relevantes |
-| ------------------------------ | --------- | --------------------------------- | ---------------- |
-| `GET /api/favorites`           | sessão    | `Favorite[]`                      | 401              |
-| `PUT /api/favorites/:nftId`    | sem corpo | `Favorite` (operação idempotente) | 401, 404 NFT     |
-| `DELETE /api/favorites/:nftId` | sem corpo | `204`                             | 401              |
+| Método e rota                  | Entrada   | Sucesso                           | Erros relevantes              |
+| ------------------------------ | --------- | --------------------------------- | ----------------------------- |
+| `GET /api/favorites`           | sessão    | `Favorite[]`                      | 401                           |
+| `PUT /api/favorites/:nftId`    | sem corpo | `Favorite` (operação idempotente) | 401, 404 NFT, 503 transitório |
+| `DELETE /api/favorites/:nftId` | sem corpo | `204`                             | 401, 503 transitório          |
 
 `Favorite` é vinculado ao usuário da sessão e NFT. Remover favorito inexistente pode responder 204 para ser idempotente.
 
 Os handlers MSW mantêm favoritos isolados por usuário e validam a existência do NFT. A interface usa mutation otimista: atualiza a lista imediatamente, restaura o snapshot anterior em caso de erro e invalida a query após a resposta.
+
+No cenário determinístico `favorite-failure`, os dois endpoints respondem `503` com `TRANSIENT_ERROR` e `retryable: true`, sem alterar o estado persistido. O E2E de interface confirma a reversão visual e o feedback acessível.
 
 ### Carrinho
 
@@ -102,7 +104,7 @@ Os fixtures de demonstração aceitam `KURIO10`, que aplica 10% de desconto, e r
 
 `OrderSnapshot` registra `id`, `userId`, estado `pending`/`confirmed`/`rejected`, linhas e cotação usadas como snapshot imutável, `transactionRef` (string simulada ou null), timestamps e `version`. Um timeout após criação não cancela necessariamente o pedido: consultar/recuperar pela chave antes de tentar enviar outra compra. Pedido confirmado ou recusado é terminal.
 
-O mock persiste a cotação por usuário, valida expiração no `POST /api/orders`, cria snapshots e guarda a associação entre usuário, chave de idempotência e conteúdo. O replay da mesma chave e payload retorna o mesmo pedido; a mesma chave com payload diferente retorna `409 CONFLICT`. O cenário `order-timeout` cria o snapshot antes de atrasar a resposta, permitindo recuperar a tentativa por `GET /api/orders/by-idempotency/:key` após o timeout do cliente. Os cenários `payment-pending` e `payment-rejected` produzem snapshots com estado `pending` ou `rejected`, sem `transactionRef`; o cenário `default` produz `confirmed`. A remoção seletiva dos itens do carrinho após sucesso ainda é pendente.
+O mock persiste a cotação por usuário, valida expiração no `POST /api/orders`, cria snapshots e guarda a associação entre usuário, chave de idempotência e conteúdo. O replay da mesma chave e payload retorna o mesmo pedido; a mesma chave com payload diferente retorna `409 CONFLICT`. O cenário `order-timeout` cria o snapshot antes de atrasar a resposta, permitindo recuperar a tentativa por `GET /api/orders/by-idempotency/:key` após o timeout do cliente. Os cenários `payment-pending` e `payment-rejected` produzem snapshots com estado `pending` ou `rejected`, sem `transactionRef`; o cenário `default` produz `confirmed`. A remoção seletiva dos itens do carrinho após sucesso preserva somente quantidades não compradas.
 
 ### Perfil
 
@@ -129,8 +131,8 @@ O avatar usa caminho/URL local de fixture no demo. Nunca armazenar senha em clar
 Estas rotas são interceptadas pelo service worker, não fazem parte da API de produção e existem para tornar testes repetíveis.
 
 | Método e rota              | Entrada                  | Sucesso                                |
-| -------------------------- | ------------------------ | -------------------------------------- | ------ | -------------- | -------------- | ------------- | ----------------- | ----------------- | ------------------ | ------------------ | ----------------------- |
-| `PUT /api/__mock/scenario` | `{ "scenario": "default" | "empty"                                | "slow" | "out-of-order" | "rate-limited" | "unavailable" | "session-expired" | "payment-pending" | "payment-rejected" | "order-timeout" }` | `{ "scenario": "..." }` |
+| -------------------------- | ------------------------ | -------------------------------------- | ------ | -------------- | -------------- | ------------- | ------------------ | ----------------- | ----------------- | ------------------ | ------------------ | ----------------------- |
+| `PUT /api/__mock/scenario` | `{ "scenario": "default" | "empty"                                | "slow" | "out-of-order" | "rate-limited" | "unavailable" | "favorite-failure" | "session-expired" | "payment-pending" | "payment-rejected" | "order-timeout" }` | `{ "scenario": "..." }` |
 | `POST /api/__mock/reset`   | —                        | `{ "scenario": "...", "reset": true }` |
 
 O cenário escolhido afeta apenas os handlers MSW em memória. Controle global é serializado no Playwright para evitar que um teste contamine outro. Não expor controles desse tipo em uma API real.
@@ -144,6 +146,6 @@ Formato comum: `VersionedEvent<T>` com `eventId`, `resourceId`, `version`, `occu
 
 Evento duplicado (mesmo `eventId`) ou mais antigo (versão menor) não modifica o estado. A tela de pedido anuncia a transição de `pending` para `confirmed` ou `rejected`; após reconexão, consultar REST para conciliar e nunca permitir uma segunda compra. Liberar listener e subscription ao encerrar sessão.
 
-## Cobertura de contratos a implementar
+## Cobertura de contratos
 
-Os contratos em `src/shared/contracts/` estabelecem os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs, sessão, favoritos, cotação, pedidos com idempotência e recuperação, perfil, carteiras, carrinho visitante/mesclagem e eventos realtime já têm handlers MSW, validação, API Axios, queries/mutations e testes de integração. A remoção seletiva do carrinho e a transição visual de `pending` por evento ainda precisam de implementação. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.
+Os contratos em `src/shared/contracts/` estabelecem os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs, sessão, favoritos com rollback otimista, cotação, pedidos com idempotência e recuperação, perfil, carteiras, carrinho visitante/mesclagem/consumo e eventos realtime já têm handlers MSW, validação, API Axios, queries/mutations e testes de integração. Cada rota relevante possui cobertura de sucesso e de pelo menos um erro do contrato.

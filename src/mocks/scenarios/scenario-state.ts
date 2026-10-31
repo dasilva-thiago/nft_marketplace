@@ -7,6 +7,7 @@ export const MockScenarioSchema = z.enum([
   'out-of-order',
   'rate-limited',
   'unavailable',
+  'favorite-failure',
   'session-expired',
   'payment-pending',
   'payment-rejected',

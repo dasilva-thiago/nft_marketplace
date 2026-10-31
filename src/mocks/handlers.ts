@@ -474,6 +474,11 @@ export const handlers = [
   http.put('/api/favorites/:nftId', ({ request, params }) => {
     const currentSession = getSessionFromRequest(request);
     if (!currentSession) return unauthorizedResponse();
+    if (getMockScenario() === 'favorite-failure')
+      return HttpResponse.json(
+        apiError('TRANSIENT_ERROR', 'Favoritos indisponíveis no momento.', true),
+        { status: 503 },
+      );
     const nft = nftFixtures.find((item) => item.id === params.nftId);
     if (!nft) return notFoundResponse('NFT não encontrado.');
     return HttpResponse.json(addFavoriteForUser(currentSession.session.user.id, nft.id));
@@ -481,6 +486,11 @@ export const handlers = [
   http.delete('/api/favorites/:nftId', ({ request, params }) => {
     const currentSession = getSessionFromRequest(request);
     if (!currentSession) return unauthorizedResponse();
+    if (getMockScenario() === 'favorite-failure')
+      return HttpResponse.json(
+        apiError('TRANSIENT_ERROR', 'Favoritos indisponíveis no momento.', true),
+        { status: 503 },
+      );
     removeFavoriteForUser(currentSession.session.user.id, String(params.nftId));
     return new HttpResponse(null, { status: 204 });
   }),

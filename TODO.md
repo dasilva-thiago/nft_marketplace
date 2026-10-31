@@ -28,7 +28,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [x] Implementar destaque, lançamentos/diário, filtros combináveis de rede/traits/faixa de preço previstos pelo contrato, histórico, paginação e URLs de busca; a validação de respostas fora de ordem permanece coberta no nível de API e a confirmação visual em 768 px é uma pendência de regressão.
 - [x] Implementar a tela visual de detalhe com acesso direto, estado 404, galeria, edição, quantidade, favorito e ações de compra/adicionar; persistência e mutations são cobertas pelas APIs de domínio.
 - [x] Persistir favoritos para autenticados; incluir mutation otimista com rollback e isolamento entre usuários.
-- [ ] Cobrir rollback otimista pela interface com um cenário de falha controlada; o contrato API já cobre erro de NFT inexistente.
+- [x] Cobrir rollback otimista pela interface com o cenário `favorite-failure`: o coração é revertido, o snapshot é restaurado e o erro é anunciado; o contrato API também cobre NFT inexistente.
 
 ## Interface de conta e carteiras
 
