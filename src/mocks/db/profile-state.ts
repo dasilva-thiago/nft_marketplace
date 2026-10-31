@@ -28,6 +28,15 @@ export function getProfileForUser(userId: string): CollectorProfile | undefined 
   return profiles.get(userId);
 }
 
+export function createProfileForUser(input: CollectorProfile): CollectorProfile {
+  const existing = profiles.get(input.userId);
+  if (existing) return existing;
+  profiles.set(input.userId, input);
+  if (typeof sessionStorage !== 'undefined')
+    sessionStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify([...profiles.values()]));
+  return input;
+}
+
 export function updateProfileForUser(
   userId: string,
   input: UpdateProfileRequest,

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('home mostra cards e filtro selecionado fica refletido na URL', async ({ page }) => {
   await page.goto('/');

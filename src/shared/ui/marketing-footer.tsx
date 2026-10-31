@@ -30,10 +30,16 @@ export function MarketingFooter() {
               aria-label="Seu e-mail para novidades"
               placeholder="Digite seu e-mail..."
               type="email"
+              disabled
+              aria-describedby="newsletter-unavailable"
             />
-            <button type="button">Enviar</button>
+            <button type="button" disabled aria-describedby="newsletter-unavailable">
+              Enviar
+            </button>
           </div>
-          <p>Receba lançamentos selecionados, histórias de criadores e novidades do mercado.</p>
+          <p id="newsletter-unavailable">
+            Inscrição indisponível nesta demonstração; newsletters não fazem parte do desafio.
+          </p>
         </form>
       </div>
       <div className="footer-bar">
@@ -46,16 +52,16 @@ export function MarketingFooter() {
         <section>
           <strong>Meu perfil</strong>
           <a href="/account/profile">Meu perfil</a>
-          <a href="/account/profile">Minha coleção</a>
-          <a href="/account/profile">Atividade</a>
-          <a href="/account/profile">Estúdio de criador</a>
+          <span aria-disabled="true">Minha coleção</span>
+          <span aria-disabled="true">Atividade · fora do escopo</span>
+          <span aria-disabled="true">Estúdio de criador · fora do escopo</span>
         </section>
         <section>
           <strong>Central de ajuda</strong>
-          <a href="#ajuda">Central de ajuda</a>
-          <a href="#ajuda">Como comprar NFTs</a>
+          <span aria-disabled="true">Central de ajuda · fora do escopo</span>
+          <span aria-disabled="true">Como comprar NFTs · fora do escopo</span>
           <a href="/account/wallets">Carteiras e segurança</a>
-          <a href="#ajuda">Política de mercado</a>
+          <span aria-disabled="true">Política de mercado · fora do escopo</span>
         </section>
         <section>
           <strong>Coleções</strong>
@@ -67,18 +73,10 @@ export function MarketingFooter() {
         <section>
           <strong>Redes sociais</strong>
           <div className="footer-socials">
-            <a href="#social" aria-label="Instagram">
-              ◎
-            </a>
-            <a href="#social" aria-label="Facebook">
-              f
-            </a>
-            <a href="#social" aria-label="LinkedIn">
-              in
-            </a>
-            <a href="#social" aria-label="YouTube">
-              ▶
-            </a>
+            <span aria-hidden="true">◎</span>
+            <span aria-hidden="true">f</span>
+            <span aria-hidden="true">in</span>
+            <span aria-hidden="true">▶</span>
           </div>
           <strong>Carteiras compatíveis</strong>
           <small>METAMASK · WALLETCONNECT · COINBASE</small>

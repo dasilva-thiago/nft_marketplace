@@ -12,6 +12,8 @@ export const MockScenarioSchema = z.enum([
   'payment-pending',
   'payment-rejected',
   'order-timeout',
+  'wallet-rejected',
+  'wallet-disconnected',
 ]);
 export type MockScenario = z.infer<typeof MockScenarioSchema>;
 

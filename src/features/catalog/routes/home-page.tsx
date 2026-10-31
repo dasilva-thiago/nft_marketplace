@@ -19,6 +19,7 @@ import { useFavoritesQuery, useToggleFavoriteMutation } from '@/features/favorit
 import type { NftSummary, PageRequest } from '@/shared/contracts';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
 import { NftCardSkeleton } from '@/shared/ui/skeleton';
+import { getResponsiveNftImageSrcSet } from '@/shared/ui/responsive-nft-image';
 
 const PAGE_SIZE = 9;
 const defaultHomeSearch = {
@@ -45,7 +46,13 @@ function EditorialNftCard({ nft }: { nft: NftSummary }) {
   return (
     <article className="visual-nft-card" aria-label={nft.name}>
       <div className="visual-nft-image">
-        <img src={nft.imageUrl} alt={`Arte de ${nft.name}`} loading="lazy" />
+        <img
+          src={nft.imageUrl}
+          srcSet={getResponsiveNftImageSrcSet(nft.imageUrl)}
+          sizes="(max-width: 768px) 48vw, 240px"
+          alt={`Arte de ${nft.name}`}
+          loading="lazy"
+        />
       </div>
       <div className="visual-nft-meta">
         <div>
@@ -64,7 +71,13 @@ function LimitedFeaturedCard({ nft }: { nft: NftSummary }) {
       <p className="limited-featured-kicker">NFT EM DESTAQUE</p>
       <strong>OFERTA LIMITADA</strong>
       <Link to="/nft/$nftId" params={{ nftId: nft.id }} aria-label={`Ver oferta ${nft.name}`}>
-        <img src={nft.imageUrl} alt={`Arte de ${nft.name}`} />
+        <img
+          src={nft.imageUrl}
+          srcSet={getResponsiveNftImageSrcSet(nft.imageUrl)}
+          sizes="220px"
+          alt={`Arte de ${nft.name}`}
+          loading="lazy"
+        />
       </Link>
       <div className="limited-featured-meta">
         <span>{nft.name}</span>
@@ -77,7 +90,13 @@ function LimitedFeaturedCard({ nft }: { nft: NftSummary }) {
 function EditorialFeatureCard({ nft }: { nft: NftSummary }) {
   return (
     <article className="editorial-feature-card">
-      <img src={nft.imageUrl} alt={`Arte de ${nft.name}`} loading="lazy" />
+      <img
+        src={nft.imageUrl}
+        srcSet={getResponsiveNftImageSrcSet(nft.imageUrl)}
+        sizes="(max-width: 768px) 45vw, 300px"
+        alt={`Arte de ${nft.name}`}
+        loading="lazy"
+      />
       <div>
         <span>{nft.collection}</span>
         <h3>{nft.name}</h3>
@@ -274,7 +293,12 @@ export function HomePage() {
           <div className="hero-art-wrap">
             <div className="hero-art-frame">
               <img
-                src={heroFeatured?.imageUrl ?? '/placeholders/nft-placeholder.svg'}
+                src={heroFeatured?.imageUrl ?? '/assets/monkey3.webp'}
+                srcSet={getResponsiveNftImageSrcSet(
+                  heroFeatured?.imageUrl ?? '/assets/monkey3.webp',
+                )}
+                sizes="(max-width: 768px) 45vw, 355px"
+                fetchPriority="high"
                 alt={heroFeatured ? `Arte de ${heroFeatured.name}` : 'Arte digital em destaque'}
                 className="hero-art"
               />
@@ -495,16 +519,23 @@ export function HomePage() {
               )}
               {!isPending && !isError && data && data.items.length > 0 && (
                 <div className="nft-grid">
-                  {data.items.map((nft) => (
+                  {data.items.map((nft, index) => (
                     <article className="nft-card" key={nft.id}>
                       <Link
                         to="/nft/$nftId"
                         params={{ nftId: nft.id }}
                         className="nft-card-link"
-                        aria-label={`Ver ${nft.name}`}
+                        aria-label={nft.name}
                       >
                         <div className="nft-card-image-wrap">
-                          <img src={nft.imageUrl} alt={`Arte de ${nft.name}`} loading="lazy" />
+                          <img
+                            src={nft.imageUrl}
+                            srcSet={getResponsiveNftImageSrcSet(nft.imageUrl)}
+                            sizes="(max-width: 768px) 50vw, 284px"
+                            alt={`Arte de ${nft.name}`}
+                            fetchPriority={index === 0 ? 'high' : undefined}
+                            loading={index === 0 ? 'eager' : 'lazy'}
+                          />
                           <span className="edition-badge">
                             {nft.availableEditions > 0
                               ? `${nft.availableEditions} disponíveis`

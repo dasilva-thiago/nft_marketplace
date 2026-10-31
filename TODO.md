@@ -50,9 +50,9 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 ## Mocking e tempo real
 
-- [x] Fixtures de catálogo com variedade para filtros/paginação e cenários default/vazio/lento/fora de ordem/429/503; ainda não há fixtures de dois usuários nem dos demais domínios.
+- [x] Fixtures de catálogo com variedade para filtros/paginação e cenários default/vazio/lento/fora de ordem/429/503; os demais domínios usam fixtures persistidas por usuário.
 - [x] Fixtures para pelo menos dois usuários e cenários de falha de conexão, sessão expirada/sem permissão, conflito, cupom, preço/edição, timeout pós-criação/idempotência e pagamentos.
-- [ ] MSW ativo por configuração em desenvolvimento e build demo, state consistente em catálogo/favoritos/carrinho/perfil/carteiras/pedidos, persistência local para refresh e reset para cenário conhecido.
+- [x] MSW ativo por configuração em desenvolvimento e build demo; estado de catálogo/favoritos/carrinho/perfil/carteiras/pedidos é isolado por domínio/usuário, persiste em `sessionStorage` durante refresh e retorna ao cenário conhecido após reset. Validado pela suíte E2E completa.
 - [x] Simular eventos com integração Socket.IO compatível com MSW usando `@mswjs/socket.io-binding`; exercitar `socket.io-client`; documentar transporte e limites. Componentes, hooks e Axios não incluem caminhos de negócio fictícios.
 - [x] `nft.updated` atualiza catálogo/detalhe/carrinho; `order.updated` atualiza pedido. Eventos têm identidade estável, recurso e versão; duplicatas/antigos não regridem estado nem reaplicam efeitos; reconexão reconcilia via REST; listeners/subscriptions são limpos; eventos de sessão antiga não alteram usuário atual.
 - [x] Cenário ponta a ponta de alteração de NFT no carrinho: a UI informa, atualiza o resumo, recota via REST e bloqueia a cotação antiga até revisão explícita.
@@ -60,17 +60,18 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 ## Interface e acessibilidade
 
-- [ ] Implementar os frames definidos pelo Figma em desktop/tablet/mobile nas larguras 390/768/1440, preservando tipografia, cores, espaçamentos, hierarquia, imagens, proporções e composição; documentar em `docs/architecture.md` cada substituição de asset e ajuste de acessibilidade.
-- [ ] Reproduzir visualmente início, login, cadastro, detalhe do NFT, carrinho e pagamento nos pares desktop/mobile definidos pelo Figma; login e cadastro desktop devem permanecer modais sobre a home, enquanto mobile deve usar as telas dedicadas.
-- [x] Reproduzir visualmente confirmação, perfil e carteiras nas referências desktop; adaptar responsivamente as três variantes mobile sem frame específico, preservando a composição desktop e documentando a decisão em `docs/architecture.md`.
+- [ ] Completar a fidelidade fina aos frames do Figma em 390/768/1440 px, preservando tipografia, cores, espaçamentos, hierarquia, imagens, proporções e composição. `ARCHITECTURE.md` registra as substituições de asset e decisões responsivas/acessíveis já tomadas.
+- [ ] Reproduzir visualmente início, login, cadastro, detalhe do NFT, carrinho e pagamento nos pares desktop/mobile definidos pelo Figma; login e cadastro desktop devem permanecer modais sobre a home, enquanto mobile deve usar as telas dedicadas. Existem baselines versionadas de início/detalhe/carrinho/pagamento; a comparação fina com todos os frames continua aberta.
+- [x] Reproduzir visualmente confirmação, perfil e carteiras nas referências desktop; adaptar responsivamente as três variantes mobile sem frame específico, preservando a composição desktop e documentando a decisão em `ARCHITECTURE.md`.
 - [x] Skeleton shimmer em catálogo, detalhe e resumo do carrinho; preservar dimensões contra CLS e respeitar movimento reduzido.
-- [ ] Teclado/foco visível; foco em diálogos/drawers; semântica, labels e erros associados; alt text; contraste e estados que não dependem só de cor; feedback acessível para mutations/eventos; sem overflow indevido e sem perda de conteúdo com zoom. Autenticação e as rotas protegidas já cobrem foco por teclado, labels, landmarks, confirmação nomeada e `aria-describedby` para erros.
+- [ ] Revisão manual global de acessibilidade, incluindo zoom/reflow e feedback de eventos em todas as telas. Playwright cobre teclado/foco, diálogo desktop, labels, landmarks, confirmação nomeada e erros associados; os contrastes representativos e os ajustes documentados em `ARCHITECTURE.md` foram verificados.
 
 ## Testes, qualidade e deploy
 
 - [x] Playwright inicial para smoke da home, catálogo via Axios/MSW (página/filtro/detalhe/404/parâmetros inválidos), Socket.IO binding e cenário 429/reset.
-- [ ] Completar E2E: catálogo/URL/histórico na interface; cadastro/login/expiração/logout/troca; favoritos/falha/recuperação; carrinho; compra/recibo/recusa/idempotência; perfil/carteiras; eventos/reconexão; teclado/foco; skeleton/falha/retry.
-- [ ] Cada teste inicia isolado; controlar relógio/latência/eventos sensíveis ao tempo; observar UI e resultado; REST por handlers MSW e tempo real por socket.io-client. Chromium desktop/mobile; visual regressão de início/detalhe/carrinho/pagamento com baselines versionadas; entregar relatório HTML e traces.
-- [ ] Lighthouse otimizado em início e detalhe, desktop/mobile, três medições por cenário; reportar medianas: Performance ≥90, Accessibility ≥95, Best Practices ≥95, SEO ≥90; reportar LCP/CLS/TBT e justificar déficits; versionar configuração, relatórios HTML/JSON, ferramentas e ambiente.
-- [ ] README completo com setup, variáveis, credenciais fictícias, cenários/reset, comandos, contratos, transporte/limitações Socket.IO/MSW, cache/retries e fluxos de falha. Código, lockfile, assets, mocks, fixtures, testes e configs entregues.
-- [ ] Deploy obrigatório (Vercel recomendado; Netlify/Cloudflare Pages aceitos), URL pública acessível, mocks e tempo real funcionais, rota direta e refresh operacionais; versão publicada corresponde ao código entregue.
+- [x] Cobrir com E2E catálogo/URL/histórico; cadastro/login/expiração/logout/troca; favoritos/falha/recuperação; carrinho; compra/recibo/recusa/idempotência; perfil/carteiras; eventos/reconexão; teclado/foco; skeleton/falha/retry. A última execução completa listou 110 casos: 104 aprovados e 6 skips intencionais por viewport.
+- [x] Casos Playwright executam em Chromium desktop/mobile com MSW e cliente Socket.IO, observam UI/resultados e isolam/resetam seus cenários; existem baselines versionadas para início/detalhe/carrinho/pagamento e reporter HTML em `playwright-report/`. A última execução terminou sem falhas.
+- [x] Executar a matriz Lighthouse em build otimizado de início/detalhe, desktop/mobile, três medições por combinação; versionar configuração, 12 relatórios HTML/JSON, ambiente/versões, medianas das categorias e LCP/CLS/TBT em `reports/lighthouse/summary.md`.
+- [ ] Otimizar a carga inicial até Performance ≥90 ou priorizar com a revisão técnica. Medianas atuais: 84% home mobile, 83% detalhe mobile, 61% home desktop e 64% detalhe desktop; Accessibility (100%), Best Practices (96% mobile/100% desktop) e SEO (100%) atingem as metas. Os LHR apontam FCP/LCP altos, request LCP não descoberto no HTML e custo de script/layout; detalhes e relatórios estão em `ARCHITECTURE.md` e `reports/lighthouse/`.
+- [x] README completo com setup, variáveis, credenciais fictícias, cenários/reset, comandos, contratos, transporte/limitações Socket.IO/MSW, cache/retries e fluxos de falha. Código, lockfile, assets, mocks, fixtures, testes e configs estão no repositório.
+- [ ] Deploy obrigatório (Vercel recomendado; Netlify/Cloudflare Pages aceitos), URL pública acessível, mocks e tempo real funcionais, rota direta e refresh operacionais; configuração Vercel/fallback está preparada, mas publicar e validar requer autorização/acesso à conta do provedor.

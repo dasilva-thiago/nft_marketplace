@@ -10,10 +10,11 @@
     "typecheck": "tsc -b --pretty",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"e2e/**/*.ts\" \"*.{ts,tsx,js,json,md}\" \"docs/**/*.md\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"e2e/**/*.ts\" \"*.{ts,tsx,js,json,md}\" \"docs/**/*.md\"",
+    "lint": "eslint .",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
-    "audit:lighthouse": "lhci autorun --config=./lighthouserc.json",
+    "audit:lighthouse": "node scripts/audit-lighthouse.mjs",
     "mocks:init": "msw init public/ --save"
   },
   "dependencies": {
@@ -31,6 +32,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@lhci/cli": "^0.15.1",
     "@mswjs/socket.io-binding": "^0.2.0",
     "@playwright/test": "^1.55.0",
@@ -40,11 +42,16 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "^10.4.21",
+    "eslint": "^10.14.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
     "msw": "^2.11.3",
     "postcss": "^8.5.6",
     "prettier": "3.6.2",
     "tailwindcss": "^3.4.17",
     "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.1",
     "vite": "^7.1.7"
   },
   "msw": {

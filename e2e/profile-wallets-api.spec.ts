@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -62,8 +62,10 @@ test('perfil e carteiras persistem por usuário e validam conflitos', async ({ p
 
   expect(result.updatedProfile.name).toBe('Ana Colecionadora');
   expect(result.password.updated).toBe(true);
-  expect(result.initialWallets).toHaveLength(1);
+  expect(result.initialWallets).toHaveLength(2);
+  expect(result.initialWallets.map((wallet) => wallet.label)).toEqual(['Principal', 'Reserva']);
   expect(result.promoted.isPrimary).toBe(true);
+  expect(result.walletsAfterUpdate).toHaveLength(3);
   expect(result.walletsAfterUpdate.filter((wallet) => wallet.isPrimary)).toHaveLength(1);
   expect(result.duplicate?.status).toBe(409);
   expect(result.duplicate?.apiError?.code).toBe('CONFLICT');

@@ -33,16 +33,16 @@ Códigos tipados: `VALIDATION_ERROR` (400), `SESSION_INVALID` (401), `FORBIDDEN`
 
 ### Sessão e conta
 
-| Método e rota             | Entrada                                         | Sucesso                                    | Erros relevantes                              |
-| ------------------------- | ----------------------------------------------- | ------------------------------------------ | --------------------------------------------- |
-| `POST /api/auth/register` | `RegisterRequest` (`name`, `email`, `password`) | `201 Session`; email existente é conflito  | 400 validação, 409 conflito                   |
-| `POST /api/auth/login`    | `LoginRequest`                                  | `200 Session` e cookie de sessão           | 400 validação, 401 credencial/sessão inválida |
-| `GET /api/session`        | —                                               | `200 Session`                              | 401 ausente/expirada                          |
-| `POST /api/auth/logout`   | —                                               | `200 { "loggedOut": true }`, expira cookie | 401 pode ser tratado como sessão já encerrada |
+| Método e rota             | Entrada                                         | Sucesso                                       | Erros relevantes                              |
+| ------------------------- | ----------------------------------------------- | --------------------------------------------- | --------------------------------------------- |
+| `POST /api/auth/register` | `RegisterRequest` (`name`, `email`, `password`) | `201 Session`; email existente é conflito     | 400 validação, 409 conflito                   |
+| `POST /api/auth/login`    | `LoginRequest`                                  | `200 Session` e cookie de sessão              | 400 validação, 401 credencial/sessão inválida |
+| `GET /api/session`        | —                                               | `200 Session` autenticada; `200 null` anônima | 401 handle inválido/expirado                  |
+| `POST /api/auth/logout`   | —                                               | `200 { "loggedOut": true }`, expira cookie    | 401 pode ser tratado como sessão já encerrada |
 
 `Session` tem `user` (`id`, `name`, `email`, `avatarUrl`) e `expiresAt`. Use duas contas fictícias de teste documentadas no README; cada uma deve ter dados privados separados.
 
-Na demonstração atual, o MSW implementa os quatro endpoints acima e valida requests/responses com Zod. O mock usa o header interno `X-Mock-Session` para transportar um handle codificado entre o cliente Axios e o handler; o valor é reconstruível após refresh somente para sustentar o cenário local. Logout remove o handle do navegador e encerra o registro em memória do mock. O cenário `session-expired` faz `GET /api/session` retornar `401 SESSION_INVALID` e é persistido na `sessionStorage` do cenário somente para reproduzir refresh em testes.
+Na demonstração atual, o MSW implementa os quatro endpoints acima e valida requests/responses com Zod. O mock usa o header interno `X-Mock-Session` para transportar um handle codificado entre o cliente Axios e o handler; o valor é reconstruível após refresh somente para sustentar o cenário local. Sem handle, `GET /api/session` retorna `200 null` para representar uma navegação anônima sem erro de rede; um handle inválido/expirado continua retornando `401 SESSION_INVALID`. Logout remove o handle do navegador e encerra o registro em memória do mock. O cenário `session-expired` faz `GET /api/session` retornar `401 SESSION_INVALID` e é persistido na `sessionStorage` do cenário somente para reproduzir refresh em testes.
 
 ### NFTs
 

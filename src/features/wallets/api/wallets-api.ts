@@ -1,6 +1,12 @@
-import type { CreateWalletRequest, UpdateWalletRequest, Wallet } from '@/shared/contracts';
+import type {
+  CreateWalletRequest,
+  UpdateWalletRequest,
+  Wallet,
+  WalletConnection,
+} from '@/shared/contracts';
 import {
   CreateWalletRequestSchema,
+  WalletConnectionSchema,
   UpdateWalletRequestSchema,
   WalletsSchema,
   WalletSchema,
@@ -24,5 +30,17 @@ export const walletsApi = {
       UpdateWalletRequestSchema.parse(input),
     );
     return WalletSchema.parse(response.data);
+  },
+
+  async connect(walletId: string): Promise<WalletConnection> {
+    const response = await http.post<unknown>(`/wallets/${encodeURIComponent(walletId)}/connect`);
+    return WalletConnectionSchema.parse(response.data);
+  },
+
+  async disconnect(walletId: string): Promise<WalletConnection> {
+    const response = await http.post<unknown>(
+      `/wallets/${encodeURIComponent(walletId)}/disconnect`,
+    );
+    return WalletConnectionSchema.parse(response.data);
   },
 };

@@ -2,21 +2,45 @@ import {
   createRootRouteWithContext,
   createRoute,
   createRouter,
+  lazyRouteComponent,
   parseSearchWith,
   stringifySearchWith,
 } from '@tanstack/react-router';
 import type { QueryClient } from '@tanstack/react-query';
 import { RootLayout } from './root-layout';
-import { LoginPage, RegisterPage } from '@/features/auth/routes/auth-page';
-import { HomePage } from '@/features/catalog/routes/home-page';
-import { NftDetailPage } from '@/features/catalog/routes/nft-detail-page';
-import { CartPage } from '@/features/cart/routes/cart-page';
-import { CheckoutPage } from '@/features/checkout/routes/checkout-page';
-import { OrderPage } from '@/features/orders/routes/order-page';
-import { ProfilePage } from '@/features/profile/routes/profile-page';
-import { WalletsPage } from '@/features/wallets/routes/wallets-page';
 import { ProtectedPlaceholderPage } from '@/features/auth/components/protected-placeholder-page';
 import { PlaceholderPage } from '@/shared/ui/placeholder-page';
+
+const LoginPage = lazyRouteComponent(() => import('@/features/auth/routes/auth-page'), 'LoginPage');
+const RegisterPage = lazyRouteComponent(
+  () => import('@/features/auth/routes/auth-page'),
+  'RegisterPage',
+);
+const HomePage = lazyRouteComponent(
+  () => import('@/features/catalog/routes/home-page'),
+  'HomePage',
+);
+const NftDetailPage = lazyRouteComponent(
+  () => import('@/features/catalog/routes/nft-detail-page'),
+  'NftDetailPage',
+);
+const CartPage = lazyRouteComponent(() => import('@/features/cart/routes/cart-page'), 'CartPage');
+const CheckoutPage = lazyRouteComponent(
+  () => import('@/features/checkout/routes/checkout-page'),
+  'CheckoutPage',
+);
+const OrderPage = lazyRouteComponent(
+  () => import('@/features/orders/routes/order-page'),
+  'OrderPage',
+);
+const ProfilePage = lazyRouteComponent(
+  () => import('@/features/profile/routes/profile-page'),
+  'ProfilePage',
+);
+const WalletsPage = lazyRouteComponent(
+  () => import('@/features/wallets/routes/wallets-page'),
+  'WalletsPage',
+);
 
 interface RouterContext {
   queryClient: QueryClient;

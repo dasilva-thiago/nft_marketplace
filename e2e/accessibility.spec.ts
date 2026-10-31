@@ -1,10 +1,10 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('autenticação associa erros aos campos e mantém foco navegável', async ({ page }) => {
   await page.goto('/login');
 
   const email = page.getByRole('textbox', { name: 'E-mail' });
-  const password = page.getByLabel('Senha');
+  const password = page.getByRole('textbox', { name: 'Senha' });
   await expect(email).toBeVisible();
   await expect(password).toBeVisible();
 
@@ -28,7 +28,25 @@ test('autenticação associa erros aos campos e mantém foco navegável', async 
 
 test('cadastro expõe confirmação de senha como campo nomeado', async ({ page }) => {
   await page.goto('/register');
-  const confirmation = page.getByLabel('Confirmação');
+  const confirmation = page.getByLabel('Confirmar senha');
   await expect(confirmation).toBeVisible();
   await expect(confirmation).toHaveAttribute('name', 'passwordConfirmation');
+});
+
+test('login desktop é modal, contém o foco e fecha com Escape', async ({ page }, testInfo) => {
+  test.skip(
+    !testInfo.project.name.includes('desktop'),
+    'Comportamento modal só existe no desktop.',
+  );
+  await page.goto('/login');
+  const dialog = page.getByRole('dialog', { name: 'Entrar na Kurio' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAttribute('aria-modal', 'true');
+
+  const close = dialog.getByRole('link', { name: 'Fechar autenticação' });
+  await dialog.getByRole('link', { name: 'Crie uma conta' }).focus();
+  await page.keyboard.press('Tab');
+  await expect(close).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page).toHaveURL(/\/\?page=1&/);
 });

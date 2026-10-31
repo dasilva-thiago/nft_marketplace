@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('falha ao favoritar reverte o coração e anuncia o erro', async ({ page }) => {
   await page.goto('/');

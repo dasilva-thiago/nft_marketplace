@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('recupera pedido persistido após timeout de rede usando a mesma chave', async ({ page }) => {
   await page.goto('/');
@@ -19,7 +19,7 @@ test('recupera pedido persistido após timeout de rede usando a mesma chave', as
     const cart = await cartApi.addItem({ nftId: 'emerald-ape-042', quantity: 1 });
     const quote = await cartApi.quote({
       items: cart.items.map(({ nftId, quantity }) => ({ nftId, quantity })),
-      walletId: 'metamask',
+      walletId: 'wallet-ana-primary',
       network: 'Ethereum',
     });
     const scenario = await fetch('/api/__mock/scenario', {
@@ -31,20 +31,38 @@ test('recupera pedido persistido após timeout de rede usando a mesma chave', as
 
     const idempotencyKey = `timeout-${Date.now()}`;
     const timeout = await ordersApi
-      .create({ quoteId: quote.quoteId, walletId: 'metamask', network: 'Ethereum' }, idempotencyKey)
+      .create(
+        { quoteId: quote.quoteId, walletId: 'wallet-ana-primary', network: 'Ethereum' },
+        idempotencyKey,
+      )
       .then(
         () => null,
         (error: unknown) => ({ code: (error as { code?: string }).code }),
       );
-    const recovered = await ordersApi.recover(idempotencyKey);
-    const replayed = await ordersApi.create(
-      { quoteId: quote.quoteId, walletId: 'metamask', network: 'Ethereum' },
-      idempotencyKey,
-    );
-    return { timeout, recovered, replayed };
+    return { timeout, idempotencyKey, quoteId: quote.quoteId };
   });
 
   expect(result.timeout?.code).toBe('ECONNABORTED');
-  expect(result.recovered.status).toBe('confirmed');
-  expect(result.replayed.id).toBe(result.recovered.id);
+  await page.reload();
+  await expect(page.getByRole('button', { name: 'Sair' })).toBeVisible();
+  const recovered = await page.evaluate(async ({ idempotencyKey, quoteId }) => {
+    const { authApi } = await import('/src/features/auth/api/auth-api.ts');
+    const { ordersApi } = await import('/src/features/orders/api/orders-api.ts');
+    const { getQuoteForUser } = await import('/src/mocks/db/quotes-state.ts');
+    const session = await authApi.getSession();
+    if (!session) throw new Error('A sessão expirou antes da recuperação.');
+    const order = await ordersApi.recover(idempotencyKey);
+    const replay = await ordersApi.create(
+      { quoteId, walletId: 'wallet-ana-primary', network: 'Ethereum' },
+      idempotencyKey,
+    );
+    return {
+      order,
+      replay,
+      savedQuoteId: getQuoteForUser(session.user.id, quoteId)?.quoteId,
+    };
+  }, result);
+  expect(recovered.order.status).toBe('confirmed');
+  expect(recovered.replay.id).toBe(recovered.order.id);
+  expect(recovered.savedQuoteId).toBe(result.quoteId);
 });

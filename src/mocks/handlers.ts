@@ -55,9 +55,17 @@ import {
   createOrderForUser,
   getOrderByIdempotencyKey,
   getOrderForUser,
+  isCartConsumedForOrder,
+  markCartConsumedForOrder,
   resetMockOrdersState,
+  updateOrderForUser,
 } from './db/orders-state';
-import { getProfileForUser, resetMockProfileState, updateProfileForUser } from './db/profile-state';
+import {
+  createProfileForUser,
+  getProfileForUser,
+  resetMockProfileState,
+  updateProfileForUser,
+} from './db/profile-state';
 import {
   createWalletForUser,
   listWalletsForUser,
@@ -110,6 +118,22 @@ function availabilityResponse(nftName: string) {
   );
 }
 
+function walletSelectionError(userId: string, walletId: string, network: string): Response | null {
+  const wallet = listWalletsForUser(userId).find((candidate) => candidate.id === walletId);
+  if (!wallet)
+    return HttpResponse.json(apiError('FORBIDDEN', 'A carteira não pertence a esta conta.'), {
+      status: 403,
+    });
+  if (wallet.network !== network)
+    return HttpResponse.json(
+      apiError('CONFLICT', 'A rede não corresponde à carteira selecionada.'),
+      {
+        status: 409,
+      },
+    );
+  return null;
+}
+
 function validationResponse(
   message: string,
   error: { issues: Array<{ path: PropertyKey[]; message: string }> },
@@ -145,15 +169,19 @@ function getCartResponse(userId: string): Cart {
 
 function buildQuote(
   items: QuoteRequest['items'],
-  couponCode?: string,
+  couponCode: string | undefined,
+  walletId: string,
+  network: QuoteRequest['network'],
 ): { value: Quote } | { error: Response } {
   const quoteLines = [];
   let subtotal = new Big(0);
+  let quoteVersion = 1;
   for (const requested of items) {
     const nft = nftFixtures.find((candidate) => candidate.id === requested.nftId);
     if (!nft) return { error: notFoundResponse('NFT não encontrado.') };
     if (requested.quantity > nft.availableEditions)
       return { error: availabilityResponse(nft.name) };
+    quoteVersion = Math.max(quoteVersion, nft.version);
     const lineTotal = new Big(nft.priceEth).times(requested.quantity);
     subtotal = subtotal.plus(lineTotal);
     quoteLines.push({
@@ -177,21 +205,46 @@ function buildQuote(
     };
 
   const discount = normalizedCoupon === 'KURIO10' ? subtotal.times('0.1') : new Big(0);
-  const networkFee = new Big('0.016');
+  const networkFee = new Big(network === 'Polygon' ? '0.002' : '0.016');
   const now = new Date();
   const quote: Quote = {
-    quoteId: `quote-${Date.now()}`,
+    quoteId: `quote-${crypto.randomUUID()}`,
     items: quoteLines,
     couponCode: normalizedCoupon ?? null,
+    walletId,
+    network,
     subtotalEth: subtotal.toFixed(),
     discountEth: discount.toFixed(),
     networkFeeEth: networkFee.toFixed(),
     totalEth: subtotal.minus(discount).plus(networkFee).toFixed(),
     createdAt: now.toISOString(),
     expiresAt: new Date(now.getTime() + 60_000).toISOString(),
-    version: 1,
+    version: quoteVersion,
   };
   return { value: quote };
+}
+
+function sameQuoteTerms(previous: Quote, current: Quote): boolean {
+  return (
+    previous.walletId === current.walletId &&
+    previous.network === current.network &&
+    previous.couponCode === current.couponCode &&
+    previous.version === current.version &&
+    previous.subtotalEth === current.subtotalEth &&
+    previous.discountEth === current.discountEth &&
+    previous.networkFeeEth === current.networkFeeEth &&
+    previous.totalEth === current.totalEth &&
+    previous.items.length === current.items.length &&
+    previous.items.every((item, index) => {
+      const currentItem = current.items[index];
+      return (
+        item.nftId === currentItem?.nftId &&
+        item.quantity === currentItem.quantity &&
+        item.unitPriceEth === currentItem.unitPriceEth &&
+        item.lineTotalEth === currentItem.lineTotalEth
+      );
+    })
+  );
 }
 
 async function readJson(request: Request): Promise<unknown> {
@@ -317,12 +370,33 @@ export const handlers = [
       })
     )
       return notFoundResponse('NFT não encontrado.');
+    if (parsed.data.event === 'order.updated') {
+      const transition = updateOrderForUser(
+        parsed.data.userId,
+        parsed.data.payload.orderId,
+        parsed.data.payload.status,
+        parsed.data.payload.transactionRef,
+        parsed.data.version,
+      );
+      if (transition.kind === 'missing') return notFoundResponse('Pedido não encontrado.');
+      if (transition.kind === 'ignored')
+        return HttpResponse.json({ published: false, reason: transition.reason });
+      publishMockSocketEvent(parsed.data.userId, 'order.updated', {
+        eventId: parsed.data.eventId,
+        resourceId: transition.order.id,
+        version: transition.order.version,
+        occurredAt: transition.order.updatedAt,
+        payload: {
+          orderId: transition.order.id,
+          status: transition.order.status,
+          transactionRef: transition.order.transactionRef,
+        },
+      });
+      return HttpResponse.json({ published: true, eventId: parsed.data.eventId });
+    }
     publishMockSocketEvent(parsed.data.userId, parsed.data.event, {
       eventId: parsed.data.eventId,
-      resourceId:
-        parsed.data.event === 'nft.updated'
-          ? parsed.data.payload.nftId
-          : parsed.data.payload.orderId,
+      resourceId: parsed.data.payload.nftId,
       version: parsed.data.version,
       occurredAt: new Date().toISOString(),
       payload: parsed.data.payload,
@@ -339,6 +413,11 @@ export const handlers = [
     resetMockOrdersState();
     resetMockProfileState();
     resetMockWalletsState();
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.clear();
+      window.localStorage.clear();
+      window.dispatchEvent(new Event('kurio:mock-reset'));
+    }
     return HttpResponse.json({ scenario: getMockScenario(), reset: true });
   }),
   http.post('/api/auth/register', async ({ request }) => {
@@ -363,6 +442,12 @@ export const handlers = [
       );
     }
     const created = await registerMockUser(parsed.data);
+    createProfileForUser({
+      userId: created.session.user.id,
+      name: created.session.user.name,
+      email: created.session.user.email,
+      avatarUrl: created.session.user.avatarUrl,
+    });
     return HttpResponse.json(created.session, {
       status: 201,
       headers: { 'X-Mock-Session': created.sessionId },
@@ -392,6 +477,7 @@ export const handlers = [
     });
   }),
   http.get('/api/session', ({ request }) => {
+    if (!request.headers.has('x-mock-session')) return HttpResponse.json(null);
     const currentSession = getSessionFromRequest(request);
     if (!currentSession)
       return HttpResponse.json(
@@ -429,6 +515,42 @@ export const handlers = [
       });
     await changeMockPassword(currentSession.session.user.id, parsed.data.newPassword);
     return HttpResponse.json({ updated: true });
+  }),
+  http.post('/api/wallets/:walletId/connect', ({ request, params }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const walletId = String(params.walletId);
+    const wallet = listWalletsForUser(currentSession.session.user.id).find(
+      (candidate) => candidate.id === walletId,
+    );
+    if (!wallet) return notFoundResponse('Carteira não encontrada.');
+    const status =
+      getMockScenario() === 'wallet-rejected'
+        ? 'rejected'
+        : getMockScenario() === 'wallet-disconnected'
+          ? 'disconnected'
+          : 'connected';
+    const message =
+      status === 'connected'
+        ? `${wallet.label} conectada à rede ${wallet.network}.`
+        : status === 'rejected'
+          ? 'A conexão foi recusada pela carteira simulada.'
+          : 'A carteira simulada está desconectada.';
+    return HttpResponse.json({ walletId, status, message });
+  }),
+  http.post('/api/wallets/:walletId/disconnect', ({ request, params }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const walletId = String(params.walletId);
+    const wallet = listWalletsForUser(currentSession.session.user.id).find(
+      (candidate) => candidate.id === walletId,
+    );
+    if (!wallet) return notFoundResponse('Carteira não encontrada.');
+    return HttpResponse.json({
+      walletId,
+      status: 'disconnected',
+      message: `${wallet.label} foi desconectada.`,
+    });
   }),
   http.get('/api/wallets', ({ request }) => {
     const currentSession = getSessionFromRequest(request);
@@ -575,7 +697,29 @@ export const handlers = [
     if (!parsed.success)
       return validationResponse('Confira os itens comprados para limpar o carrinho.', parsed.error);
 
-    const cart = getCartForUser(currentSession.session.user.id);
+    const userId = currentSession.session.user.id;
+    const order = getOrderForUser(userId, parsed.data.orderId);
+    if (!order) return notFoundResponse('Pedido não encontrado para esta conta.');
+    if (order.status !== 'confirmed')
+      return HttpResponse.json(
+        apiError('CONFLICT', 'O carrinho só pode ser atualizado após a confirmação do pedido.'),
+        { status: 409 },
+      );
+    if (isCartConsumedForOrder(userId, order.id)) return HttpResponse.json(getCartResponse(userId));
+
+    const expected = order.items
+      .map(({ nftId, quantity }) => ({ nftId, quantity }))
+      .sort((a, b) => a.nftId.localeCompare(b.nftId));
+    const received = parsed.data.items
+      .map(({ nftId, quantity }) => ({ nftId, quantity }))
+      .sort((a, b) => a.nftId.localeCompare(b.nftId));
+    if (JSON.stringify(expected) !== JSON.stringify(received))
+      return HttpResponse.json(
+        apiError('CONFLICT', 'Os itens enviados não correspondem ao snapshot confirmado.'),
+        { status: 409 },
+      );
+
+    const cart = getCartForUser(userId);
     const purchased = new Map(parsed.data.items.map((item) => [item.nftId, item.quantity]));
     const items = cart.items.flatMap((item) => {
       const purchasedQuantity = purchased.get(item.nftId) ?? 0;
@@ -584,14 +728,27 @@ export const handlers = [
       const nft = nftFixtures.find((candidate) => candidate.id === item.nftId);
       return [{ ...item, quantity: remainingQuantity, nft: nft ? toNftSummary(nft) : item.nft }];
     });
-    return HttpResponse.json(saveCartForUser({ ...cart, items, version: cart.version + 1 }));
+    const updatedCart = saveCartForUser({ ...cart, items, version: cart.version + 1 });
+    markCartConsumedForOrder(userId, order.id);
+    return HttpResponse.json(updatedCart);
   }),
   http.post('/api/quotes', async ({ request }) => {
     const currentSession = getSessionFromRequest(request);
     if (!currentSession) return unauthorizedResponse();
     const parsed = QuoteRequestSchema.safeParse(await readJson(request));
     if (!parsed.success) return validationResponse('Confira os itens da cotação.', parsed.error);
-    const quote = buildQuote(parsed.data.items, parsed.data.couponCode);
+    const selectionError = walletSelectionError(
+      currentSession.session.user.id,
+      parsed.data.walletId,
+      parsed.data.network,
+    );
+    if (selectionError) return selectionError;
+    const quote = buildQuote(
+      parsed.data.items,
+      parsed.data.couponCode,
+      parsed.data.walletId,
+      parsed.data.network,
+    );
     if ('error' in quote) return quote.error;
     return HttpResponse.json(saveQuoteForUser(currentSession.session.user.id, quote.value));
   }),
@@ -605,14 +762,59 @@ export const handlers = [
       });
     const parsed = CreateOrderRequestSchema.safeParse(await readJson(request));
     if (!parsed.success) return validationResponse('Confira os dados do pedido.', parsed.error);
-    const quote = getQuoteForUser(currentSession.session.user.id, parsed.data.quoteId);
+    const userId = currentSession.session.user.id;
+    const existingOrder = getOrderByIdempotencyKey(userId, idempotencyKey);
+    if (existingOrder) {
+      const replay = createOrderForUser(
+        userId,
+        parsed.data,
+        existingOrder.quote,
+        idempotencyKey,
+        existingOrder.status,
+      );
+      if (replay.kind === 'conflict')
+        return HttpResponse.json(
+          apiError('CONFLICT', 'A chave de idempotência já foi usada com outro pedido.'),
+          { status: 409 },
+        );
+      return HttpResponse.json(replay.order);
+    }
+
+    const selectionError = walletSelectionError(userId, parsed.data.walletId, parsed.data.network);
+    if (selectionError) return selectionError;
+    const quote = getQuoteForUser(userId, parsed.data.quoteId);
     if (!quote) return notFoundResponse('Cotação não encontrada.');
-    if (Date.parse(quote.expiresAt) <= Date.now())
-      return HttpResponse.json(apiError('CONFLICT', 'A cotação expirou. Gere uma nova cotação.'), {
-        status: 409,
-      });
+    const currentCart = getCartForUser(userId);
+    const cartItems = currentCart.items.map(({ nftId, quantity }) => ({ nftId, quantity }));
+    const cartMatchesQuote = quote.items.every((item) =>
+      cartItems.some((line) => line.nftId === item.nftId && line.quantity >= item.quantity),
+    );
+    const refreshed = buildQuote(
+      quote.items.map(({ nftId, quantity }) => ({ nftId, quantity })),
+      quote.couponCode ?? undefined,
+      parsed.data.walletId,
+      parsed.data.network,
+    );
+    if ('error' in refreshed) return refreshed.error;
+    const quoteChanged = !sameQuoteTerms(quote, refreshed.value) || !cartMatchesQuote;
+    const quoteExpired = Date.parse(quote.expiresAt) <= Date.now();
+    if (quoteChanged || quoteExpired) {
+      const nextQuote = saveQuoteForUser(userId, refreshed.value);
+      return HttpResponse.json(
+        apiError(
+          'CONFLICT',
+          'A cotação ou o carrinho mudou. Revise os valores atualizados.',
+          false,
+          {
+            quoteId: nextQuote.quoteId,
+            totalEth: nextQuote.totalEth,
+          },
+        ),
+        { status: 409 },
+      );
+    }
     const result = createOrderForUser(
-      currentSession.session.user.id,
+      userId,
       parsed.data,
       quote,
       idempotencyKey,

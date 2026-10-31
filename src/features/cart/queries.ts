@@ -107,7 +107,7 @@ export function useQuoteQuery(request: QuoteRequest) {
   return useQuery({
     queryKey: cartKeys.quote(userId ?? 'anonymous', request),
     queryFn: ({ signal }) => cartApi.quote(request, signal),
-    enabled: Boolean(userId && request.items.length),
+    enabled: Boolean(userId && request.items.length && request.walletId && request.network),
     staleTime: 5_000,
     retry: false,
   });

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('catálogo filtra e pagina dados recebidos pelo Axios/MSW', async ({ page }) => {
   await page.goto('/');

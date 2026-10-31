@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -15,6 +15,10 @@ test.beforeEach(async ({ page }) => {
 test('cadastro, sessão, refresh e logout não expõem senha', async ({ page }) => {
   const result = await page.evaluate(async () => {
     const { authApi } = await import('/src/features/auth/api/auth-api.ts');
+    const anonymousResponse = await fetch('/api/session');
+    const anonymousStatus = anonymousResponse.status;
+    const anonymousBody = await anonymousResponse.json();
+    const anonymousSession = await authApi.getSession();
     const email = `collector-${Date.now()}@kurio.demo`;
     const created = await authApi.register({
       name: 'Colecionador Demo',
@@ -25,9 +29,21 @@ test('cadastro, sessão, refresh e logout não expõem senha', async ({ page }) 
     const refreshed = await authApi.getSession();
     await authApi.logout();
     const afterLogout = await authApi.getSession();
-    return { created, storedSessionHandle, refreshed, afterLogout, storage: { ...sessionStorage } };
+    return {
+      anonymousStatus,
+      anonymousBody,
+      anonymousSession,
+      created,
+      storedSessionHandle,
+      refreshed,
+      afterLogout,
+      storage: { ...sessionStorage },
+    };
   });
 
+  expect(result.anonymousStatus).toBe(200);
+  expect(result.anonymousBody).toBeNull();
+  expect(result.anonymousSession).toBeNull();
   expect(result.created.user.email).toContain('@kurio.demo');
   expect(result.created).not.toHaveProperty('password');
   expect(result.refreshed?.user.email).toBe(result.created.user.email);

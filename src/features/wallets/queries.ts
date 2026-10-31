@@ -51,3 +51,17 @@ export function useUpdateWalletMutation() {
     },
   });
 }
+
+export function useConnectWalletMutation() {
+  return useMutation({
+    mutationFn: (walletId: string) => walletsApi.connect(walletId),
+    retry: false,
+  });
+}
+
+export function useDisconnectWalletMutation() {
+  return useMutation({
+    mutationFn: (walletId: string) => walletsApi.disconnect(walletId),
+    retry: false,
+  });
+}

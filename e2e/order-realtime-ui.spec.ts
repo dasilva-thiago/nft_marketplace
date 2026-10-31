@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('atualiza a confirmação visual quando pedido pending recebe evento realtime', async ({
   page,
@@ -27,11 +27,11 @@ test('atualiza a confirmação visual quando pedido pending recebe evento realti
     const cart = await cartApi.addItem({ nftId: 'emerald-ape-042', quantity: 1 });
     const quote = await cartApi.quote({
       items: cart.items.map(({ nftId, quantity }) => ({ nftId, quantity })),
-      walletId: 'metamask',
+      walletId: 'wallet-ana-primary',
       network: 'Ethereum',
     });
     return ordersApi.create(
-      { quoteId: quote.quoteId, walletId: 'metamask', network: 'Ethereum' },
+      { quoteId: quote.quoteId, walletId: 'wallet-ana-primary', network: 'Ethereum' },
       `realtime-ui-${Date.now()}`,
     );
   });
@@ -42,6 +42,8 @@ test('atualiza a confirmação visual quando pedido pending recebe evento realti
   }, order.id);
   await expect(page.getByText('Seu pedido está sendo processado')).toBeVisible();
   await expect(page.getByText('pending', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Atualizar estado' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Tentar novamente' })).toHaveCount(0);
   await page.waitForTimeout(700);
 
   await page.evaluate(async (orderId) => {
@@ -62,4 +64,9 @@ test('atualiza a confirmação visual quando pedido pending recebe evento realti
   await expect(page.getByText('Seus NFTs agora estão na sua carteira')).toBeVisible();
   await expect(page.getByText('confirmed', { exact: true })).toBeVisible();
   await expect(page.getByText('Transação simulada confirmada: 0xconfirmed.')).toBeVisible();
+  const remainingCart = await page.evaluate(async () => {
+    const { cartApi } = await import('/src/features/cart/api/cart-api.ts');
+    return cartApi.get();
+  });
+  expect(remainingCart.items).toHaveLength(0);
 });

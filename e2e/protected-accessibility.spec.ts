@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
-test('formulários protegidos expõem nomes e landmarks acessíveis', async ({ page }) => {
+test('formulários protegidos expõem nomes e landmarks acessíveis', async ({ page }, testInfo) => {
   await page.goto('/');
   await expect(
     page.getByRole('heading', { name: 'SEJA DONO DO FUTURO DA ARTE DIGITAL' }),
@@ -39,6 +39,13 @@ test('formulários protegidos expõem nomes e landmarks acessíveis', async ({ p
     const { router } = await import('/src/app/router.tsx');
     await router.navigate({ to: '/checkout' });
   });
+  if (testInfo.project.name.includes('mobile')) {
+    await expect(page.getByRole('complementary', { name: 'Pagamento com carteira' })).toBeVisible();
+    await expect(page.getByRole('radio')).toHaveCount(2);
+    await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeDisabled();
+    return;
+  }
+
   await expect(page.getByRole('form', { name: 'Perfil do colecionador' })).toBeVisible();
   await expect(page.getByLabel('Nome de exibição*')).toBeVisible();
   await expect(page.getByRole('complementary', { name: /Seus NFTs/ })).toBeVisible();

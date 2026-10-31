@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('Socket.IO client recebe confirmação do handler MSW pelo binding', async ({ page }) => {
   await page.goto('/');

@@ -91,6 +91,8 @@ export function connectMarketplaceRealtime(userId: string, queryClient: QueryCli
     const current = queryClient.getQueryData<OrderSnapshot>(orderKey);
     if (
       typeof version !== 'number' ||
+      parsed.data.status === 'pending' ||
+      (current && current.status !== 'pending') ||
       (current && version <= current.version) ||
       !accept(`order:${parsed.data.orderId}`, version)
     )

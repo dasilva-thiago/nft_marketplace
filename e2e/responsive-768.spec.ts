@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('home, detalhe e carrinho não criam overflow horizontal em 768px', async ({ page }) => {
   await page.setViewportSize({ width: 768, height: 1000 });

@@ -39,6 +39,10 @@ export const authApi = {
   async getSession(): Promise<Session | null> {
     try {
       const response = await http.get<unknown>('/session');
+      if (response.data === null) {
+        clearSessionCredential();
+        return null;
+      }
       return SessionSchema.parse(response.data);
     } catch (error: unknown) {
       const apiError = readApiError(error);

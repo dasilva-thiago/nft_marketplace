@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, ShoppingCart, UserRound } from 'lucide-react';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLogoutMutation, useSessionQuery } from '@/features/auth/queries';
@@ -39,12 +39,22 @@ export function RootLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isAuthRoute = pathname === '/login' || pathname === '/register';
   const isHomeRoute = pathname === '/';
+  const isCheckoutRoute = pathname === '/checkout';
+  const isCartRoute = pathname === '/cart';
+  const isDetailRoute = pathname.startsWith('/nft/');
+  const mainClassName = [
+    isAuthRoute && 'auth-route-main',
+    isCartRoute && 'cart-route-main',
+    isDetailRoute && 'detail-route-main',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <>
       {sessionQuery.data ? <RealtimeBridge userId={sessionQuery.data.user.id} /> : null}
       <header
-        className={`site-header${isAuthRoute ? ' auth-route-header' : ''}${isHomeRoute ? ' home-route-header' : ''}${isHomeRoute && sessionQuery.data ? ' home-route-authenticated' : ''}`}
+        className={`site-header${isAuthRoute ? ' auth-route-header' : ''}${isHomeRoute ? ' home-route-header' : ''}${isHomeRoute && sessionQuery.data ? ' home-route-authenticated' : ''}${isCheckoutRoute ? ' checkout-route-header' : ''}${isCartRoute ? ' cart-route-header' : ''}${isDetailRoute ? ' detail-route-header' : ''}`}
       >
         <Link to="/" search={homeSearch} className="wordmark">
           KURIO
@@ -53,53 +63,53 @@ export function RootLayout() {
           <Link to="/" search={homeSearch}>
             Início
           </Link>
-          {isHomeRoute ? (
-            <>
-              <a href="#catalogo">Mercado</a>
-              <a href="#lancamentos">Criadores</a>
-              <a href="#diario">Aprenda</a>
-            </>
-          ) : (
-            <>
-              <Link to="/" search={homeSearch}>
-                Mercado
-              </Link>
-              <Link to="/account/profile">Perfil</Link>
-              <Link to="/cart">Carrinho</Link>
-            </>
-          )}
+          <a href={isHomeRoute ? '#catalogo' : '/#catalogo'}>Mercado</a>
+          <a href={isHomeRoute ? '#lancamentos' : '/#lancamentos'}>Criadores</a>
+          <a href={isHomeRoute ? '#diario' : '/#diario'}>Aprenda</a>
         </nav>
-        {isHomeRoute && (
-          <a href="#catalogo" className="header-search-link" aria-label="Buscar no marketplace">
+        <div className="header-tools">
+          <a
+            href={isHomeRoute ? '#catalogo' : '/#catalogo'}
+            className="header-search-link"
+            aria-label="Buscar no marketplace"
+          >
             <Search size={15} aria-hidden="true" />
           </a>
-        )}
-        <div className="session-header-actions" aria-live="polite">
-          {sessionQuery.isPending ? (
-            <span className="session-status">Verificando sessão…</span>
-          ) : null}
+          <Link to="/cart" className="header-icon-link" aria-label="Carrinho">
+            <ShoppingCart size={16} aria-hidden="true" />
+          </Link>
           {sessionQuery.data ? (
-            <>
-              <span className="session-user" title={sessionQuery.data.user.email}>
-                {sessionQuery.data.user.name}
-              </span>
-              <button
-                type="button"
-                className="session-logout"
-                onClick={() => logoutMutation.mutate()}
-                disabled={logoutMutation.isPending}
-              >
-                {logoutMutation.isPending ? 'Saindo…' : 'Sair'}
-              </button>
-            </>
-          ) : !sessionQuery.isPending ? (
-            <Link to="/login" search={{ returnTo: '/' }} className="login-link">
-              Entrar
+            <Link to="/account/profile" className="header-icon-link" aria-label="Meu perfil">
+              <UserRound size={16} aria-hidden="true" />
             </Link>
           ) : null}
+          <div className="session-header-actions" aria-live="polite">
+            {sessionQuery.isPending ? (
+              <span className="session-status">Verificando sessão…</span>
+            ) : null}
+            {sessionQuery.data ? (
+              <>
+                <span className="session-user" title={sessionQuery.data.user.email}>
+                  {sessionQuery.data.user.name}
+                </span>
+                <button
+                  type="button"
+                  className="session-logout"
+                  onClick={() => logoutMutation.mutate()}
+                  disabled={logoutMutation.isPending}
+                >
+                  {logoutMutation.isPending ? 'Saindo…' : 'Sair'}
+                </button>
+              </>
+            ) : !sessionQuery.isPending ? (
+              <Link to="/login" search={{ returnTo: '/' }} className="login-link">
+                Entrar
+              </Link>
+            ) : null}
+          </div>
         </div>
       </header>
-      <main className={isAuthRoute ? 'auth-route-main' : undefined}>
+      <main className={mainClassName || undefined}>
         <Outlet />
       </main>
     </>

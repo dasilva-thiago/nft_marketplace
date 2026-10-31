@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('a home do marketplace carrega hero e catálogo sem erro de aplicação', async ({ page }) => {
   await page.goto('/');

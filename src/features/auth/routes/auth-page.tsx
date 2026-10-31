@@ -1,15 +1,29 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
-import { Facebook, Search } from 'lucide-react';
+import { Eye, EyeOff, Facebook, Search } from 'lucide-react';
+import { catalogListQuery } from '@/features/catalog/queries';
 import { LoginRequestSchema, RegisterRequestSchema } from '@/shared/contracts/schemas';
+import { Button } from '@/shared/ui/button';
 import { readApiError } from '../api/auth-api';
 import { useLoginMutation, useRegisterMutation } from '../queries';
 import { safeReturnTo } from '../return-to';
 
 type AuthMode = 'login' | 'register';
-type FormValues = { name: string; email: string; password: string };
-type FieldName = keyof FormValues;
-const initialValues: FormValues = { name: '', email: '', password: '' };
+type FieldName = 'name' | 'email' | 'password' | 'passwordConfirmation';
+type FormValues = Record<FieldName, string>;
+const initialValues: FormValues = { name: '', email: '', password: '', passwordConfirmation: '' };
+const homeSearch = {
+  page: 1,
+  search: '',
+  collection: '',
+  network: '',
+  trait: '',
+  priceMin: '',
+  priceMax: '',
+  sort: 'priceEth' as const,
+  sortOrder: 'asc' as const,
+};
 function fieldId(field: FieldName): string {
   return `auth-${field}`;
 }
@@ -21,12 +35,76 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
   const navigate = useNavigate();
   const search = useSearch({ from: mode === 'login' ? '/login' : '/register' });
   const returnTo = safeReturnTo(search.returnTo);
+  const modalRef = useRef<HTMLDivElement>(null);
   const [values, setValues] = useState<FormValues>(initialValues);
+  const [isDesktopDialog, setIsDesktopDialog] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 621px)').matches,
+  );
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
   const [localErrors, setLocalErrors] = useState<Partial<Record<FieldName | 'form', string>>>({});
+  const sceneQuery = useQuery(
+    catalogListQuery({ page: 1, pageSize: 6, sort: 'priceEth', sortOrder: 'desc' }),
+  );
+  const sceneNfts = sceneQuery.data?.items ?? [];
   const loginMutation = useLoginMutation();
   const registerMutation = useRegisterMutation();
   const mutation = mode === 'login' ? loginMutation : registerMutation;
   const apiError = readApiError(mutation.error);
+
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 621px)');
+    const update = () => setIsDesktopDialog(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (!isDesktopDialog) return;
+    const modal = modalRef.current;
+    if (!modal) return;
+    const previousFocus =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusable = () =>
+      Array.from(
+        modal.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => element.getAttribute('aria-hidden') !== 'true');
+    focusable()[0]?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        void navigate({ to: '/', search: homeSearch });
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const elements = focusable();
+      if (!elements.length) return;
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      if (
+        event.shiftKey &&
+        (document.activeElement === first || !modal.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        (document.activeElement === last || !modal.contains(document.activeElement))
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      previousFocus?.focus();
+    };
+  }, [isDesktopDialog, navigate]);
 
   const updateField = (field: FieldName, value: string) => {
     setValues((current) => ({ ...current, [field]: value }));
@@ -49,17 +127,29 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
       loginMutation.mutate(parsed.data, { onSuccess });
       return;
     }
-    const parsed = RegisterRequestSchema.safeParse(values);
+    const parsed = RegisterRequestSchema.safeParse({
+      name: values.name,
+      email: values.email,
+      password: values.password,
+    });
     if (!parsed.success) return onInvalid(parsed.error.issues);
+    if (values.password !== values.passwordConfirmation) {
+      setLocalErrors({ passwordConfirmation: 'As senhas não coincidem.' });
+      return;
+    }
     setLocalErrors({});
     registerMutation.mutate(parsed.data, { onSuccess });
   };
   const pageError = localErrors.form ?? apiError?.message;
   const isLogin = mode === 'login';
   const fieldError = (field: FieldName) => localErrors[field] ?? apiError?.fields?.[field];
+  const featureImage = sceneNfts[0]?.imageUrl ?? '/placeholders/nft-placeholder.svg';
 
   return (
-    <section className="auth-screen" aria-labelledby="auth-title">
+    <section
+      className="auth-screen"
+      aria-label={isDesktopDialog ? undefined : 'Autenticação Kurio'}
+    >
       <div className="auth-scene" aria-hidden="true">
         <div className="auth-scene-copy">
           <span>Bem-vindo à Kurio</span>
@@ -69,42 +159,38 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
             DA ARTE DIGITAL
           </strong>
           <p>Descubra NFTs selecionados de criadores do mundo todo.</p>
-          <button type="button">EXPLORAR</button>
+          <span className="auth-scene-cta">EXPLORAR</span>
         </div>
         <div className="auth-scene-art">
-          <img src="/placeholders/nft-placeholder.svg" alt="" />
+          <img src={featureImage} alt="" />
         </div>
         <div className="auth-scene-grid">
-          {Array.from({ length: 6 }, (_, index) => (
-            <img src="/placeholders/nft-placeholder.svg" alt="" key={index} />
+          {sceneNfts.map((nft) => (
+            <img src={nft.imageUrl} alt="" key={nft.id} />
           ))}
         </div>
         <div className="auth-scene-search">
           <Search size={13} /> Buscar no mercado
         </div>
       </div>
-      <div className="auth-modal">
+      <div
+        className="auth-modal"
+        ref={modalRef}
+        role={isDesktopDialog ? 'dialog' : undefined}
+        aria-modal={isDesktopDialog ? true : undefined}
+        aria-labelledby="auth-title"
+      >
         <div className="auth-modal-header">
-          <span>Kurio</span>
-          <Link
-            to="/"
-            search={{
-              page: 1,
-              search: '',
-              collection: '',
-              network: '',
-              trait: '',
-              priceMin: '',
-              priceMax: '',
-              sort: 'priceEth',
-              sortOrder: 'asc',
-            }}
-            aria-label="Fechar"
-          >
+          <span>KURIO</span>
+          <Link to="/" search={homeSearch} aria-label="Fechar autenticação">
             ×
           </Link>
         </div>
-        <div className="auth-tabs">
+        <h1 className="sr-only" id="auth-title">
+          {isLogin ? 'Entrar na Kurio' : 'Criar perfil de colecionador'}
+        </h1>
+        <h2 className="auth-mobile-title">{isLogin ? 'Entrar' : 'Criar perfil de colecionador'}</h2>
+        <div className="auth-tabs" aria-label="Acesso à conta">
           <Link className={isLogin ? 'is-active' : ''} to="/login" search={{ returnTo }}>
             Entrar
           </Link>
@@ -158,37 +244,73 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
               </small>
             )}
           </label>
-          <label className="auth-field" htmlFor={fieldId('password')}>
-            <span>Senha</span>
-            <input
-              id={fieldId('password')}
-              name="password"
-              type="password"
-              autoComplete={isLogin ? 'current-password' : 'new-password'}
-              placeholder={isLogin ? '••••••••••' : 'Senha'}
-              value={values.password}
-              onChange={(event) => updateField('password', event.target.value)}
-              aria-invalid={Boolean(fieldError('password'))}
-              aria-describedby={fieldError('password') ? errorId('password') : undefined}
-            />
+          <div className="auth-field auth-password-field">
+            <label htmlFor={fieldId('password')}>Senha</label>
+            <div className="auth-password-control">
+              <input
+                id={fieldId('password')}
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete={isLogin ? 'current-password' : 'new-password'}
+                placeholder={isLogin ? '••••••••••' : 'Senha'}
+                value={values.password}
+                onChange={(event) => updateField('password', event.target.value)}
+                aria-invalid={Boolean(fieldError('password'))}
+                aria-describedby={fieldError('password') ? errorId('password') : undefined}
+              />
+              <button
+                type="button"
+                className="auth-password-toggle"
+                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                aria-pressed={showPassword}
+                onClick={() => setShowPassword((visible) => !visible)}
+              >
+                {showPassword ? <Eye size={15} /> : <EyeOff size={15} />}
+              </button>
+            </div>
             {fieldError('password') && (
               <small id={errorId('password')} className="field-error">
                 {fieldError('password')}
               </small>
             )}
-          </label>
+          </div>
           {mode === 'register' && (
-            <label className="auth-field" htmlFor="auth-password-confirmation">
-              <span>Confirmar senha</span>
-              <input
-                id="auth-password-confirmation"
-                name="passwordConfirmation"
-                aria-label="Confirmação"
-                type="password"
-                placeholder="Confirmar senha"
-                autoComplete="new-password"
-              />
-            </label>
+            <div className="auth-field auth-password-field">
+              <label htmlFor={fieldId('passwordConfirmation')}>Confirmar senha</label>
+              <div className="auth-password-control">
+                <input
+                  id={fieldId('passwordConfirmation')}
+                  name="passwordConfirmation"
+                  type={showPasswordConfirmation ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  placeholder="Confirmar senha"
+                  value={values.passwordConfirmation}
+                  onChange={(event) => updateField('passwordConfirmation', event.target.value)}
+                  aria-invalid={Boolean(fieldError('passwordConfirmation'))}
+                  aria-describedby={
+                    fieldError('passwordConfirmation') ? errorId('passwordConfirmation') : undefined
+                  }
+                />
+                <button
+                  type="button"
+                  className="auth-password-toggle"
+                  aria-label={
+                    showPasswordConfirmation
+                      ? 'Ocultar confirmação de senha'
+                      : 'Mostrar confirmação de senha'
+                  }
+                  aria-pressed={showPasswordConfirmation}
+                  onClick={() => setShowPasswordConfirmation((visible) => !visible)}
+                >
+                  {showPasswordConfirmation ? <Eye size={15} /> : <EyeOff size={15} />}
+                </button>
+              </div>
+              {fieldError('passwordConfirmation') && (
+                <small id={errorId('passwordConfirmation')} className="field-error">
+                  {fieldError('passwordConfirmation')}
+                </small>
+              )}
+            </div>
           )}
           {pageError && (
             <p className="form-error" role="alert">
@@ -196,28 +318,40 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
             </p>
           )}
           {isLogin && (
-            <Link className="forgot-password" to="/login" search={{ returnTo }}>
+            <span
+              className="forgot-password"
+              aria-disabled="true"
+              title="Recuperação de senha não faz parte desta demonstração."
+            >
               Esqueceu a senha?
-            </Link>
+            </span>
           )}
-          <button
+          <Button
             type="submit"
-            aria-label={isLogin ? 'Entrar na conta' : 'Criar conta'}
+            aria-label={
+              isLogin ? 'Entrar na conta' : isDesktopDialog ? 'Criar conta' : 'Criar perfil'
+            }
             className="primary-button auth-submit"
             disabled={mutation.isPending}
           >
-            {mutation.isPending ? 'Validando…' : isLogin ? 'Entrar' : 'Criar perfil'}
-          </button>
+            {mutation.isPending
+              ? 'Validando…'
+              : isLogin
+                ? 'Entrar'
+                : isDesktopDialog
+                  ? 'Criar conta'
+                  : 'Criar perfil'}
+          </Button>
         </form>
         <div className="auth-social-divider">
           <span>Ou continue com</span>
         </div>
-        <div className="auth-socials">
-          <button type="button">
+        <div className="auth-socials" aria-label="Provedores sociais indisponíveis na demonstração">
+          <button type="button" disabled title="Login social não disponível nesta demonstração.">
             <strong>G</strong> Continuar com Google
           </button>
-          <button type="button">
-            <Facebook size={15} fill="currentColor" /> Continuar com Facebook
+          <button type="button" disabled title="Login social não disponível nesta demonstração.">
+            <Facebook size={15} aria-hidden="true" /> Continuar com Facebook
           </button>
         </div>
         <p className="auth-switch">

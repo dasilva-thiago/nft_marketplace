@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -23,6 +23,8 @@ test('carrinho autenticado valida estoque e cotação usa precisão decimal', as
     const quote = await cartApi.quote({
       items: updated.items.map(({ nftId, quantity }) => ({ nftId, quantity })),
       couponCode: 'KURIO10',
+      walletId: 'wallet-ana-primary',
+      network: 'Ethereum',
     });
     const unavailable = await cartApi.addItem({ nftId: 'emerald-ape-042', quantity: 3 }).then(
       () => null,

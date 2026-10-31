@@ -1,5 +1,6 @@
 import type { Nft } from '@/shared/contracts';
 import { NftSchema } from '@/shared/contracts/schemas';
+import { readMockStorage, removeMockStorage, writeMockStorage } from '../db/storage';
 
 const monkey1 = '/assets/monkey1.webp';
 const monkey2 = '/assets/monkey2.webp';
@@ -234,6 +235,35 @@ const initialMarketData = new Map(
   ]),
 );
 
+const MARKET_DATA_STORAGE_KEY = 'kurio.mock.nft-market-data';
+const storedMarketData =
+  readMockStorage<
+    Array<[string, { priceEth: string; availableEditions: number; version: number }]>
+  >(MARKET_DATA_STORAGE_KEY);
+if (Array.isArray(storedMarketData)) {
+  for (const [nftId, marketData] of storedMarketData) {
+    if (
+      typeof nftId === 'string' &&
+      marketData &&
+      typeof marketData.priceEth === 'string' &&
+      Number.isInteger(marketData.availableEditions) &&
+      Number.isInteger(marketData.version)
+    ) {
+      updateMockNftMarketData(nftId, marketData);
+    }
+  }
+}
+
+function persistMarketData(): void {
+  writeMockStorage(
+    MARKET_DATA_STORAGE_KEY,
+    nftFixtures.map((nft) => [
+      nft.id,
+      { priceEth: nft.priceEth, availableEditions: nft.availableEditions, version: nft.version },
+    ]),
+  );
+}
+
 export function updateMockNftMarketData(
   nftId: string,
   input: Pick<Nft, 'priceEth' | 'availableEditions' | 'version'>,
@@ -244,6 +274,7 @@ export function updateMockNftMarketData(
   nft.priceEth = input.priceEth;
   nft.availableEditions = input.availableEditions;
   nft.version = input.version;
+  persistMarketData();
   return true;
 }
 
@@ -253,4 +284,5 @@ export function resetMockNftMarketData(): void {
     if (!initial) continue;
     Object.assign(nft, initial);
   }
+  removeMockStorage(MARKET_DATA_STORAGE_KEY);
 }

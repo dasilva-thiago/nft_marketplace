@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, Minus, Plus, Share2, Star, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Heart, Minus, Plus, Share2, Star, ShoppingCart } from 'lucide-react';
 import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { nftDetailQuery, catalogListQuery } from '@/features/catalog/queries';
@@ -9,6 +9,7 @@ import { useFavoritesQuery, useToggleFavoriteMutation } from '@/features/favorit
 import { NftCard } from '@/shared/ui/nft-card';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
 import { Skeleton } from '@/shared/ui/skeleton';
+import { getResponsiveNftImageSrcSet } from '@/shared/ui/responsive-nft-image';
 
 export function NftDetailPage() {
   const { nftId } = useParams({ from: '/nft/$nftId' });
@@ -57,7 +58,15 @@ export function NftDetailPage() {
                 <Skeleton key={index} />
               ))}
             </div>
-            <Skeleton className="detail-skeleton-main-image" />
+            <div className="detail-skeleton-main-image" aria-hidden="true">
+              <img
+                src="/assets/monkey3.webp"
+                srcSet={getResponsiveNftImageSrcSet('/assets/monkey3.webp')}
+                sizes="(max-width: 768px) 92vw, 552px"
+                alt=""
+                fetchPriority="high"
+              />
+            </div>
           </div>
           <div className="detail-copy detail-skeleton-copy">
             <Skeleton className="detail-skeleton-title" />
@@ -99,9 +108,39 @@ export function NftDetailPage() {
     );
 
   const gallery = nft.gallery.length ? nft.gallery : [nft.imageUrl];
+  const soldOut = nft.availableEditions === 0;
   return (
     <>
       <section className="visual-page-shell detail-page">
+        <div className="detail-mobile-header">
+          <Link
+            to="/"
+            search={{
+              page: 1,
+              search: '',
+              collection: '',
+              network: '',
+              trait: '',
+              priceMin: '',
+              priceMax: '',
+              sort: 'priceEth',
+              sortOrder: 'asc',
+            }}
+            aria-label="Voltar ao mercado"
+          >
+            <ArrowLeft size={18} aria-hidden="true" />
+          </Link>
+          <button
+            type="button"
+            className="detail-mobile-favorite"
+            onClick={() => void toggleFavorite()}
+            disabled={favoritesQuery.isPending || favoriteMutation.isPending}
+            aria-label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+            aria-pressed={isFavorite}
+          >
+            <Heart size={18} fill={isFavorite ? 'currentColor' : 'none'} aria-hidden="true" />
+          </button>
+        </div>
         <Link
           className="back-link"
           to="/"
@@ -127,6 +166,8 @@ export function NftDetailPage() {
                   type="button"
                   className={index === galleryIndex ? 'is-active' : ''}
                   key={`${image}-${index}`}
+                  aria-label={`Visualizar imagem ${index + 1} de ${gallery.length} de ${nft.name}`}
+                  aria-pressed={index === galleryIndex}
                   onClick={() => setGalleryIndex(index)}
                 >
                   <img src={image} alt="" />
@@ -134,7 +175,13 @@ export function NftDetailPage() {
               ))}
             </div>
             <div className="detail-main-image">
-              <img src={gallery[galleryIndex]} alt={`Arte de ${nft.name}`} />
+              <img
+                src={gallery[galleryIndex]}
+                srcSet={getResponsiveNftImageSrcSet(gallery[galleryIndex])}
+                sizes="(max-width: 768px) 92vw, 552px"
+                alt={`Arte de ${nft.name}`}
+                fetchPriority="high"
+              />
             </div>
           </div>
           <div className="detail-copy">
@@ -167,6 +214,7 @@ export function NftDetailPage() {
                 <button
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={quantity <= 1 || soldOut}
                   aria-label="Diminuir quantidade"
                 >
                   <Minus size={14} />
@@ -174,7 +222,8 @@ export function NftDetailPage() {
                 <strong>{quantity}</strong>
                 <button
                   type="button"
-                  onClick={() => setQuantity(Math.min(nft.availableEditions || 1, quantity + 1))}
+                  onClick={() => setQuantity(Math.min(nft.availableEditions, quantity + 1))}
+                  disabled={quantity >= nft.availableEditions || soldOut}
                   aria-label="Aumentar quantidade"
                 >
                   <Plus size={14} />
@@ -186,15 +235,15 @@ export function NftDetailPage() {
               <button
                 type="button"
                 className="primary-button"
-                disabled={addMutation.isPending}
+                disabled={addMutation.isPending || soldOut}
                 onClick={() => void addToCart()}
               >
-                Comprar NFT
+                {soldOut ? 'Esgotado' : 'Comprar NFT'}
               </button>
               <button
                 type="button"
                 className="secondary-outline"
-                disabled={addMutation.isPending}
+                disabled={addMutation.isPending || soldOut}
                 onClick={() => void addToCart()}
               >
                 <ShoppingCart size={15} /> Adicionar
@@ -229,7 +278,12 @@ export function NftDetailPage() {
                 <dd>{nft.attributes.map((attribute) => attribute.value).join(', ')}</dd>
               </div>
             </dl>
-            <button type="button" className="share-button">
+            <button
+              type="button"
+              className="share-button"
+              disabled
+              title="Compartilhamento externo não faz parte desta demonstração."
+            >
               <Share2 size={13} /> Compartilhar este NFT
             </button>
           </div>
@@ -250,7 +304,7 @@ export function NftDetailPage() {
           <p>Contrato: Direitos autorais e registro verificado.</p>
         </div>
         <section className="related-section">
-          <div className="section-line-title">Mais desta coleção</div>
+          <h2 className="section-line-title">Mais desta coleção</h2>
           <div className="related-grid">
             {relatedQuery.data?.items.map((item) => (
               <NftCard key={item.id} nft={item} compact />

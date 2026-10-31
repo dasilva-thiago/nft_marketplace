@@ -1,9 +1,20 @@
 {
   "ci": {
     "collect": {
-      "url": ["http://127.0.0.1:4173/", "http://127.0.0.1:4173/nft/emerald-ape-042"],
+      "url": ["http://localhost/", "http://localhost/nft/emerald-ape-042"],
       "numberOfRuns": 3,
-      "staticDistDir": "./dist"
+      "staticDistDir": "./dist",
+      "isSinglePageApplication": true,
+      "settings": {
+        "formFactor": "mobile",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 390,
+          "height": 844,
+          "deviceScaleFactor": 2
+        },
+        "chromeFlags": "--no-sandbox --disable-dev-shm-usage"
+      }
     },
     "assert": {
       "assertions": {
@@ -13,6 +24,10 @@
         "categories:seo": ["warn", { "minScore": 0.9 }]
       }
     },
-    "upload": { "target": "filesystem", "outputDir": "./artifacts/lighthouse" }
+    "upload": {
+      "target": "filesystem",
+      "outputDir": "./reports/lighthouse/mobile",
+      "reportFilenamePattern": "%%HOSTNAME%%-%%PATHNAME%%-%%DATETIME%%.report.%%EXTENSION%%"
+    }
   }
 }

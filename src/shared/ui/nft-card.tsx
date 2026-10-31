@@ -1,6 +1,7 @@
 import { ArrowRight, Heart } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import type { NftSummary } from '@/shared/contracts';
+import { getResponsiveNftImageSrcSet } from '@/shared/ui/responsive-nft-image';
 
 export function NftCard({ nft, compact = false }: { nft: NftSummary; compact?: boolean }) {
   return (
@@ -9,10 +10,16 @@ export function NftCard({ nft, compact = false }: { nft: NftSummary; compact?: b
         to="/nft/$nftId"
         params={{ nftId: nft.id }}
         className="visual-nft-card-link"
-        aria-label={`Ver ${nft.name}`}
+        aria-label={nft.name}
       >
         <div className="visual-nft-image">
-          <img src={nft.imageUrl} alt={`Arte de ${nft.name}`} loading="lazy" />
+          <img
+            src={nft.imageUrl}
+            srcSet={getResponsiveNftImageSrcSet(nft.imageUrl)}
+            sizes="(max-width: 768px) 48vw, 240px"
+            alt={`Arte de ${nft.name}`}
+            loading="lazy"
+          />
           <span className="visual-nft-badge">
             {nft.availableEditions > 0 ? 'RARO' : 'ESGOTADO'}
           </span>

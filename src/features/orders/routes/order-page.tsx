@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { Check, ExternalLink, X } from 'lucide-react';
 import { Link, useParams } from '@tanstack/react-router';
+import { useConsumeCartMutation } from '@/features/cart/queries';
 import { useOrderQuery } from '@/features/orders/queries';
 
 const homeSearch = {
@@ -17,7 +19,16 @@ const homeSearch = {
 export function OrderPage() {
   const { orderId } = useParams({ from: '/orders/$orderId' });
   const query = useOrderQuery(orderId);
+  const { mutateAsync: consumeCart } = useConsumeCartMutation();
   const order = query.data;
+
+  useEffect(() => {
+    if (order?.status !== 'confirmed') return;
+    void consumeCart({
+      orderId: order.id,
+      items: order.items.map(({ nftId, quantity }) => ({ nftId, quantity })),
+    }).catch(() => undefined);
+  }, [consumeCart, order]);
 
   if (query.isPending)
     return (
@@ -134,16 +145,25 @@ export function OrderPage() {
             ? `Transação simulada confirmada: ${order.transactionRef}.`
             : isRejected
               ? 'Nenhum ativo foi removido do carrinho.'
-              : 'Não feche esta página; o estado poderá ser recuperado após reconexão.'}
+              : 'O pedido ainda está sendo processado. Acompanhe o estado aqui e não reenvie o pagamento.'}
         </p>
         {isConfirmed ? (
           <Link to="/" search={homeSearch} className="primary-button">
             <ExternalLink size={14} /> Ver no mercado
           </Link>
-        ) : (
+        ) : isRejected ? (
           <Link to="/checkout" className="primary-button">
-            Tentar novamente
+            Nova tentativa
           </Link>
+        ) : (
+          <button
+            type="button"
+            className="primary-button"
+            onClick={() => void query.refetch()}
+            disabled={query.isFetching}
+          >
+            {query.isFetching ? 'Atualizando…' : 'Atualizar estado'}
+          </button>
         )}
       </div>
     </section>

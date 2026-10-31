@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -22,20 +22,20 @@ test('pedido usa snapshot da cotação e chave de idempotência', async ({ page 
     const cart = await cartApi.addItem({ nftId: 'emerald-ape-042', quantity: 1 });
     const quote = await cartApi.quote({
       items: cart.items.map(({ nftId, quantity }) => ({ nftId, quantity })),
-      walletId: 'metamask',
+      walletId: 'wallet-ana-primary',
       network: 'Ethereum',
     });
     const key = `e2e-order-${Date.now()}`;
     const created = await ordersApi.create(
-      { quoteId: quote.quoteId, walletId: 'metamask', network: 'Ethereum' },
+      { quoteId: quote.quoteId, walletId: 'wallet-ana-primary', network: 'Ethereum' },
       key,
     );
     const replayed = await ordersApi.create(
-      { quoteId: quote.quoteId, walletId: 'metamask', network: 'Ethereum' },
+      { quoteId: quote.quoteId, walletId: 'wallet-ana-primary', network: 'Ethereum' },
       key,
     );
     const differentPayload = await ordersApi
-      .create({ quoteId: quote.quoteId, walletId: 'coinbase', network: 'Ethereum' }, key)
+      .create({ quoteId: quote.quoteId, walletId: 'wallet-other', network: 'Ethereum' }, key)
       .then(
         () => null,
         (error: unknown) => ({
@@ -65,7 +65,7 @@ test('backend simula pedido pendente e pagamento recusado', async ({ page }) => 
     const cart = await cartApi.addItem({ nftId: 'desert-ape-117', quantity: 1 });
     const quote = await cartApi.quote({
       items: cart.items.map(({ nftId, quantity }) => ({ nftId, quantity })),
-      walletId: 'metamask',
+      walletId: 'wallet-ana-primary',
       network: 'Ethereum',
     });
     const setScenario = async (scenario: 'payment-pending' | 'payment-rejected') => {
@@ -78,12 +78,12 @@ test('backend simula pedido pendente e pagamento recusado', async ({ page }) => 
     };
     await setScenario('payment-pending');
     const pending = await ordersApi.create(
-      { quoteId: quote.quoteId, walletId: 'metamask', network: 'Ethereum' },
+      { quoteId: quote.quoteId, walletId: 'wallet-ana-primary', network: 'Ethereum' },
       `pending-${Date.now()}`,
     );
     await setScenario('payment-rejected');
     const rejected = await ordersApi.create(
-      { quoteId: quote.quoteId, walletId: 'metamask', network: 'Ethereum' },
+      { quoteId: quote.quoteId, walletId: 'wallet-ana-primary', network: 'Ethereum' },
       `rejected-${Date.now()}`,
     );
     return { pending, rejected };

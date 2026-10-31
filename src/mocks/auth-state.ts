@@ -1,6 +1,7 @@
 import type { Session, UserSummary } from '@/shared/contracts';
 import { getMockScenario } from './scenarios/scenario-state';
 import { userFixtures, type MockUserRecord } from './fixtures/users';
+import { readMockStorage, removeMockStorage, writeMockStorage } from './db/storage';
 
 const SESSION_TTL_MS = 30 * 60 * 1000;
 
@@ -16,7 +17,27 @@ type EncodedSession = {
   expiresAt: string;
 };
 
-let users = new Map<string, MockUserRecord>(userFixtures.map((user) => [user.id, { ...user }]));
+const USERS_STORAGE_KEY = 'kurio.mock.users';
+
+function initialUsers(): Map<string, MockUserRecord> {
+  const stored = readMockStorage<MockUserRecord[]>(USERS_STORAGE_KEY);
+  if (!Array.isArray(stored)) return new Map(userFixtures.map((user) => [user.id, { ...user }]));
+  const valid = stored.filter(
+    (user) =>
+      user &&
+      typeof user.id === 'string' &&
+      typeof user.name === 'string' &&
+      typeof user.email === 'string' &&
+      typeof user.passwordHash === 'string',
+  );
+  return new Map([...userFixtures, ...valid].map((user) => [user.id, { ...user }]));
+}
+
+function persistUsers(): void {
+  writeMockStorage(USERS_STORAGE_KEY, [...users.values()]);
+}
+
+let users = initialUsers();
 let sessions = new Map<string, MockSessionRecord>();
 
 function normalizeEmail(email: string): string {
@@ -24,7 +45,8 @@ function normalizeEmail(email: string): string {
 }
 
 function toUserSummary(user: MockUserRecord): UserSummary {
-  const { passwordHash: _passwordHash, ...summary } = user;
+  const { passwordHash, ...summary } = user;
+  void passwordHash;
   return summary;
 }
 
@@ -119,6 +141,7 @@ export async function registerMockUser(input: {
     passwordHash: await hashMockPassword(input.password),
   };
   users.set(user.id, user);
+  persistUsers();
   return createSession(user);
 }
 
@@ -141,6 +164,7 @@ export async function changeMockPassword(userId: string, password: string): Prom
   if (!user) return false;
   user.passwordHash = await hashMockPassword(password);
   users.set(userId, user);
+  persistUsers();
   return true;
 }
 
@@ -182,4 +206,5 @@ export function deleteSessionFromRequest(request: Request): void {
 export function resetMockAuthState(): void {
   users = new Map(userFixtures.map((user) => [user.id, { ...user }]));
   sessions = new Map();
+  removeMockStorage(USERS_STORAGE_KEY);
 }

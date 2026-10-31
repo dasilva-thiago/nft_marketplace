@@ -78,7 +78,7 @@ export interface Session {
   expiresAt: string;
 }
 
-export interface AuthResponse extends Session {}
+export type AuthResponse = Session;
 
 export interface RegisterRequest {
   name: string;
@@ -123,6 +123,7 @@ export interface MergeCartRequest {
 }
 
 export interface ConsumeCartRequest {
+  orderId: string;
   items: Array<{ nftId: string; quantity: number }>;
 }
 
@@ -138,14 +139,16 @@ export interface QuoteLine {
 export interface QuoteRequest {
   items: Array<{ nftId: string; quantity: number }>;
   couponCode?: string;
-  walletId?: string;
-  network?: string;
+  walletId: string;
+  network: 'Ethereum' | 'Polygon';
 }
 
 export interface Quote {
   quoteId: string;
   items: QuoteLine[];
   couponCode: string | null;
+  walletId: string;
+  network: 'Ethereum' | 'Polygon';
   subtotalEth: string;
   discountEth: string;
   networkFeeEth: string;
@@ -173,7 +176,7 @@ export interface OrderSnapshot {
 export interface CreateOrderRequest {
   quoteId: string;
   walletId: string;
-  network: string;
+  network: 'Ethereum' | 'Polygon';
 }
 
 export interface CollectorProfile {
@@ -198,15 +201,23 @@ export interface Wallet {
   userId: string;
   label: string;
   address: string;
-  network: string;
+  network: 'Ethereum' | 'Polygon';
   isPrimary: boolean;
   version: number;
+}
+
+export type WalletConnectionStatus = 'connected' | 'rejected' | 'disconnected';
+
+export interface WalletConnection {
+  walletId: string;
+  status: WalletConnectionStatus;
+  message: string;
 }
 
 export interface CreateWalletRequest {
   label: string;
   address: string;
-  network: string;
+  network: 'Ethereum' | 'Polygon';
   isPrimary?: boolean;
 }
 

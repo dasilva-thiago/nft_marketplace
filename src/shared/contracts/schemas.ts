@@ -128,14 +128,15 @@ export const MergeCartRequestSchema = z.object({
 });
 
 export const ConsumeCartRequestSchema = z.object({
+  orderId: z.string().min(1),
   items: z.array(z.object({ nftId: z.string().min(1), quantity: positiveInteger })).min(1),
 });
 
 export const QuoteRequestSchema = z.object({
   items: z.array(z.object({ nftId: z.string().min(1), quantity: positiveInteger })).min(1),
   couponCode: z.string().trim().min(1).optional(),
-  walletId: z.string().min(1).optional(),
-  network: z.string().min(1).optional(),
+  walletId: z.string().min(1),
+  network: z.enum(['Ethereum', 'Polygon']),
 });
 
 export const QuoteLineSchema = z.object({
@@ -151,6 +152,8 @@ export const QuoteSchema = z.object({
   quoteId: z.string().min(1),
   items: z.array(QuoteLineSchema),
   couponCode: z.string().nullable(),
+  walletId: z.string().min(1),
+  network: z.enum(['Ethereum', 'Polygon']),
   subtotalEth: ethDecimal,
   discountEth: ethDecimal,
   networkFeeEth: ethDecimal,
@@ -163,7 +166,7 @@ export const QuoteSchema = z.object({
 export const CreateOrderRequestSchema = z.object({
   quoteId: z.string().min(1),
   walletId: z.string().min(1),
-  network: z.string().min(1),
+  network: z.enum(['Ethereum', 'Polygon']),
 });
 
 export const OrderSnapshotSchema = z.object({
@@ -207,6 +210,12 @@ export const WalletSchema = z.object({
 
 export const WalletsSchema = z.array(WalletSchema);
 
+export const WalletConnectionSchema = z.object({
+  walletId: z.string().min(1),
+  status: z.enum(['connected', 'rejected', 'disconnected']),
+  message: z.string().min(1),
+});
+
 export const CreateWalletRequestSchema = z.object({
   label: z.string().trim().min(2).max(80),
   address: z.string().trim().min(4).max(128),
@@ -222,11 +231,28 @@ export const NftUpdatedPayloadSchema = z.object({
   availableEditions: nonNegativeInteger,
 });
 
-export const OrderUpdatedPayloadSchema = z.object({
-  orderId: z.string().min(1),
-  status: z.enum(['pending', 'confirmed', 'rejected']),
-  transactionRef: z.string().nullable(),
-});
+export const OrderUpdatedPayloadSchema = z
+  .object({
+    orderId: z.string().min(1),
+    status: z.enum(['pending', 'confirmed', 'rejected']),
+    transactionRef: z.string().nullable(),
+  })
+  .superRefine((payload, context) => {
+    if (payload.status === 'confirmed' && !payload.transactionRef) {
+      context.addIssue({
+        code: 'custom',
+        path: ['transactionRef'],
+        message: 'Pedidos confirmados precisam de uma referência de transação.',
+      });
+    }
+    if (payload.status !== 'confirmed' && payload.transactionRef !== null) {
+      context.addIssue({
+        code: 'custom',
+        path: ['transactionRef'],
+        message: 'Pedidos não confirmados não podem ter uma referência de transação.',
+      });
+    }
+  });
 
 export const MockSocketEventRequestSchema = z.discriminatedUnion('event', [
   z.object({

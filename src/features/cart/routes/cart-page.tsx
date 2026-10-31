@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Minus, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Minus, Plus, Trash2 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { catalogListQuery } from '@/features/catalog/queries';
@@ -9,6 +9,7 @@ import {
   useRemoveCartItemMutation,
   useUpdateCartItemMutation,
 } from '@/features/cart/queries';
+import { useWalletsQuery } from '@/features/wallets/queries';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
 import { CartLineSkeleton, CartSummarySkeleton } from '@/shared/ui/skeleton';
 
@@ -31,15 +32,20 @@ export function CartPage() {
   );
   const updateMutation = useUpdateCartItemMutation();
   const removeMutation = useRemoveCartItemMutation();
+  const walletsQuery = useWalletsQuery();
+  const primaryWallet =
+    walletsQuery.data?.find((wallet) => wallet.isPrimary) ?? walletsQuery.data?.[0];
   const [couponDraft, setCouponDraft] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<string | undefined>();
   const cart = cartQuery.data;
   const quoteRequest = useMemo(
     () => ({
       items: cart?.items.map(({ nftId, quantity }) => ({ nftId, quantity })) ?? [],
+      walletId: primaryWallet?.id ?? '',
+      network: primaryWallet?.network ?? 'Ethereum',
       ...(appliedCoupon ? { couponCode: appliedCoupon } : {}),
     }),
-    [appliedCoupon, cart?.items],
+    [appliedCoupon, cart?.items, primaryWallet],
   );
   const quoteQuery = useQuoteQuery(quoteRequest);
   const actionError = updateMutation.error || removeMutation.error || quoteQuery.error;
@@ -47,12 +53,19 @@ export function CartPage() {
   return (
     <>
       <section className="visual-page-shell cart-page">
+        <div className="cart-mobile-header">
+          <Link to="/" search={homeSearch} aria-label="Voltar ao mercado">
+            <ArrowLeft size={17} aria-hidden="true" />
+          </Link>
+          <h1>Carrinho de NFTs</h1>
+          <span aria-hidden="true" />
+        </div>
         <Link className="back-link" to="/" search={homeSearch}>
           ← Início / Mercado
         </Link>
         <div className="cart-layout">
           <div>
-            <h1>Carrinho de NFTs</h1>
+            <h1 className="cart-desktop-title">Carrinho de NFTs</h1>
             <div className="cart-table-head">
               <span>NFTs</span>
               <span>Preço</span>
@@ -72,7 +85,7 @@ export function CartPage() {
             ) : cart?.items.length ? (
               cart.items.map((item) => (
                 <article className="cart-line" key={item.nftId}>
-                  <img src={item.nft.imageUrl} alt="" />
+                  <img src={item.nft.imageUrl} alt={`Arte de ${item.nft.name}`} />
                   <div className="cart-line-name">
                     <strong>{item.nft.name}</strong>
                     <small>ID do token: #{String(item.nftId.length).padStart(4, '0')}</small>
@@ -160,29 +173,38 @@ export function CartPage() {
               <dl>
                 <div>
                   <dt>Subtotal</dt>
-                  <dd>{quoteQuery.data?.subtotalEth ?? '0.000'} ETH</dd>
+                  <dd>{quoteQuery.data ? `${quoteQuery.data.subtotalEth} ETH` : '—'}</dd>
                 </div>
                 <div>
                   <dt>Desconto do lançamento</dt>
-                  <dd>(-) {quoteQuery.data?.discountEth ?? '0.000'} ETH</dd>
+                  <dd>
+                    {quoteQuery.data?.discountEth ? `(-) ${quoteQuery.data.discountEth} ETH` : '—'}
+                  </dd>
                 </div>
                 <div>
                   <dt>Taxa de rede</dt>
-                  <dd>{quoteQuery.data?.networkFeeEth ?? '0.000'} ETH</dd>
+                  <dd>{quoteQuery.data ? `${quoteQuery.data.networkFeeEth} ETH` : '—'}</dd>
                 </div>
                 <div className="total">
                   <dt>Total</dt>
-                  <dd>{quoteQuery.data?.totalEth ?? '0.000'} ETH</dd>
+                  <dd>{quoteQuery.data?.totalEth ? `${quoteQuery.data.totalEth} ETH` : '—'}</dd>
                 </div>
               </dl>
-              <Link
-                to="/checkout"
-                className="primary-button"
-                disabled={!cart?.items.length}
-                aria-disabled={!cart?.items.length}
-              >
-                Conectar e finalizar
-              </Link>
+              {walletsQuery.isPending ? (
+                <div className="visual-empty">Carregando carteiras…</div>
+              ) : primaryWallet && cart?.items.length ? (
+                <Link to="/checkout" className="primary-button">
+                  Conectar e finalizar
+                </Link>
+              ) : primaryWallet ? (
+                <button type="button" className="primary-button" disabled>
+                  Carrinho vazio
+                </button>
+              ) : (
+                <Link to="/account/wallets" className="primary-button">
+                  Cadastrar uma carteira
+                </Link>
+              )}
               <Link to="/" search={homeSearch} className="continue-link">
                 Continuar explorando
               </Link>
