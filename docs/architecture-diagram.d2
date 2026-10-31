@@ -1,0 +1,70 @@
+direction: right
+
+user: Usuário {
+  shape: person
+}
+
+browser: Navegador / SPA {
+  direction: down
+
+  router: TanStack Router
+  features: Features por domínio {
+    direction: down
+    catalog: Catálogo e detalhe
+    auth: Autenticação e sessão
+    cart: Carrinho
+    checkout: Checkout e pedidos
+    profile: Perfil e carteiras
+  }
+  ui: Shared UI / shadcn adaptado
+  query: TanStack Query\n(cache, loading, retry, invalidation)
+  api: APIs de domínio\n(Axios + contratos tipados + Zod)
+  realtime: Cliente Socket.IO\n(eventos versionados e deduplicados)
+
+  router -> features
+  features -> ui
+  features -> query
+  features -> api
+  features -> realtime
+}
+
+transport: Camada de transporte simulada {
+  direction: down
+
+  rest: REST / HTTP
+  socket: WebSocket / Socket.IO
+  mocks: MSW\n(handlers, fixtures, cenários)
+  state: Estado determinístico de domínio\n(sessão, catálogo, cenários)
+
+  rest -> mocks
+  socket -> mocks
+  mocks -> state
+}
+
+external: Serviços externos simulados {
+  blockchain: Carteira / blockchain\n(não conectado)
+  payment: Pagamento\n(simulado)
+}
+
+tests: Qualidade {
+  direction: down
+  e2e: Playwright\n(UI + REST + Socket.IO)
+  build: TypeScript / Vite / Lighthouse
+}
+
+user -> browser
+browser.api -> transport.rest
+browser.realtime -> transport.socket
+transport.mocks -> browser.query: respostas REST
+transport.mocks -> browser.realtime: eventos
+browser.api -> external.payment: contrato simulado
+browser.features.checkout -> external.blockchain: seleção simulada
+browser -> tests: validação
+
+note: Princípios transversais {
+  shape: rectangle
+  text: "ETH como strings decimais; big.js para cálculos;\nqueries privadas isoladas por identidade;\nmutations de pedido com idempotência;\nrecibo como snapshot imutável."
+}
+
+browser.query -> note
+transport.state -> note
