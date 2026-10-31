@@ -34,6 +34,12 @@ import {
 import { socketIoMockHandler } from './socket-io-handler';
 import { appEnv } from '@/app/config/env';
 import { getCartForUser, resetMockCartState, saveCartForUser } from './db/cart-state';
+import {
+  addFavoriteForUser,
+  listFavoritesForUser,
+  removeFavoriteForUser,
+  resetMockFavoritesState,
+} from './db/favorites-state';
 
 const configuredDelay = appEnv.mockDelayMs;
 
@@ -276,6 +282,7 @@ export const handlers = [
     resetMockScenario();
     resetMockAuthState();
     resetMockCartState();
+    resetMockFavoritesState();
     return HttpResponse.json({ scenario: getMockScenario(), reset: true });
   }),
   http.post('/api/auth/register', async ({ request }) => {
@@ -340,6 +347,24 @@ export const handlers = [
   http.post('/api/auth/logout', ({ request }) => {
     deleteSessionFromRequest(request);
     return HttpResponse.json({ loggedOut: true });
+  }),
+  http.get('/api/favorites', ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    return HttpResponse.json(listFavoritesForUser(currentSession.session.user.id));
+  }),
+  http.put('/api/favorites/:nftId', ({ request, params }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const nft = nftFixtures.find((item) => item.id === params.nftId);
+    if (!nft) return notFoundResponse('NFT não encontrado.');
+    return HttpResponse.json(addFavoriteForUser(currentSession.session.user.id, nft.id));
+  }),
+  http.delete('/api/favorites/:nftId', ({ request, params }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    removeFavoriteForUser(currentSession.session.user.id, String(params.nftId));
+    return new HttpResponse(null, { status: 204 });
   }),
   http.get('/api/cart', ({ request }) => {
     const currentSession = getSessionFromRequest(request);

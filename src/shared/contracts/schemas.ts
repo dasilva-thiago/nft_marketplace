@@ -94,6 +94,14 @@ export const LoginRequestSchema = z.object({
   password: passwordSchema,
 });
 
+export const FavoriteSchema = z.object({
+  userId: z.string().min(1),
+  nftId: z.string().min(1),
+  createdAt: z.string().datetime({ offset: true }),
+});
+
+export const FavoritesSchema = z.array(FavoriteSchema);
+
 export const CartLineSchema = z.object({
   nftId: z.string().min(1),
   quantity: positiveInteger,

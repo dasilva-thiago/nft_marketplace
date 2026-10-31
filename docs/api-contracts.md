@@ -63,6 +63,8 @@ Na demonstração atual, o MSW implementa os quatro endpoints acima e valida req
 
 `Favorite` é vinculado ao usuário da sessão e NFT. Remover favorito inexistente pode responder 204 para ser idempotente.
 
+Os handlers MSW mantêm favoritos isolados por usuário e validam a existência do NFT. A interface usa mutation otimista: atualiza a lista imediatamente, restaura o snapshot anterior em caso de erro e invalida a query após a resposta.
+
 ### Carrinho
 
 | Método e rota                   | Entrada                                    | Sucesso           | Erros relevantes                                 |
@@ -137,4 +139,4 @@ Evento duplicado (mesmo `eventId`) ou mais antigo (versão menor) não modifica 
 
 ## Cobertura de contratos a implementar
 
-Os contratos em `src/shared/contracts/` estabelecem os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs, sessão e o núcleo autenticado de carrinho/cotação já têm handlers MSW, validação, API Axios, queries/mutations e testes de integração. Favoritos, checkout, pedidos, perfil, carteiras, carrinho visitante/mesclagem e eventos de negócio ainda precisam de implementação. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.
+Os contratos em `src/shared/contracts/` estabelecem os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs, sessão, favoritos e o núcleo autenticado de carrinho/cotação já têm handlers MSW, validação, API Axios, queries/mutations e testes de integração. Checkout, pedidos, perfil, carteiras, carrinho visitante/mesclagem e eventos de negócio ainda precisam de implementação. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.

@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { nftDetailQuery, catalogListQuery } from '@/features/catalog/queries';
 import { useAddCartItemMutation } from '@/features/cart/queries';
 import { useSessionQuery } from '@/features/auth/queries';
+import { useFavoritesQuery, useToggleFavoriteMutation } from '@/features/favorites/queries';
 import { NftCard } from '@/shared/ui/nft-card';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
 
@@ -19,7 +20,10 @@ export function NftDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const sessionQuery = useSessionQuery();
   const addMutation = useAddCartItemMutation();
+  const favoritesQuery = useFavoritesQuery();
+  const favoriteMutation = useToggleFavoriteMutation();
   const nft = detailQuery.data;
+  const isFavorite = favoritesQuery.data?.some((favorite) => favorite.nftId === nftId) ?? false;
 
   async function addToCart() {
     if (!sessionQuery.data) {
@@ -28,6 +32,14 @@ export function NftDetailPage() {
     }
     await addMutation.mutateAsync({ nftId, quantity });
     await navigate({ to: '/cart' });
+  }
+
+  async function toggleFavorite() {
+    if (!sessionQuery.data) {
+      await navigate({ to: '/login', search: { returnTo: `/nft/${nftId}` } });
+      return;
+    }
+    await favoriteMutation.mutateAsync({ nftId, shouldFavorite: !isFavorite });
   }
 
   if (detailQuery.isPending)
@@ -164,13 +176,20 @@ export function NftDetailPage() {
               >
                 <ShoppingCart size={15} /> Adicionar
               </button>
-              <button type="button" className="secondary-outline">
-                <Heart size={15} /> Favoritar
+              <button
+                type="button"
+                className="secondary-outline"
+                disabled={favoritesQuery.isPending || favoriteMutation.isPending}
+                onClick={() => void toggleFavorite()}
+                aria-pressed={isFavorite}
+              >
+                <Heart size={15} fill={isFavorite ? 'currentColor' : 'none'} />{' '}
+                {isFavorite ? 'Favoritado' : 'Favoritar'}
               </button>
             </div>
-            {addMutation.isError ? (
+            {addMutation.isError || favoriteMutation.isError ? (
               <p className="form-error" role="alert">
-                Não foi possível adicionar este NFT. Confira a disponibilidade e tente novamente.
+                Não foi possível concluir a ação. Confira sua sessão e tente novamente.
               </p>
             ) : null}
             <dl className="detail-attributes">

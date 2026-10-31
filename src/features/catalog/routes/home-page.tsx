@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { catalogListQuery } from '@/features/catalog/queries';
 import { useSessionQuery } from '@/features/auth/queries';
+import { useFavoritesQuery, useToggleFavoriteMutation } from '@/features/favorites/queries';
 import type { NftSummary, PageRequest } from '@/shared/contracts';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
 
@@ -94,8 +95,14 @@ export function HomePage() {
   const searchState = useSearch({ from: '/' });
   const navigate = useNavigate({ from: '/' });
   const sessionQuery = useSessionQuery();
+  const favoritesQuery = useFavoritesQuery();
+  const favoriteMutation = useToggleFavoriteMutation();
   const [searchDraft, setSearchDraft] = useState(searchState.search);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const favoriteIds = useMemo(
+    () => new Set(favoritesQuery.data?.map((favorite) => favorite.nftId)),
+    [favoritesQuery.data],
+  );
   const priceDraftRef = useRef({
     min: searchState.priceMin || '0',
     max: searchState.priceMax || '5',
@@ -105,6 +112,17 @@ export function HomePage() {
   useEffect(() => {
     priceDraftRef.current = { min: searchState.priceMin || '0', max: searchState.priceMax || '5' };
   }, [searchState.priceMin, searchState.priceMax]);
+
+  async function toggleFavorite(nftId: string) {
+    if (!sessionQuery.data) {
+      await navigate({ to: '/login', search: { returnTo: '/' } });
+      return;
+    }
+    await favoriteMutation.mutateAsync({
+      nftId,
+      shouldFavorite: !favoriteIds.has(nftId),
+    });
+  }
 
   const filters = useMemo<Record<string, string | string[]> | undefined>(() => {
     const next: Record<string, string> = {};
@@ -489,10 +507,18 @@ export function HomePage() {
                           <button
                             type="button"
                             className="card-favorite"
-                            aria-label={`Favoritar ${nft.name}`}
-                            onClick={(event) => event.preventDefault()}
+                            aria-label={`${favoriteIds.has(nft.id) ? 'Remover dos favoritos' : 'Favoritar'} ${nft.name}`}
+                            aria-pressed={favoriteIds.has(nft.id)}
+                            disabled={favoriteMutation.isPending || favoritesQuery.isPending}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              void toggleFavorite(nft.id);
+                            }}
                           >
-                            <Heart size={14} />
+                            <Heart
+                              size={14}
+                              fill={favoriteIds.has(nft.id) ? 'currentColor' : 'none'}
+                            />
                           </button>
                         </div>
                         <div className="nft-card-details">

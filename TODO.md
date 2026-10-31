@@ -8,7 +8,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [x] Rotas tipadas declaradas para início, NFT, carrinho, checkout, pedido, login, cadastro, perfil e carteiras; as telas visuais principais já substituem os placeholders.
 - [x] Contratos TypeScript documentados para sessão/conta, catálogo, favoritos, carrinho, cotação, pedidos, perfil, carteiras e eventos; ETH representado como string decimal.
 - [x] API simulada do catálogo: 12 NFTs locais variados, listagem, busca, filtros de coleção/rede/atributo, ordenação, paginação e detalhe/404, com validação Zod.
-- [ ] Completar handlers REST/MSW para favoritos, pedidos idempotentes, perfil e carteiras; carrinho e cotação têm o núcleo autenticado implementado.
+- [ ] Completar handlers REST/MSW para pedidos idempotentes, perfil e carteiras; favoritos, carrinho e cotação têm o núcleo autenticado implementado.
 - [x] Erros tipados e cenários iniciais de parâmetros inválidos, catálogo vazio/lento, respostas fora de ordem, HTTP 429 e 503, com controle e reset de cenário no MSW.
 - [ ] Completar cenários de sessão inválida, falta de permissão, conflito de disponibilidade, cupom, timeout/idempotência e persistência/reset de todos os recursos.
 
@@ -36,7 +36,8 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [ ] Replicar a nova referência reenviada da home: hero compacto com `Emerald Ape #042`, catálogo em três colunas, card de oferta limitada, faixas editoriais, diário e footer; manter os quatro assets de macacos reutilizados em todo o catálogo e documentar qualquer ajuste de acessibilidade.
 - [x] Implementar destaque, lançamentos/diário, filtros combináveis de rede/traits/faixa de preço previstos pelo contrato, histórico, paginação e URLs de busca; a validação de respostas fora de ordem permanece coberta no nível de API e a confirmação visual em 768 px continua pendente.
 - [x] Implementar a tela visual de detalhe com acesso direto, estado 404, galeria, edição, quantidade, favorito e ações de compra/adicionar; persistência e mutations permanecem pendentes.
-- [ ] Persistir favoritos para autenticados; incluir ao menos uma mutation otimista com rollback.
+- [x] Persistir favoritos para autenticados; incluir mutation otimista com rollback e isolamento entre usuários.
+- [ ] Cobrir rollback otimista pela interface com um cenário de falha controlada; o contrato API já cobre erro de NFT inexistente.
 
 ## Sessão e conta
 
