@@ -64,7 +64,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [ ] Reproduzir visualmente início, login, cadastro, detalhe do NFT, carrinho e pagamento nos pares desktop/mobile definidos pelo Figma; login e cadastro desktop devem permanecer modais sobre a home, enquanto mobile deve usar as telas dedicadas.
 - [x] Reproduzir visualmente confirmação, perfil e carteiras nas referências desktop; adaptar responsivamente as três variantes mobile sem frame específico, preservando a composição desktop e documentando a decisão em `docs/architecture.md`.
 - [x] Skeleton shimmer em catálogo, detalhe e resumo do carrinho; preservar dimensões contra CLS e respeitar movimento reduzido.
-- [ ] Teclado/foco visível; foco em diálogos/drawers; semântica, labels e erros associados; alt text; contraste e estados que não dependem só de cor; feedback acessível para mutations/eventos; sem overflow indevido e sem perda de conteúdo com zoom. Autenticação já cobre foco por teclado, labels, confirmação nomeada e `aria-describedby` para erros.
+- [ ] Teclado/foco visível; foco em diálogos/drawers; semântica, labels e erros associados; alt text; contraste e estados que não dependem só de cor; feedback acessível para mutations/eventos; sem overflow indevido e sem perda de conteúdo com zoom. Autenticação e as rotas protegidas já cobrem foco por teclado, labels, landmarks, confirmação nomeada e `aria-describedby` para erros.
 
 ## Testes, qualidade e deploy
 

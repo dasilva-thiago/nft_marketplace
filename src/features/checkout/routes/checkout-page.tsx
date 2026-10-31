@@ -119,59 +119,72 @@ export function CheckoutPage() {
           <form
             className="collector-form"
             id="checkout-collector-form"
+            aria-labelledby="checkout-form-title"
             onSubmit={(event: FormEvent<HTMLFormElement>) => {
               event.preventDefault();
               void submitOrder();
             }}
           >
-            <h1>Perfil do colecionador</h1>
+            <h1 id="checkout-form-title">Perfil do colecionador</h1>
             <div className="form-grid">
               <label>
                 Nome de exibição*
-                <input required defaultValue="Colecionador Kurio" />
+                <input id="checkout-display-name" required defaultValue="Colecionador Kurio" />
               </label>
               <label>
                 Nome de usuário*
-                <input required placeholder="Seu usuário" />
+                <input id="checkout-username" required placeholder="Seu usuário" />
               </label>
               <label>
                 Rede*
-                <select value={network} onChange={(event) => setNetwork(event.target.value)}>
+                <select
+                  id="checkout-network"
+                  value={network}
+                  onChange={(event) => setNetwork(event.target.value)}
+                >
                   <option>Ethereum</option>
                   <option>Polygon</option>
                 </select>
               </label>
               <label>
                 Nome do perfil*
-                <input required placeholder="Seu perfil" />
+                <input id="checkout-profile-name" required placeholder="Seu perfil" />
               </label>
               <label>
                 Endereço da carteira*
-                <input required placeholder="Endereço 0x da carteira" />
+                <input
+                  id="checkout-wallet-address"
+                  required
+                  placeholder="Endereço 0x da carteira"
+                />
               </label>
               <label>
                 E-mail*
-                <input required type="email" placeholder="contato@email.com" />
+                <input id="checkout-email" required type="email" placeholder="contato@email.com" />
               </label>
               <label>
                 Tipo de carteira*
-                <select value={walletId} onChange={(event) => setWalletId(event.target.value)}>
+                <select
+                  id="checkout-wallet"
+                  value={walletId}
+                  onChange={(event) => setWalletId(event.target.value)}
+                >
                   <option value="metamask">MetaMask</option>
                   <option value="coinbase">Coinbase Wallet</option>
                 </select>
               </label>
               <label>
                 Nome ENS
-                <input placeholder=".eth" />
+                <input id="checkout-ens" placeholder=".eth" />
               </label>
             </div>
             <label className="full-field">
               Observação do colecionador (opcional)
-              <textarea rows={4} />
+              <textarea id="checkout-note" rows={4} />
             </label>
           </form>
-          <aside className="checkout-summary">
-            <h2>
+          <aside className="checkout-summary" aria-labelledby="checkout-summary-title">
+            <h2 id="checkout-summary-title">
               Seus NFTs <small>{cart?.items.length ?? 0} itens</small>
             </h2>
             {cartQuery.isPending ? <div className="visual-empty">Carregando carrinho…</div> : null}

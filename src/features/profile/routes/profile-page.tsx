@@ -47,7 +47,7 @@ export function ProfilePage() {
 
   return (
     <section className="account-page visual-page-shell">
-      <aside className="account-sidebar">
+      <nav className="account-sidebar" aria-label="Navegação da conta">
         <h2>Meu perfil</h2>
         {menu.map((item, index) => (
           <Link
@@ -59,9 +59,13 @@ export function ProfilePage() {
           </Link>
         ))}
         <button type="button">Sair</button>
-      </aside>
-      <form className="account-form" onSubmit={(event) => void submit(event)}>
-        <h1>Perfil do colecionador</h1>
+      </nav>
+      <form
+        className="account-form"
+        aria-labelledby="profile-form-title"
+        onSubmit={(event) => void submit(event)}
+      >
+        <h1 id="profile-form-title">Perfil do colecionador</h1>
         <div className="form-grid">
           <label>
             Nome de exibição*

@@ -73,7 +73,7 @@ export function WalletsPage() {
 
   return (
     <section className="account-page visual-page-shell">
-      <aside className="account-sidebar">
+      <nav className="account-sidebar" aria-label="Navegação da conta">
         <h2>Meu perfil</h2>
         {menu.map((item, index) => (
           <Link
@@ -85,11 +85,15 @@ export function WalletsPage() {
           </Link>
         ))}
         <button type="button">Sair</button>
-      </aside>
-      <form className="account-form wallet-form" onSubmit={(event) => void submit(event)}>
+      </nav>
+      <form
+        className="account-form wallet-form"
+        aria-labelledby="wallet-form-title"
+        onSubmit={(event) => void submit(event)}
+      >
         <div className="account-heading">
           <div>
-            <h1>Carteira principal</h1>
+            <h1 id="wallet-form-title">Carteira principal</h1>
             <p>Estas carteiras ficam disponíveis no pagamento e para receber NFTs comprados.</p>
           </div>
           <button type="button" className="text-button" onClick={startAdding}>
@@ -97,7 +101,7 @@ export function WalletsPage() {
           </button>
         </div>
         {walletsQuery.data?.length ? (
-          <div className="wallet-list" aria-label="Carteiras cadastradas">
+          <div className="wallet-list" role="list" aria-label="Carteiras cadastradas">
             {walletsQuery.data.map((wallet) => (
               <button
                 type="button"
