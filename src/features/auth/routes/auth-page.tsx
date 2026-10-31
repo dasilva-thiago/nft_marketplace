@@ -13,6 +13,9 @@ const initialValues: FormValues = { name: '', email: '', password: '' };
 function fieldId(field: FieldName): string {
   return `auth-${field}`;
 }
+function errorId(field: FieldName): string {
+  return `${fieldId(field)}-error`;
+}
 
 export function AuthPage({ mode }: { mode: AuthMode }) {
   const navigate = useNavigate();
@@ -53,6 +56,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
   };
   const pageError = localErrors.form ?? apiError?.message;
   const isLogin = mode === 'login';
+  const fieldError = (field: FieldName) => localErrors[field] ?? apiError?.fields?.[field];
 
   return (
     <section className="auth-screen" aria-labelledby="auth-title">
@@ -125,10 +129,13 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
                 placeholder="Nome de usuário"
                 value={values.name}
                 onChange={(event) => updateField('name', event.target.value)}
-                aria-invalid={Boolean(localErrors.name || apiError?.fields?.name)}
+                aria-invalid={Boolean(fieldError('name'))}
+                aria-describedby={fieldError('name') ? errorId('name') : undefined}
               />
-              {(localErrors.name || apiError?.fields?.name) && (
-                <small className="field-error">{localErrors.name ?? apiError?.fields?.name}</small>
+              {fieldError('name') && (
+                <small id={errorId('name')} className="field-error">
+                  {fieldError('name')}
+                </small>
               )}
             </label>
           )}
@@ -142,10 +149,13 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
               placeholder="Digite seu e-mail"
               value={values.email}
               onChange={(event) => updateField('email', event.target.value)}
-              aria-invalid={Boolean(localErrors.email || apiError?.fields?.email)}
+              aria-invalid={Boolean(fieldError('email'))}
+              aria-describedby={fieldError('email') ? errorId('email') : undefined}
             />
-            {(localErrors.email || apiError?.fields?.email) && (
-              <small className="field-error">{localErrors.email ?? apiError?.fields?.email}</small>
+            {fieldError('email') && (
+              <small id={errorId('email')} className="field-error">
+                {fieldError('email')}
+              </small>
             )}
           </label>
           <label className="auth-field" htmlFor={fieldId('password')}>
@@ -158,24 +168,27 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
               placeholder={isLogin ? '••••••••••' : 'Senha'}
               value={values.password}
               onChange={(event) => updateField('password', event.target.value)}
-              aria-invalid={Boolean(localErrors.password || apiError?.fields?.password)}
+              aria-invalid={Boolean(fieldError('password'))}
+              aria-describedby={fieldError('password') ? errorId('password') : undefined}
             />
-            {(localErrors.password || apiError?.fields?.password) && (
-              <small className="field-error">
-                {localErrors.password ?? apiError?.fields?.password}
+            {fieldError('password') && (
+              <small id={errorId('password')} className="field-error">
+                {fieldError('password')}
               </small>
             )}
           </label>
           {mode === 'register' && (
-            <div className="auth-field">
+            <label className="auth-field" htmlFor="auth-password-confirmation">
               <span>Confirmar senha</span>
               <input
+                id="auth-password-confirmation"
+                name="passwordConfirmation"
                 aria-label="Confirmação"
                 type="password"
                 placeholder="Confirmar senha"
                 autoComplete="new-password"
               />
-            </div>
+            </label>
           )}
           {pageError && (
             <p className="form-error" role="alert">
