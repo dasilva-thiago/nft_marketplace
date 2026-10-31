@@ -126,13 +126,13 @@ A fatia só será considerada concluída quando os handlers, APIs Axios, schemas
 - Telas conectadas: início, login, cadastro, detalhe, carrinho, pagamento, confirmação, perfil e carteiras.
 - Evidência visual: capturas reais conferidas em 390 px e 1440 px; a largura 768 px continua como próxima validação de regressão.
 - Evidência automatizada: `pnpm typecheck` passou; `pnpm build` passou; `pnpm test:e2e` passou com 30/30 testes.
-- Limitações mantidas de propósito: artes individuais/fontes do Figma não foram fornecidas, então o placeholder continua; carrinho, pagamento, pedido, perfil e carteiras ainda são composição visual e não têm handlers de domínio concluídos.
+- Limitações mantidas de propósito: fontes exportadas do Figma não foram fornecidas; os quatro assets aprovados de macacos são reutilizados nos fixtures para manter a unidade visual, enquanto carrinho, pagamento, pedido, perfil e carteiras ainda são composição visual e não têm handlers de domínio concluídos.
 
 ## Nova fatia aprovada — home e listagem de NFTs
 
 Esta é a próxima fatia autorizada. A referência primária é `desktop-inicio.png`/`mobile-inicio.png`, com validação adicional em 768 px. A home deve conter hero, busca, filtros, ordenação, paginação, cards, destaque, lançamentos/diário e footer; a listagem deve consultar somente o endpoint REST tipado, manter filtros combináveis/ordenação/página na URL e preservar Back/Forward/refresh.
 
-Não serão inventados assets de NFT: enquanto os arquivos individuais não forem disponibilizados, o placeholder já documentado permanece. Não serão adicionados filtros ou regras de negócio que não existam nos contratos; quando a referência visual mostrar um controle sem contrato funcional, ele deverá permanecer claramente demonstrativo ou ser documentado como pendência, nunca simular sucesso.
+Não serão inventados assets de NFT: os quatro arquivos aprovados pelo usuário são reutilizados de forma determinística nos fixtures, sem gerar ou alterar pixels. Não serão adicionados filtros ou regras de negócio que não existam nos contratos; quando a referência visual mostrar um controle sem contrato funcional, ele deverá permanecer claramente demonstrativo ou ser documentado como pendência, nunca simular sucesso.
 
 ### Critérios de saída desta fatia
 
@@ -141,6 +141,12 @@ Não serão inventados assets de NFT: enquanto os arquivos individuais não fore
 - Estados pending/skeleton, vazio, erro com retry e carregamento em background são preservados.
 - Os testes E2E cobrem filtros combinados, refresh, Back/Forward, paginação, vazio, erro/429 e resposta fora de ordem.
 
+## Nova rodada — fidelidade da home à referência reenviada
+
+A nova referência da home passa a ser a fonte visual de maior prioridade para esta rodada. Ela mostra uma composição editorial compacta: hero com o macaco verde em destaque, cabeçalho estreito, catálogo em três colunas com sidebar de filtros, card "NFT em destaque" abaixo da sidebar, duas faixas editoriais, diário de cunhagem em quatro cards e footer dividido em benefícios, newsletter e links. A implementação deve corrigir a composição atual sem transformar a screenshot em asset.
+
+Os dados de catálogo continuam vindo dos contratos existentes. Para a cena default, a imagem hero usará o NFT `Emerald Ape #042`, o card de oferta limitada usará `Desert Ape #117` e as faixas editoriais priorizarão a coleção `Neo Apes`; busca, filtros, paginação e os testes que dependem das demais coleções continuam preservados.
+
 ## Atualização — assets reais de macacos
 
-O repositório recebeu quatro assets aprovados pelo usuário em `public/assets/monkey1.webp` até `public/assets/monkey4.webp`. Eles foram integrados aos fixtures dos cinco NFTs da coleção `Neo Apes`, mantendo ids, nomes, preços, redes, traits e contratos existentes; o quinto item reutiliza um asset aprovado porque o pacote contém quatro imagens. Como todos os componentes de home, listagem, detalhe, carrinho e pedido consomem `imageUrl`/`gallery` dos contratos, a substituição se propaga para essas telas sem duplicar lógica de apresentação. Os demais NFTs continuam usando o placeholder até que existam assets correspondentes.
+O repositório recebeu quatro assets aprovados pelo usuário em `public/assets/monkey1.webp` até `public/assets/monkey4.webp`. Eles foram integrados aos fixtures de todas as coleções visíveis, com reutilização determinística e sem alterar ids, nomes, preços, redes, traits ou contratos. Como todos os componentes de home, listagem, detalhe, carrinho e pedido consomem `imageUrl`/`gallery` dos contratos, a substituição se propaga para essas telas sem duplicar lógica de apresentação.

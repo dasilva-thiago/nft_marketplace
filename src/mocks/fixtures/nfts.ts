@@ -1,7 +1,6 @@
 import type { Nft } from '@/shared/api/contracts';
 import { NftSchema } from '@/shared/api/schemas';
 
-const placeholder = '/placeholders/nft-placeholder.svg';
 const monkey1 = '/assets/monkey1.webp';
 const monkey2 = '/assets/monkey2.webp';
 const monkey3 = '/assets/monkey3.webp';
@@ -100,14 +99,14 @@ const rawNfts: Nft[] = [
   {
     id: 'pixel-cat-014',
     name: 'Pixel Cat #014',
-    imageUrl: placeholder,
+    imageUrl: monkey4,
     collection: 'Pixel Friends',
     priceEth: '0.12',
     availableEditions: 32,
     network: 'Polygon',
     version: 1,
     description: 'Gato pixelado da coleção Pixel Friends.',
-    gallery: [placeholder],
+    gallery: [monkey4],
     edition: 14,
     totalEditions: 500,
     attributes: [
@@ -118,14 +117,14 @@ const rawNfts: Nft[] = [
   {
     id: 'pixel-fox-033',
     name: 'Pixel Fox #033',
-    imageUrl: placeholder,
+    imageUrl: monkey3,
     collection: 'Pixel Friends',
     priceEth: '0.18',
     availableEditions: 15,
     network: 'Polygon',
     version: 1,
     description: 'Raposa pixelada da coleção Pixel Friends.',
-    gallery: [placeholder],
+    gallery: [monkey3],
     edition: 33,
     totalEditions: 400,
     attributes: [
@@ -136,14 +135,14 @@ const rawNfts: Nft[] = [
   {
     id: 'pixel-owl-052',
     name: 'Pixel Owl #052',
-    imageUrl: placeholder,
+    imageUrl: monkey2,
     collection: 'Pixel Friends',
     priceEth: '0.24',
     availableEditions: 4,
     network: 'Ethereum',
     version: 1,
     description: 'Coruja pixelada da coleção Pixel Friends.',
-    gallery: [placeholder],
+    gallery: [monkey2],
     edition: 52,
     totalEditions: 300,
     attributes: [
@@ -154,14 +153,14 @@ const rawNfts: Nft[] = [
   {
     id: 'samurai-021',
     name: 'Neon Samurai #021',
-    imageUrl: placeholder,
+    imageUrl: monkey1,
     collection: 'Neon Legends',
     priceEth: '1.05',
     availableEditions: 3,
     network: 'Ethereum',
     version: 1,
     description: 'Samurai digital da coleção Neon Legends.',
-    gallery: [placeholder],
+    gallery: [monkey1],
     edition: 21,
     totalEditions: 120,
     attributes: [
@@ -172,14 +171,14 @@ const rawNfts: Nft[] = [
   {
     id: 'ronin-064',
     name: 'Neon Ronin #064',
-    imageUrl: placeholder,
+    imageUrl: monkey4,
     collection: 'Neon Legends',
     priceEth: '0.93',
     availableEditions: 9,
     network: 'Polygon',
     version: 1,
     description: 'Ronin digital em uma edição limitada.',
-    gallery: [placeholder],
+    gallery: [monkey4],
     edition: 64,
     totalEditions: 150,
     attributes: [
@@ -190,14 +189,14 @@ const rawNfts: Nft[] = [
   {
     id: 'astral-dragon-009',
     name: 'Astral Dragon #009',
-    imageUrl: placeholder,
+    imageUrl: monkey1,
     collection: 'Mythic Worlds',
     priceEth: '4.80',
     availableEditions: 2,
     network: 'Ethereum',
     version: 1,
     description: 'Dragão astral da coleção Mythic Worlds.',
-    gallery: [placeholder],
+    gallery: [monkey1],
     edition: 9,
     totalEditions: 50,
     attributes: [
@@ -208,14 +207,14 @@ const rawNfts: Nft[] = [
   {
     id: 'forest-spirit-026',
     name: 'Forest Spirit #026',
-    imageUrl: placeholder,
+    imageUrl: monkey2,
     collection: 'Mythic Worlds',
     priceEth: '0.57',
     availableEditions: 7,
     network: 'Polygon',
     version: 1,
     description: 'Espírito guardião da coleção Mythic Worlds.',
-    gallery: [placeholder],
+    gallery: [monkey2],
     edition: 26,
     totalEditions: 90,
     attributes: [

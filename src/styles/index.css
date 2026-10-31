@@ -2771,3 +2771,351 @@ select:focus-visible {
     display: none;
   }
 }
+
+/* Home reference pass: compact editorial marketplace composition. */
+.home-reference {
+  width: min(100% - 48px, 1180px);
+}
+
+.home-reference .market-hero {
+  min-height: 350px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.7fr);
+  gap: clamp(40px, 8vw, 110px);
+  padding: 42px 34px 48px;
+}
+
+.home-reference .hero-copy {
+  padding-left: 0;
+}
+
+.home-reference .hero-copy h1 {
+  max-width: 470px;
+  font-size: clamp(2.35rem, 4.2vw, 4rem);
+  line-height: 0.98;
+}
+
+.home-reference .hero-description {
+  max-width: 390px;
+  margin: 18px 0 20px;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.home-reference .hero-proof {
+  margin-top: 20px;
+}
+
+.home-reference .hero-art-wrap {
+  width: min(100%, 355px);
+}
+
+.home-reference .hero-art-frame {
+  aspect-ratio: 1;
+  border-radius: 10px;
+}
+
+.home-reference .hero-art-overlay {
+  padding: 26px 16px 13px;
+}
+
+.home-reference .catalog-section {
+  padding: 35px 34px 48px;
+}
+
+.home-reference .catalog-heading-row {
+  margin-bottom: 18px;
+}
+
+.home-reference .catalog-heading-row h2 {
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
+}
+
+.home-reference .catalog-layout {
+  grid-template-columns: 205px minmax(0, 1fr);
+  gap: 22px;
+}
+
+.home-reference .catalog-sidebar {
+  padding: 15px 14px 17px;
+}
+
+.home-reference .results-toolbar {
+  min-height: 30px;
+  margin-bottom: 10px;
+}
+
+.home-reference .nft-grid {
+  gap: 13px;
+}
+
+.home-reference .nft-card-image-wrap {
+  aspect-ratio: 1 / 0.97;
+}
+
+.home-reference .nft-card-details {
+  padding: 11px 10px 10px;
+}
+
+.home-reference .nft-card h3 {
+  font-size: 0.75rem;
+}
+
+.home-reference .nft-card-footer {
+  padding: 8px 10px;
+}
+
+.limited-featured-card {
+  margin-top: 24px;
+  padding: 13px 11px 11px;
+  background: #3b2116;
+  border: 1px solid #59311d;
+  text-align: center;
+}
+
+.limited-featured-kicker,
+.limited-featured-card > strong {
+  display: block;
+  margin: 0;
+  font:
+    600 0.58rem 'DM Mono',
+    monospace;
+  letter-spacing: 0.08em;
+}
+
+.limited-featured-kicker {
+  color: #efaa61;
+}
+
+.limited-featured-card > strong {
+  margin-top: 4px;
+  color: #f0e0d3;
+}
+
+.limited-featured-card a {
+  display: block;
+  margin-top: 13px;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.limited-featured-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 0.88;
+  object-fit: cover;
+}
+
+.limited-featured-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 9px;
+  color: #d0a27a;
+  font:
+    0.55rem 'DM Mono',
+    monospace;
+  text-align: left;
+}
+
+.limited-featured-meta strong {
+  color: #f2c184;
+}
+
+.home-reference .home-section {
+  width: min(100% - 68px, 1112px);
+  padding-top: 35px;
+}
+
+.home-reference .section-heading {
+  margin-bottom: 14px;
+  padding-bottom: 9px;
+}
+
+.home-reference .section-heading h2 {
+  font-size: clamp(1.25rem, 2.1vw, 1.75rem);
+}
+
+.home-reference .launch-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.editorial-feature-card {
+  display: grid;
+  grid-template-columns: minmax(125px, 0.85fr) minmax(0, 1.15fr);
+  min-height: 170px;
+  overflow: hidden;
+  background: #241611;
+  border: 1px solid #392117;
+}
+
+.editorial-feature-card > img {
+  width: 100%;
+  height: 100%;
+  min-height: 170px;
+  object-fit: cover;
+}
+
+.editorial-feature-card > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 18px 16px;
+}
+
+.editorial-feature-card span {
+  color: #d18e51;
+  font:
+    0.52rem 'DM Mono',
+    monospace;
+  text-transform: uppercase;
+}
+
+.editorial-feature-card h3 {
+  margin: 7px 0 0;
+  color: #f2e7dc;
+  font:
+    500 0.82rem 'DM Mono',
+    monospace;
+}
+
+.editorial-feature-card p {
+  margin: 10px 0;
+  color: #a98b79;
+  font:
+    0.56rem/1.5 'DM Mono',
+    monospace;
+}
+
+.editorial-feature-card a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: auto;
+  padding: 7px 9px;
+  background: #d98b45;
+  color: #28150d;
+  font:
+    600 0.55rem 'DM Mono',
+    monospace;
+}
+
+.home-reference .diary-section {
+  padding-top: 40px;
+  padding-bottom: 48px;
+}
+
+.home-reference .diary-grid {
+  gap: 13px;
+}
+
+.home-reference .diary-grid .visual-nft-image {
+  aspect-ratio: 1.1;
+}
+
+@media (max-width: 920px) and (min-width: 621px) {
+  .home-reference .market-hero {
+    padding-inline: 22px;
+  }
+
+  .home-reference .catalog-section {
+    padding-inline: 22px;
+  }
+
+  .home-reference .catalog-layout {
+    grid-template-columns: 180px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .home-reference {
+    width: calc(100% - 32px);
+  }
+
+  .home-reference .market-hero {
+    min-height: 0;
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 28px 0 25px;
+  }
+
+  .home-reference .hero-copy h1 {
+    font-size: clamp(2rem, 10vw, 2.8rem);
+  }
+
+  .home-reference .hero-description {
+    font-size: 0.72rem;
+  }
+
+  .home-reference .hero-art-wrap {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: min(100%, 300px);
+    justify-self: center;
+  }
+
+  .home-reference .catalog-section {
+    padding: 27px 0 35px;
+  }
+
+  .home-reference .catalog-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .home-reference .catalog-sidebar {
+    padding: 14px;
+  }
+
+  .home-reference .limited-featured-card {
+    display: none;
+  }
+
+  .home-reference .home-section {
+    width: calc(100% - 32px);
+    padding-top: 28px;
+  }
+
+  .home-reference .launch-section,
+  .home-reference .diary-section {
+    display: block;
+  }
+
+  .home-reference .launch-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .editorial-feature-card {
+    grid-template-columns: 118px minmax(0, 1fr);
+  }
+
+  .editorial-feature-card > img {
+    min-height: 145px;
+  }
+
+  .home-reference .diary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-reference .diary-grid .visual-nft-meta {
+    display: block;
+  }
+}
+
+.header-search-link {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: #c9bdb2;
+}
+
+.header-search-link:hover {
+  color: #e99a45;
+}
+
+@media (max-width: 620px) {
+  .header-search-link {
+    display: none;
+  }
+}

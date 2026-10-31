@@ -1,3 +1,4 @@
+import { Search } from 'lucide-react';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useLogoutMutation, useSessionQuery } from '@/features/auth/queries';
 
@@ -32,12 +33,27 @@ export function RootLayout() {
           <Link to="/" search={homeSearch}>
             Início
           </Link>
-          <Link to="/" search={homeSearch}>
-            Mercado
-          </Link>
-          <Link to="/account/profile">Perfil</Link>
-          <Link to="/cart">Carrinho</Link>
+          {isHomeRoute ? (
+            <>
+              <a href="#catalogo">Mercado</a>
+              <a href="#lancamentos">Criadores</a>
+              <a href="#diario">Aprenda</a>
+            </>
+          ) : (
+            <>
+              <Link to="/" search={homeSearch}>
+                Mercado
+              </Link>
+              <Link to="/account/profile">Perfil</Link>
+              <Link to="/cart">Carrinho</Link>
+            </>
+          )}
         </nav>
+        {isHomeRoute && (
+          <a href="#catalogo" className="header-search-link" aria-label="Buscar no marketplace">
+            <Search size={15} aria-hidden="true" />
+          </a>
+        )}
         <div className="session-header-actions" aria-live="polite">
           {sessionQuery.isPending ? (
             <span className="session-status">Verificando sessão…</span>

@@ -56,6 +56,40 @@ function EditorialNftCard({ nft }: { nft: NftSummary }) {
   );
 }
 
+function LimitedFeaturedCard({ nft }: { nft: NftSummary }) {
+  return (
+    <article className="limited-featured-card">
+      <p className="limited-featured-kicker">NFT EM DESTAQUE</p>
+      <strong>OFERTA LIMITADA</strong>
+      <Link to="/nft/$nftId" params={{ nftId: nft.id }} aria-label={`Ver oferta ${nft.name}`}>
+        <img src={nft.imageUrl} alt={`Arte de ${nft.name}`} />
+      </Link>
+      <div className="limited-featured-meta">
+        <span>{nft.name}</span>
+        <strong>{formatEth(nft.priceEth)}</strong>
+      </div>
+    </article>
+  );
+}
+
+function EditorialFeatureCard({ nft }: { nft: NftSummary }) {
+  return (
+    <article className="editorial-feature-card">
+      <img src={nft.imageUrl} alt={`Arte de ${nft.name}`} loading="lazy" />
+      <div>
+        <span>{nft.collection}</span>
+        <h3>{nft.name}</h3>
+        <p>
+          Uma peça selecionada para colecionadores que acompanham a próxima geração da arte digital.
+        </p>
+        <Link to="/nft/$nftId" params={{ nftId: nft.id }}>
+          Explorar <ArrowRight size={13} aria-hidden="true" />
+        </Link>
+      </div>
+    </article>
+  );
+}
+
 export function HomePage() {
   const searchState = useSearch({ from: '/' });
   const navigate = useNavigate({ from: '/' });
@@ -106,15 +140,31 @@ export function HomePage() {
   const facetsQuery = useQuery(
     catalogListQuery({ page: 1, pageSize: 100, sort: 'name', sortOrder: 'asc' }),
   );
+  const heroQuery = useQuery(
+    catalogListQuery({ page: 1, pageSize: 1, search: 'emerald', sort: 'name', sortOrder: 'asc' }),
+  );
   const featuredQuery = useQuery(
-    catalogListQuery({ page: 1, pageSize: 1, sort: 'priceEth', sortOrder: 'desc' }),
+    catalogListQuery({ page: 1, pageSize: 1, search: 'desert', sort: 'name', sortOrder: 'asc' }),
   );
   const launchQuery = useQuery(
-    catalogListQuery({ page: 1, pageSize: 4, sort: 'priceEth', sortOrder: 'desc' }),
+    catalogListQuery({
+      page: 1,
+      pageSize: 4,
+      sort: 'priceEth',
+      sortOrder: 'desc',
+      filters: { collection: 'Neo Apes' },
+    }),
   );
   const diaryQuery = useQuery(
-    catalogListQuery({ page: 1, pageSize: 4, sort: 'name', sortOrder: 'asc' }),
+    catalogListQuery({
+      page: 1,
+      pageSize: 4,
+      sort: 'name',
+      sortOrder: 'asc',
+      filters: { collection: 'Neo Apes' },
+    }),
   );
+  const heroFeatured = heroQuery.data?.items[0];
   const featured = featuredQuery.data?.items[0];
   const facetItems = facetsQuery.data?.items ?? [];
   const collections = uniqueValues(facetItems, 'collection');
@@ -150,7 +200,7 @@ export function HomePage() {
 
   return (
     <>
-      <div className="marketplace-page">
+      <div className="marketplace-page home-reference">
         <div className="mobile-discovery-bar">
           <form className="mobile-search-form" onSubmit={onSubmitSearch} role="search">
             <Search size={17} aria-hidden="true" />
@@ -183,7 +233,7 @@ export function HomePage() {
         <section className="market-hero" aria-labelledby="hero-title">
           <div className="hero-copy">
             <p className="eyebrow">
-              <Sparkles size={14} aria-hidden="true" /> COLECIONÁVEIS DIGITAIS
+              <Sparkles size={14} aria-hidden="true" /> BEM-VINDO À KURIO
             </p>
             <h1 id="hero-title">SEJA DONO DO FUTURO DA ARTE DIGITAL</h1>
             <p className="hero-description">
@@ -201,14 +251,14 @@ export function HomePage() {
           <div className="hero-art-wrap">
             <div className="hero-art-frame">
               <img
-                src={featured?.imageUrl ?? '/placeholders/nft-placeholder.svg'}
-                alt={featured ? `Arte de ${featured.name}` : 'Arte digital em destaque'}
+                src={heroFeatured?.imageUrl ?? '/placeholders/nft-placeholder.svg'}
+                alt={heroFeatured ? `Arte de ${heroFeatured.name}` : 'Arte digital em destaque'}
                 className="hero-art"
               />
               <div className="hero-art-overlay">
                 <span>EM DESTAQUE</span>
-                <strong>{featured?.name ?? 'Peças digitais únicas'}</strong>
-                {featured && <span>{formatEth(featured.priceEth)}</span>}
+                <strong>{heroFeatured?.name ?? 'Peças digitais únicas'}</strong>
+                {heroFeatured && <span>{formatEth(heroFeatured.priceEth)}</span>}
               </div>
             </div>
             <div className="hero-index" aria-hidden="true">
@@ -379,6 +429,7 @@ export function HomePage() {
               <button type="button" className="clear-filters" onClick={clearFilters}>
                 Limpar filtros
               </button>
+              {featured && <LimitedFeaturedCard nft={featured} />}
             </aside>
             <div className="catalog-results" aria-live="polite" aria-busy={isPending || isFetching}>
               <div className="results-toolbar">
@@ -492,7 +543,11 @@ export function HomePage() {
           </div>
         </section>
 
-        <section className="home-section launch-section" aria-labelledby="launch-heading">
+        <section
+          className="home-section launch-section"
+          id="lancamentos"
+          aria-labelledby="launch-heading"
+        >
           <div className="section-heading">
             <div>
               <p className="eyebrow">LANÇAMENTOS SELECIONADOS</p>
@@ -503,12 +558,12 @@ export function HomePage() {
             </a>
           </div>
           <div className="launch-grid">
-            {launchQuery.data?.items.slice(0, 4).map((nft) => (
-              <EditorialNftCard key={nft.id} nft={nft} />
+            {launchQuery.data?.items.slice(0, 2).map((nft) => (
+              <EditorialFeatureCard key={nft.id} nft={nft} />
             ))}
           </div>
         </section>
-        <section className="home-section diary-section" aria-labelledby="diary-heading">
+        <section className="home-section diary-section" id="diario" aria-labelledby="diary-heading">
           <div className="section-heading">
             <div>
               <p className="eyebrow">DIÁRIO DA CUNHAGEM</p>

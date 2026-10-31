@@ -33,7 +33,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 ## Catálogo, detalhe e favoritos
 
 - [x] Primeira home funcional: hero, listagem de cards ligada à API, busca submetida, filtro de coleção, ordenação, paginação, estados loading/erro/vazio e parâmetros preservados na URL; testes cobrem filtro/busca/histórico em desktop e mobile.
-- [ ] Comparar e ajustar fidelidade dos frames Figma da home/listagem em 390/768/1440 px; a composição já foi conferida em 390/1440. Os quatro assets de macacos recebidos já substituem o placeholder nos NFTs `Neo Apes`; as demais coleções ainda aguardam artes correspondentes.
+- [ ] Replicar a nova referência reenviada da home: hero compacto com `Emerald Ape #042`, catálogo em três colunas, card de oferta limitada, faixas editoriais, diário e footer; manter os quatro assets de macacos reutilizados em todo o catálogo e documentar qualquer ajuste de acessibilidade.
 - [x] Implementar destaque, lançamentos/diário, filtros combináveis de rede/traits/faixa de preço previstos pelo contrato, histórico, paginação e URLs de busca; a validação de respostas fora de ordem permanece coberta no nível de API e a confirmação visual em 768 px continua pendente.
 - [x] Implementar a tela visual de detalhe com acesso direto, estado 404, galeria, edição, quantidade, favorito e ações de compra/adicionar; persistência e mutations permanecem pendentes.
 - [ ] Persistir favoritos para autenticados; incluir ao menos uma mutation otimista com rollback.

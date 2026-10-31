@@ -56,7 +56,7 @@ O design de referência é o export do Figma: base escura marrom/preta e acentos
 
 As referências recebidas foram usadas como fonte visual primária. Login e cadastro desktop são apresentados como modal sobre uma cena de marketplace; em mobile, o shell vira uma tela dedicada. Detalhe, carrinho, checkout, confirmação, perfil e carteiras usam os mesmos tokens âmbar/marrom, grids, formulários e footer editorial. Capturas reais foram conferidas em 390 px e 1440 px; a largura 768 px ainda precisa de uma rodada específica de regressão visual.
 
-O ZIP não contém assets individuais das artes nem fontes exportadas. As imagens continuam em `/public/placeholders/nft-placeholder.svg`, sem recortar a screenshot inteira como asset de produto. Essa substituição é deliberada e deve ser removida somente quando os arquivos individuais forem disponibilizados.
+O ZIP não contém fontes exportadas. Os quatro assets aprovados pelo usuário em `/public/assets/monkey1.webp` até `/public/assets/monkey4.webp` são reutilizados deterministicamente nos fixtures de todas as coleções para que a home e as telas de catálogo não exibam placeholders. A reutilização preserva os contratos e não recorta a screenshot inteira como asset de produto.
 
 Não existem referências mobile de confirmação, perfil e carteiras. Por autorização do usuário, essas três variantes foram adaptadas responsivamente a partir da composição desktop: sidebar vira grid de navegação, formulários passam a uma coluna e a confirmação mantém o cartão central. Essas diferenças são adaptação de layout, não uma nova direção visual.
 
