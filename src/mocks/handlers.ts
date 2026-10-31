@@ -33,7 +33,7 @@ import {
   resetMockAuthState,
   verifyMockPassword,
 } from './auth-state';
-import { nftFixtures } from './fixtures/nfts';
+import { nftFixtures, resetMockNftMarketData, updateMockNftMarketData } from './fixtures/nfts';
 import {
   MockScenarioSchema,
   getMockScenario,
@@ -302,6 +302,15 @@ export const handlers = [
       return HttpResponse.json(apiError('VALIDATION_ERROR', 'Evento de mock inválido.'), {
         status: 400,
       });
+    if (
+      parsed.data.event === 'nft.updated' &&
+      !updateMockNftMarketData(parsed.data.payload.nftId, {
+        priceEth: parsed.data.payload.priceEth,
+        availableEditions: parsed.data.payload.availableEditions,
+        version: parsed.data.version,
+      })
+    )
+      return notFoundResponse('NFT não encontrado.');
     publishMockSocketEvent(parsed.data.userId, parsed.data.event, {
       eventId: parsed.data.eventId,
       resourceId:
@@ -317,6 +326,7 @@ export const handlers = [
   http.post('/api/__mock/reset', () => {
     resetMockScenario();
     resetMockAuthState();
+    resetMockNftMarketData();
     resetMockCartState();
     resetMockFavoritesState();
     resetMockQuotesState();

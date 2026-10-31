@@ -44,7 +44,6 @@ Os quatro assets de macacos em `public/assets/monkey1.webp` até `public/assets/
 
 - recuperação completa de pedido após timeout, refresh e reconexão;
 - remoção seletiva de itens/quantidades comprados após confirmação;
-- bloqueio visual explícito do checkout quando a cotação é invalidada por evento realtime;
 - cobertura de avatar, confirmação de senha, skeletons e revisão de foco/teclado;
 - regressão visual dedicada em 768 px;
 - auditoria Lighthouse, otimização de bundle, configuração de deploy e validação pública.

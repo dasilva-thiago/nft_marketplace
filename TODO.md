@@ -41,7 +41,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [x] Adicionar/alterar/remover itens autenticados conforme disponibilidade de NFT/edição; handlers MSW isolam o carrinho por usuário e queries usam chave privada por identidade.
 - [x] Aplicar cupom na cotação API e tratar inválido/expirado; subtotal, desconto, taxa de rede e total vêm da API. ETH trafega em strings decimais e o teste cobre precisão arbitrária.
 - [x] Persistir carrinho visitante em armazenamento local e mesclar ao autenticar/cadastrar; quantidades são somadas, disponibilidade é validada e o armazenamento visitante só é limpo após sucesso.
-- [ ] Refletir alteração de preço/disponibilidade enquanto aberto; informar alteração, atualizar resumo e invalidar cotação.
+- [x] Refletir alteração de preço/disponibilidade enquanto aberto; informar alteração, atualizar resumo, invalidar a cotação e exigir revisão explícita antes da confirmação.
 - [x] Checkout protegido usa os itens do carrinho, gera nova cotação por carteira/rede, valida campos obrigatórios e confirma a compra pela API.
 - [x] Pedido com chave de idempotência: mesma chave/conteúdo recupera o mesmo pedido; chave reutilizada com conteúdo diferente retorna conflito. Mutation sem retry automático e E2E de replay/conflito.
 - [ ] Recuperação pós-timeout/reconexão, remoção seletiva do carrinho após sucesso e transições de `pending` via evento ainda precisam ser concluídas; os estados `confirmed`, `pending` e `rejected` já são simulados por cenários determinísticos e snapshots consultáveis por refresh.
@@ -53,7 +53,8 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [ ] MSW ativo por configuração em desenvolvimento e build demo, state consistente em catálogo/favoritos/carrinho/perfil/carteiras/pedidos, persistência local para refresh e reset para cenário conhecido.
 - [x] Simular eventos com integração Socket.IO compatível com MSW usando `@mswjs/socket.io-binding`; exercitar `socket.io-client`; documentar transporte e limites. Componentes, hooks e Axios não incluem caminhos de negócio fictícios.
 - [x] `nft.updated` atualiza catálogo/detalhe/carrinho; `order.updated` atualiza pedido. Eventos têm identidade estável, recurso e versão; duplicatas/antigos não regridem estado nem reaplicam efeitos; reconexão reconcilia via REST; listeners/subscriptions são limpos; eventos de sessão antiga não alteram usuário atual.
-- [ ] Cenário ponta a ponta: NFT no carrinho sofre alteração → UI informa e atualiza resumo → checkout bloqueia cotação antiga. Queda com pedido pendente → reconexão/refresh recupera estado sem segunda compra; estados confirmados/recusados são terminais.
+- [x] Cenário ponta a ponta de alteração de NFT no carrinho: a UI informa, atualiza o resumo, recota via REST e bloqueia a cotação antiga até revisão explícita.
+- [ ] Queda com pedido pendente → reconexão/refresh recupera estado sem segunda compra; estados confirmados/recusados são terminais.
 
 ## Interface e acessibilidade
 

@@ -22,7 +22,6 @@ Pendências principais:
 
 - recuperação completa de pedido após timeout, refresh e reconexão;
 - remoção seletiva das linhas compradas após confirmação;
-- bloqueio visual explícito do checkout quando a cotação fica desatualizada por evento;
 - conclusão da cobertura de avatar, confirmação de senha, skeletons, foco/teclado e regressão visual em 768 px;
 - auditoria Lighthouse, otimização e deploy público.
 

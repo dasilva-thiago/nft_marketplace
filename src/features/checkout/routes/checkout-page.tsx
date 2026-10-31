@@ -1,12 +1,15 @@
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { Link, useNavigate } from '@tanstack/react-router';
+import { useSessionQuery } from '@/features/auth/queries';
 import { useCartQuery, useQuoteQuery } from '@/features/cart/queries';
 import { useCreateOrderMutation } from '@/features/orders/queries';
+import { useNftRealtimeUpdate } from '@/realtime/realtime-signal';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
 
 export function CheckoutPage() {
   const navigate = useNavigate({ from: '/checkout' });
+  const sessionQuery = useSessionQuery();
   const cartQuery = useCartQuery();
   const createOrderMutation = useCreateOrderMutation();
   const [network, setNetwork] = useState('Ethereum');
@@ -22,9 +25,31 @@ export function CheckoutPage() {
     [cart?.items, network, walletId],
   );
   const quoteQuery = useQuoteQuery(quoteRequest);
+  const realtimeUpdate = useNftRealtimeUpdate(sessionQuery.data?.user.id);
+  const [reviewedQuoteId, setReviewedQuoteId] = useState<string | null>(null);
+  const affectedByUpdate = Boolean(
+    realtimeUpdate && cart?.items.some((item) => item.nftId === realtimeUpdate.nftId),
+  );
+  const quoteInvalidated = Boolean(
+    affectedByUpdate &&
+      quoteQuery.data &&
+      realtimeUpdate &&
+      new Date(realtimeUpdate.occurredAt).getTime() > new Date(quoteQuery.data.createdAt).getTime(),
+  );
+  const quoteNeedsReview = Boolean(
+    affectedByUpdate && quoteQuery.data && reviewedQuoteId !== quoteQuery.data.quoteId,
+  );
+
+  useEffect(() => {
+    if (quoteQuery.data && !realtimeUpdate) setReviewedQuoteId(quoteQuery.data.quoteId);
+  }, [quoteQuery.data, realtimeUpdate]);
+
+  useEffect(() => {
+    if (quoteInvalidated && !quoteQuery.isFetching) void quoteQuery.refetch();
+  }, [quoteInvalidated, quoteQuery.isFetching, quoteQuery.refetch]);
 
   async function submitOrder() {
-    if (!quoteQuery.data) return;
+    if (!quoteQuery.data || quoteNeedsReview || quoteQuery.isFetching) return;
     const order = await createOrderMutation.mutateAsync({
       input: { quoteId: quoteQuery.data.quoteId, walletId, network },
       idempotencyKey,
@@ -153,7 +178,26 @@ export function CheckoutPage() {
               />
               <span>Coinbase Wallet · {network}</span>
             </label>
-            {createOrderMutation.isError || quoteQuery.isError ? (
+            {quoteNeedsReview ? (
+              <div className="form-error" role="alert" aria-live="assertive">
+                <strong>A cotação foi alterada</strong>
+                <span>
+                  O preço ou a disponibilidade de um NFT do carrinho mudou. Uma nova cotação foi
+                  carregada; revise o total antes de confirmar a compra.
+                </span>
+                {quoteQuery.isFetching ? (
+                  <span>Atualizando cotação…</span>
+                ) : quoteQuery.data ? (
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() => setReviewedQuoteId(quoteQuery.data?.quoteId ?? null)}
+                  >
+                    Revisar nova cotação
+                  </button>
+                ) : null}
+              </div>
+            ) : createOrderMutation.isError || quoteQuery.isError ? (
               <p className="form-error" role="alert">
                 A cotação mudou ou o pedido não pôde ser confirmado. Revise os dados e tente
                 novamente.
@@ -163,7 +207,13 @@ export function CheckoutPage() {
               type="submit"
               form="checkout-collector-form"
               className="primary-button"
-              disabled={!quoteQuery.data || createOrderMutation.isPending || !cart?.items.length}
+              disabled={
+                !quoteQuery.data ||
+                quoteNeedsReview ||
+                quoteQuery.isFetching ||
+                createOrderMutation.isPending ||
+                !cart?.items.length
+              }
             >
               {createOrderMutation.isPending ? 'Confirmando…' : 'Confirmar compra'}
             </button>

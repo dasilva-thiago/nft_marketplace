@@ -657,6 +657,19 @@ select:focus-visible {
   border: 1px solid #704236;
   background: #2a1915;
 }
+.checkout-summary .form-error {
+  display: grid;
+  gap: 8px;
+}
+.checkout-summary .form-error strong {
+  color: #f2c27d;
+}
+.checkout-summary .form-error span {
+  display: block;
+}
+.checkout-summary .form-error .secondary-button {
+  justify-self: start;
+}
 .auth-submit {
   width: 100%;
   min-height: 46px;

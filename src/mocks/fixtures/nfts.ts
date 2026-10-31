@@ -226,3 +226,31 @@ const rawNfts: Nft[] = [
 
 // Validação imediata: fixtures incorretas falham durante o desenvolvimento, não numa tela do usuário.
 export const nftFixtures: Nft[] = rawNfts.map((nft) => NftSchema.parse(nft));
+
+const initialMarketData = new Map(
+  nftFixtures.map((nft) => [
+    nft.id,
+    { priceEth: nft.priceEth, availableEditions: nft.availableEditions, version: nft.version },
+  ]),
+);
+
+export function updateMockNftMarketData(
+  nftId: string,
+  input: Pick<Nft, 'priceEth' | 'availableEditions' | 'version'>,
+): boolean {
+  const nft = nftFixtures.find((candidate) => candidate.id === nftId);
+  if (!nft) return false;
+  if (input.version <= nft.version) return true;
+  nft.priceEth = input.priceEth;
+  nft.availableEditions = input.availableEditions;
+  nft.version = input.version;
+  return true;
+}
+
+export function resetMockNftMarketData(): void {
+  for (const nft of nftFixtures) {
+    const initial = initialMarketData.get(nft.id);
+    if (!initial) continue;
+    Object.assign(nft, initial);
+  }
+}

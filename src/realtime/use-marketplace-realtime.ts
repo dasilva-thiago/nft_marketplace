@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { NftUpdatedPayloadSchema, OrderUpdatedPayloadSchema } from '@/shared/contracts/schemas';
 import type { Cart, NftSummary, OrderSnapshot } from '@/shared/contracts';
 import { createMarketplaceSocket } from './socket-client';
+import { realtimeKeys, type NftRealtimeUpdate } from './realtime-signal';
 
 const catalogKeys = { all: ['catalog'] as const };
 const cartKeys = {
@@ -66,6 +67,11 @@ export function connectMarketplaceRealtime(userId: string, queryClient: QueryCli
     const version = event.version;
     if (typeof version !== 'number' || !accept(`nft:${parsed.data.nftId}`, version)) return;
     const patch = { ...parsed.data, version };
+    queryClient.setQueryData<NftRealtimeUpdate>(realtimeKeys.nftUpdated(userId), {
+      nftId: parsed.data.nftId,
+      version,
+      occurredAt: new Date().toISOString(),
+    });
     queryClient.setQueriesData({ queryKey: catalogKeys.all }, (current) =>
       updateCatalogCache(current, parsed.data.nftId, patch),
     );
