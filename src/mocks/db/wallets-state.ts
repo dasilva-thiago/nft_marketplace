@@ -1,7 +1,9 @@
 import type { CreateWalletRequest, UpdateWalletRequest, Wallet } from '@/shared/contracts';
 
-const initialWallets = () =>
-  new Map<string, Wallet[]>([
+const WALLET_STORAGE_KEY = 'kurio.mock.wallets';
+
+function initialWallets(loadStored = true) {
+  const defaults = new Map<string, Wallet[]>([
     [
       'collector-ana',
       [
@@ -31,6 +33,16 @@ const initialWallets = () =>
       ],
     ],
   ]);
+  if (!loadStored || typeof sessionStorage === 'undefined') return defaults;
+  try {
+    const stored = JSON.parse(sessionStorage.getItem(WALLET_STORAGE_KEY) ?? 'null') as Array<
+      [string, Wallet[]]
+    > | null;
+    return stored?.length ? new Map(stored) : defaults;
+  } catch {
+    return defaults;
+  }
+}
 
 let wallets = initialWallets();
 
@@ -54,6 +66,7 @@ export function createWalletForUser(userId: string, input: CreateWalletRequest):
     version: 1,
   };
   wallets.set(userId, [...next, wallet]);
+  persistWallets();
   return wallet;
 }
 
@@ -72,9 +85,16 @@ export function updateWalletForUser(
     return shouldBePrimary ? { ...wallet, isPrimary: false, version: wallet.version + 1 } : wallet;
   });
   wallets.set(userId, updated);
+  persistWallets();
   return updated.find((wallet) => wallet.id === walletId);
 }
 
+function persistWallets(): void {
+  if (typeof sessionStorage !== 'undefined')
+    sessionStorage.setItem(WALLET_STORAGE_KEY, JSON.stringify([...wallets.entries()]));
+}
+
 export function resetMockWalletsState(): void {
-  wallets = initialWallets();
+  wallets = initialWallets(false);
+  if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem(WALLET_STORAGE_KEY);
 }

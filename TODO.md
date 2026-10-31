@@ -34,7 +34,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 - [x] Cadastro, login, logout e sessão integrada à API simulada; credenciais fictícias; sessão recuperável após refresh; expiração durante navegação retorna ao contexto protegido.
 - [x] Logout/troca de usuário limpam cache privado; nenhum usuário vê dados de outro. Checkout, perfil, carteiras, favoritos e pedidos exigem autenticação.
-- [ ] Perfil: edição de nome e senha, e carteiras: cadastrar/editar principal e secundária, estão implementados; falta concluir avatar, confirmação de senha na interface e cobertura de refresh da UI.
+- [x] Perfil: edição de nome e senha com confirmação validada; avatar selecionável/removível com assets locais; carteiras podem ser cadastradas/editadas e perfil/carteiras recuperam os dados após refresh da UI.
 
 ## Carrinho e pagamento
 

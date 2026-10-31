@@ -21,25 +21,47 @@ export function ProfilePage() {
   const updateProfileMutation = useUpdateProfileMutation();
   const changePasswordMutation = useChangePasswordMutation();
   const [name, setName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const avatarOptions = ['/assets/monkey1.webp', '/assets/monkey2.webp', '/assets/monkey3.webp'];
 
   useEffect(() => {
-    if (profileQuery.data) setName(profileQuery.data.name);
+    if (profileQuery.data) {
+      setName(profileQuery.data.name);
+      setAvatarUrl(profileQuery.data.avatarUrl);
+    }
   }, [profileQuery.data]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await updateProfileMutation.mutateAsync({ name });
+    setValidationError(null);
+    if (currentPassword || newPassword || passwordConfirmation) {
+      if (!currentPassword || !newPassword || !passwordConfirmation) {
+        setValidationError('Preencha a senha atual, a nova senha e a confirmação.');
+        return;
+      }
+      if (newPassword !== passwordConfirmation) {
+        setValidationError('A confirmação da nova senha não confere.');
+        return;
+      }
+    }
+    await updateProfileMutation.mutateAsync({ name, avatarUrl });
     if (currentPassword || newPassword) {
       await changePasswordMutation.mutateAsync({ currentPassword, newPassword });
       setCurrentPassword('');
       setNewPassword('');
+      setPasswordConfirmation('');
     }
   }
 
-  const feedback =
-    updateProfileMutation.isSuccess && !changePasswordMutation.isError
+  const feedback = validationError
+    ? validationError
+    : updateProfileMutation.isSuccess && !changePasswordMutation.isError
       ? 'Perfil atualizado.'
       : updateProfileMutation.isError || changePasswordMutation.isError
         ? 'Não foi possível salvar as alterações.'
@@ -89,16 +111,46 @@ export function ProfilePage() {
             Apelido da carteira*
             <input placeholder="Minha carteira" />
           </label>
-          <label>
-            Avatar
+          <div className="auth-field">
+            <span id="avatar-field-label">Avatar</span>
             <div className="avatar-control">
-              <span>{name.slice(0, 2).toUpperCase() || 'CU'}</span>
-              <button type="button">Alterar</button>
-              <button type="button" className="text-button">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar selecionado" />
+              ) : (
+                <span>{name.slice(0, 2).toUpperCase() || 'CU'}</span>
+              )}
+              <button type="button" onClick={() => setAvatarPickerOpen((open) => !open)}>
+                Alterar
+              </button>
+              <button type="button" className="text-button" onClick={() => setAvatarUrl(null)}>
                 Remover
               </button>
             </div>
-          </label>
+            {avatarPickerOpen ? (
+              <fieldset className="avatar-picker">
+                <legend>Escolha um avatar</legend>
+                <div role="radiogroup" aria-label="Avatares disponíveis">
+                  {avatarOptions.map((option) => {
+                    const absoluteOption = new URL(option, window.location.origin).toString();
+                    return (
+                      <button
+                        type="button"
+                        key={option}
+                        aria-label={`Selecionar avatar ${option.split('/').pop()}`}
+                        aria-pressed={avatarUrl === absoluteOption}
+                        onClick={() => {
+                          setAvatarUrl(absoluteOption);
+                          setAvatarPickerOpen(false);
+                        }}
+                      >
+                        <img src={option} alt="" />
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            ) : null}
+          </div>
         </div>
         <fieldset className="password-fields">
           <legend>Alterar senha</legend>
@@ -118,16 +170,28 @@ export function ProfilePage() {
               onChange={(event) => setNewPassword(event.target.value)}
               type="password"
               minLength={8}
+              aria-describedby="new-password-help"
             />
           </label>
           <label>
             Confirmar nova senha
-            <input type="password" minLength={8} />
+            <input
+              type="password"
+              minLength={8}
+              value={passwordConfirmation}
+              onChange={(event) => setPasswordConfirmation(event.target.value)}
+            />
           </label>
         </fieldset>
+        {newPassword ? (
+          <small id="new-password-help" className="field-help">
+            Use pelo menos 8 caracteres.
+          </small>
+        ) : null}
         {feedback ? (
           <p
             role="status"
+            aria-live="polite"
             className={feedback === 'Perfil atualizado.' ? 'form-success' : 'form-error'}
           >
             {feedback}

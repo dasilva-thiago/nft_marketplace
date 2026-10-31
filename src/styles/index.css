@@ -1932,6 +1932,45 @@ select:focus-visible {
   background: #5a3826;
   color: #eaa45c;
 }
+.avatar-control > img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.avatar-picker {
+  margin: 10px 0 0;
+  border: 1px solid #493125;
+  padding: 9px;
+}
+.avatar-picker legend {
+  padding: 0 4px;
+  color: #c9ae98;
+  font-size: 0.56rem;
+}
+.avatar-picker [role='radiogroup'] {
+  display: flex;
+  gap: 8px;
+}
+.avatar-picker button {
+  width: 38px;
+  height: 38px;
+  padding: 2px;
+  border: 1px solid #493125;
+  border-radius: 50%;
+  background: #1a100d;
+  cursor: pointer;
+}
+.avatar-picker button[aria-pressed='true'] {
+  border-color: #e99a45;
+  box-shadow: 0 0 0 2px rgba(233, 154, 69, 0.22);
+}
+.avatar-picker img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
 .avatar-control button,
 .text-button {
   border: 0;
