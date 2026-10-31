@@ -2,7 +2,7 @@
 
 Esta documentação define o formato compartilhado entre a interface e o MSW. Todos os endpoints têm o prefixo `/api`; Axios é a única camada HTTP da aplicação. Respostas de sucesso retornam JSON direto (exceto `204` em remoção sem corpo). Erros usam o formato abaixo. O backend é simulado por MSW; não há blockchain nem gateway de pagamento.
 
-Os tipos TypeScript correspondentes ficam em `src/shared/api/contracts.ts`. Se um campo mudar, atualize tipo, handler e testes juntos.
+Os tipos TypeScript correspondentes ficam em `src/shared/contracts/` e os schemas Zod no mesmo limite. Se um campo mudar, atualize tipo, schema, handler e testes juntos.
 
 ## Padrões comuns
 
@@ -74,6 +74,8 @@ Na demonstração atual, o MSW implementa os quatro endpoints acima e valida req
 
 `Cart` contém `userId` ou `null`, `items` e `version`. Cada `CartLine` tem `nftId`, quantidade inteira e o resumo atual do NFT. Ao login, preservar/mesclar carrinho visitante segundo regra documentada e testada; não descartar itens silenciosamente.
 
+Na fatia atualmente implementada, o carrinho é protegido por sessão e mantém estado isolado por usuário no MSW. A persistência/mesclagem de carrinho visitante continua pendente.
+
 ### Cotação e cupom
 
 | Método e rota      | Entrada                                                                             | Sucesso              | Erros relevantes                                                |
@@ -81,6 +83,8 @@ Na demonstração atual, o MSW implementa os quatro endpoints acima e valida req
 | `POST /api/quotes` | `QuoteRequest`: itens (`nftId`, `quantity`), `couponCode?`, `walletId?`, `network?` | `Quote` atual da API | 401, 404 NFT/carteira, 409 estoque, 422 cupom inválido/expirado |
 
 `Quote` contém `quoteId`, linhas cotadas (`QuoteLine`), cupom aplicado, `subtotalEth`, `discountEth`, `networkFeeEth`, `totalEth`, `createdAt`, `expiresAt`, `version`. Toda mudança de item, cupom, preço, disponibilidade, carteira ou rede requer cotação nova. Checkout não aceita cotação expirada ou antiga; divergência deve ser mostrada e exigir confirmação do usuário.
+
+Os fixtures de demonstração aceitam `KURIO10`, que aplica 10% de desconto, e reconhecem `EXPIRED` como cupom expirado. Outros códigos retornam `COUPON_INVALID`; a taxa de rede simulada é `0.016` ETH.
 
 ### Pedidos
 
@@ -133,4 +137,4 @@ Evento duplicado (mesmo `eventId`) ou mais antigo (versão menor) não modifica 
 
 ## Cobertura de contratos a implementar
 
-O arquivo `contracts.ts` estabelece os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs já têm handlers MSW, validação e testes de integração; os demais recursos ainda precisam de handlers, validação e persistência. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.
+Os contratos em `src/shared/contracts/` estabelecem os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs, sessão e o núcleo autenticado de carrinho/cotação já têm handlers MSW, validação, API Axios, queries/mutations e testes de integração. Favoritos, checkout, pedidos, perfil, carteiras, carrinho visitante/mesclagem e eventos de negócio ainda precisam de implementação. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.

@@ -1,20 +1,34 @@
 import { useState } from 'react';
 import { Heart, Minus, Plus, Share2, Star, ShoppingCart } from 'lucide-react';
-import { Link, useParams } from '@tanstack/react-router';
+import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { nftDetailQuery, catalogListQuery } from '@/features/catalog/queries';
+import { useAddCartItemMutation } from '@/features/cart/queries';
+import { useSessionQuery } from '@/features/auth/queries';
 import { NftCard } from '@/shared/ui/nft-card';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
 
 export function NftDetailPage() {
   const { nftId } = useParams({ from: '/nft/$nftId' });
+  const navigate = useNavigate({ from: '/nft/$nftId' });
   const detailQuery = useQuery(nftDetailQuery(nftId));
   const relatedQuery = useQuery(
     catalogListQuery({ page: 1, pageSize: 5, sort: 'priceEth', sortOrder: 'asc' }),
   );
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const sessionQuery = useSessionQuery();
+  const addMutation = useAddCartItemMutation();
   const nft = detailQuery.data;
+
+  async function addToCart() {
+    if (!sessionQuery.data) {
+      await navigate({ to: '/login', search: { returnTo: `/nft/${nftId}` } });
+      return;
+    }
+    await addMutation.mutateAsync({ nftId, quantity });
+    await navigate({ to: '/cart' });
+  }
 
   if (detailQuery.isPending)
     return (
@@ -134,16 +148,31 @@ export function NftDetailPage() {
               <strong className="detail-price">{nft.priceEth} ETH</strong>
             </div>
             <div className="detail-actions">
-              <button type="button" className="primary-button">
+              <button
+                type="button"
+                className="primary-button"
+                disabled={addMutation.isPending}
+                onClick={() => void addToCart()}
+              >
                 Comprar NFT
               </button>
-              <button type="button" className="secondary-outline">
+              <button
+                type="button"
+                className="secondary-outline"
+                disabled={addMutation.isPending}
+                onClick={() => void addToCart()}
+              >
                 <ShoppingCart size={15} /> Adicionar
               </button>
               <button type="button" className="secondary-outline">
                 <Heart size={15} /> Favoritar
               </button>
             </div>
+            {addMutation.isError ? (
+              <p className="form-error" role="alert">
+                Não foi possível adicionar este NFT. Confira a disponibilidade e tente novamente.
+              </p>
+            ) : null}
             <dl className="detail-attributes">
               <div>
                 <dt>ID do token:</dt>

@@ -8,7 +8,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [x] Rotas tipadas declaradas para início, NFT, carrinho, checkout, pedido, login, cadastro, perfil e carteiras; as telas visuais principais já substituem os placeholders.
 - [x] Contratos TypeScript documentados para sessão/conta, catálogo, favoritos, carrinho, cotação, pedidos, perfil, carteiras e eventos; ETH representado como string decimal.
 - [x] API simulada do catálogo: 12 NFTs locais variados, listagem, busca, filtros de coleção/rede/atributo, ordenação, paginação e detalhe/404, com validação Zod.
-- [ ] Completar handlers REST/MSW para sessão/conta (cadastro, login, consulta, logout, expiração), favoritos, carrinho, cotação, pedidos idempotentes, perfil e carteiras.
+- [ ] Completar handlers REST/MSW para favoritos, pedidos idempotentes, perfil e carteiras; carrinho e cotação têm o núcleo autenticado implementado.
 - [x] Erros tipados e cenários iniciais de parâmetros inválidos, catálogo vazio/lento, respostas fora de ordem, HTTP 429 e 503, com controle e reset de cenário no MSW.
 - [ ] Completar cenários de sessão inválida, falta de permissão, conflito de disponibilidade, cupom, timeout/idempotência e persistência/reset de todos os recursos.
 
@@ -16,7 +16,7 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 - [x] Documentar a diferença entre validação de demonstração e proteção real; adicionar Zod para query de catálogo, fixtures e respostas do catálogo.
 - [x] Simular HTTP 429 com `Retry-After` e testar reset; não representa rate limit de produção.
-- [ ] Aplicar schemas Zod aos demais domínios e tratar 429 na interface sem repetir mutations automaticamente.
+- [ ] Aplicar schemas Zod aos demais domínios e tratar 429 na interface sem repetir mutations automaticamente; carrinho/cotação já validam requests e respostas.
 - [ ] Configurar cabeçalhos de segurança do deploy quando a plataforma for escolhida.
 - [ ] JWT, Helmet middleware e cookie HttpOnly exigem servidor real; não implementar como segredo/controle de segurança no bundle ou no mock do navegador.
 
@@ -46,8 +46,9 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 
 ## Carrinho e pagamento
 
-- [ ] Adicionar/alterar/remover itens conforme disponibilidade de NFT/edição; persistir em refresh e preservar/mesclar itens do visitante ao autenticar.
-- [ ] Aplicar/remover cupom; tratar inválido/expirado; subtotal, desconto, taxa de rede e total vêm da cotação da API. ETH trafega em strings decimais; quantidades inteiras; precisão arbitrária; cotação da API é referência final.
+- [x] Adicionar/alterar/remover itens autenticados conforme disponibilidade de NFT/edição; handlers MSW isolam o carrinho por usuário e queries usam chave privada por identidade.
+- [x] Aplicar cupom na cotação API e tratar inválido/expirado; subtotal, desconto, taxa de rede e total vêm da API. ETH trafega em strings decimais e o teste cobre precisão arbitrária.
+- [ ] Persistir/mesclar carrinho visitante ao autenticar; a implementação atual protege o carrinho por sessão.
 - [ ] Refletir alteração de preço/disponibilidade enquanto aberto; informar alteração, atualizar resumo e invalidar cotação.
 - [ ] Checkout valida campos, permite revisão, usa carteiras e redes cadastradas e simula conexão/recusa/desconexão. Revalidar preço, disponibilidade, cupom e taxas antes de confirmar; mudança exige nova confirmação.
 - [ ] Pedido com chave de idempotência: mesma chave/conteúdo recupera o mesmo pedido; chave reutilizada com conteúdo diferente retorna conflito. Impedir duplicata por clique/reenvio após timeout.

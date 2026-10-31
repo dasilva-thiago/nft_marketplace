@@ -1,10 +1,20 @@
 import Big from 'big.js';
 import { delay, http, HttpResponse } from 'msw';
-import type { ApiError, NftSummary, PageRequest } from '@/shared/contracts';
+import type {
+  ApiError,
+  Cart,
+  NftSummary,
+  PageRequest,
+  Quote,
+  QuoteRequest,
+} from '@/shared/contracts';
 import {
+  AddCartItemRequestSchema,
   LoginRequestSchema,
   PageRequestSchema,
+  QuoteRequestSchema,
   RegisterRequestSchema,
+  UpdateCartItemRequestSchema,
 } from '@/shared/contracts/schemas';
 import {
   deleteSessionFromRequest,
@@ -23,6 +33,7 @@ import {
 } from './scenarios/scenario-state';
 import { socketIoMockHandler } from './socket-io-handler';
 import { appEnv } from '@/app/config/env';
+import { getCartForUser, resetMockCartState, saveCartForUser } from './db/cart-state';
 
 const configuredDelay = appEnv.mockDelayMs;
 
@@ -47,6 +58,110 @@ function validationFields(error: {
   return Object.fromEntries(
     error.issues.map((issue) => [String(issue.path[0] ?? 'form'), issue.message]),
   );
+}
+
+function unauthorizedResponse() {
+  return HttpResponse.json(
+    apiError('SESSION_INVALID', 'Sua sessão expirou ou não foi encontrada.'),
+    {
+      status: 401,
+    },
+  );
+}
+
+function notFoundResponse(message: string) {
+  return HttpResponse.json(apiError('NOT_FOUND', message), { status: 404 });
+}
+
+function availabilityResponse(nftName: string) {
+  return HttpResponse.json(
+    apiError('AVAILABILITY_CONFLICT', `A disponibilidade de ${nftName} mudou.`, false),
+    { status: 409 },
+  );
+}
+
+function validationResponse(
+  message: string,
+  error: { issues: Array<{ path: PropertyKey[]; message: string }> },
+) {
+  return HttpResponse.json(apiError('VALIDATION_ERROR', message, false, validationFields(error)), {
+    status: 400,
+  });
+}
+
+function toNftSummary(nft: (typeof nftFixtures)[number]): NftSummary {
+  return {
+    id: nft.id,
+    name: nft.name,
+    imageUrl: nft.imageUrl,
+    collection: nft.collection,
+    priceEth: nft.priceEth,
+    availableEditions: nft.availableEditions,
+    network: nft.network,
+    version: nft.version,
+  };
+}
+
+function getCartResponse(userId: string): Cart {
+  const cart = getCartForUser(userId);
+  return {
+    ...cart,
+    items: cart.items.map((item) => {
+      const nft = nftFixtures.find((candidate) => candidate.id === item.nftId);
+      return nft ? { ...item, nft: toNftSummary(nft) } : item;
+    }),
+  };
+}
+
+function buildQuote(
+  items: QuoteRequest['items'],
+  couponCode?: string,
+): { value: Quote } | { error: Response } {
+  const quoteLines = [];
+  let subtotal = new Big(0);
+  for (const requested of items) {
+    const nft = nftFixtures.find((candidate) => candidate.id === requested.nftId);
+    if (!nft) return { error: notFoundResponse('NFT não encontrado.') };
+    if (requested.quantity > nft.availableEditions)
+      return { error: availabilityResponse(nft.name) };
+    const lineTotal = new Big(nft.priceEth).times(requested.quantity);
+    subtotal = subtotal.plus(lineTotal);
+    quoteLines.push({
+      nftId: nft.id,
+      name: nft.name,
+      imageUrl: nft.imageUrl,
+      unitPriceEth: nft.priceEth,
+      quantity: requested.quantity,
+      lineTotalEth: lineTotal.toFixed(),
+    });
+  }
+
+  const normalizedCoupon = couponCode?.trim().toUpperCase();
+  if (normalizedCoupon === 'EXPIRED')
+    return {
+      error: HttpResponse.json(apiError('COUPON_EXPIRED', 'Este cupom expirou.'), { status: 422 }),
+    };
+  if (normalizedCoupon && normalizedCoupon !== 'KURIO10')
+    return {
+      error: HttpResponse.json(apiError('COUPON_INVALID', 'Cupom inválido.'), { status: 422 }),
+    };
+
+  const discount = normalizedCoupon === 'KURIO10' ? subtotal.times('0.1') : new Big(0);
+  const networkFee = new Big('0.016');
+  const now = new Date();
+  const quote: Quote = {
+    quoteId: `quote-${Date.now()}`,
+    items: quoteLines,
+    couponCode: normalizedCoupon ?? null,
+    subtotalEth: subtotal.toFixed(),
+    discountEth: discount.toFixed(),
+    networkFeeEth: networkFee.toFixed(),
+    totalEth: subtotal.minus(discount).plus(networkFee).toFixed(),
+    createdAt: now.toISOString(),
+    expiresAt: new Date(now.getTime() + 60_000).toISOString(),
+    version: 1,
+  };
+  return { value: quote };
 }
 
 async function readJson(request: Request): Promise<unknown> {
@@ -160,6 +275,7 @@ export const handlers = [
   http.post('/api/__mock/reset', () => {
     resetMockScenario();
     resetMockAuthState();
+    resetMockCartState();
     return HttpResponse.json({ scenario: getMockScenario(), reset: true });
   }),
   http.post('/api/auth/register', async ({ request }) => {
@@ -224,6 +340,68 @@ export const handlers = [
   http.post('/api/auth/logout', ({ request }) => {
     deleteSessionFromRequest(request);
     return HttpResponse.json({ loggedOut: true });
+  }),
+  http.get('/api/cart', ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    return HttpResponse.json(getCartResponse(currentSession.session.user.id));
+  }),
+  http.post('/api/cart/items', async ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const parsed = AddCartItemRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success)
+      return validationResponse('Informe uma quantidade inteira válida.', parsed.error);
+
+    const nft = nftFixtures.find((item) => item.id === parsed.data.nftId);
+    if (!nft) return notFoundResponse('NFT não encontrado.');
+    const cart = getCartForUser(currentSession.session.user.id);
+    const existing = cart.items.find((item) => item.nftId === nft.id);
+    const nextQuantity = (existing?.quantity ?? 0) + parsed.data.quantity;
+    if (nextQuantity > nft.availableEditions) return availabilityResponse(nft.name);
+    const items = existing
+      ? cart.items.map((item) =>
+          item.nftId === nft.id
+            ? { ...item, quantity: nextQuantity, nft: toNftSummary(nft) }
+            : item,
+        )
+      : [...cart.items, { nftId: nft.id, quantity: parsed.data.quantity, nft: toNftSummary(nft) }];
+    return HttpResponse.json(saveCartForUser({ ...cart, items, version: cart.version + 1 }));
+  }),
+  http.patch('/api/cart/items/:nftId', async ({ request, params }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const parsed = UpdateCartItemRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success)
+      return validationResponse('Informe uma quantidade inteira válida.', parsed.error);
+    const cart = getCartForUser(currentSession.session.user.id);
+    const line = cart.items.find((item) => item.nftId === params.nftId);
+    if (!line) return notFoundResponse('O item não está no carrinho.');
+    const nft = nftFixtures.find((item) => item.id === params.nftId);
+    if (!nft) return notFoundResponse('NFT não encontrado.');
+    if (parsed.data.quantity > nft.availableEditions) return availabilityResponse(nft.name);
+    const items = cart.items.map((item) =>
+      item.nftId === params.nftId
+        ? { ...item, quantity: parsed.data.quantity, nft: toNftSummary(nft) }
+        : item,
+    );
+    return HttpResponse.json(saveCartForUser({ ...cart, items, version: cart.version + 1 }));
+  }),
+  http.delete('/api/cart/items/:nftId', ({ request, params }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const cart = getCartForUser(currentSession.session.user.id);
+    const items = cart.items.filter((item) => item.nftId !== params.nftId);
+    return HttpResponse.json(saveCartForUser({ ...cart, items, version: cart.version + 1 }));
+  }),
+  http.post('/api/quotes', async ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const parsed = QuoteRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success) return validationResponse('Confira os itens da cotação.', parsed.error);
+    const quote = buildQuote(parsed.data.items, parsed.data.couponCode);
+    if ('error' in quote) return quote.error;
+    return HttpResponse.json(quote.value);
   }),
   http.get('/api/nfts', async ({ request }) => {
     const params = readPageRequest(new URL(request.url));

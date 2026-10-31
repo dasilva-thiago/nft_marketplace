@@ -1,6 +1,6 @@
 # NFT Marketplace — fundação arquitetural
 
-Repositório iniciado a partir do desafio frontend. A primeira versão funcional da home e o catálogo REST simulado já estão preparados; **a reprodução visual exata do Figma, a tela de detalhe e os fluxos de compra, conta e tempo real ainda não estão concluídos**. As rotas não-home permanecem marcações explícitas.
+Repositório iniciado a partir do desafio frontend. A home, o catálogo REST simulado, a conta/sessão, a tela de detalhe e o núcleo autenticado de carrinho/cotação já estão preparados; **checkout efetivo, favoritos, pedidos, perfil, carteiras e tempo real de negócio ainda não estão concluídos**. As rotas visuais existentes não significam que todos os fluxos de domínio estejam implementados.
 
 ## Stack obrigatória
 
@@ -10,7 +10,7 @@ React + TypeScript + Vite; TanStack Router para rotas; TanStack Query para estad
 
 Veja [`docs/architecture.md`](docs/architecture.md) para responsabilidades por camada, regras de dependência, isolamento de sessão/cache, precisão ETH e sincronização por Socket.IO.
 Para implementar o teste na ordem correta e verificar a conclusão de cada requisito do enunciado, siga o [roteiro completo de implementação](docs/implementation-roadmap.md).
-Os formatos de dados e endpoints previstos para cada recurso estão no [contrato da API REST](docs/api-contracts.md); essa é a referência compartilhada para os próximos handlers MSW e chamadas Axios.
+Os formatos de dados e endpoints previstos para cada recurso estão no [contrato da API REST](docs/api-contracts.md); essa é a referência compartilhada para os próximos handlers MSW e chamadas Axios. A documentação registra quais recursos já têm fluxo de domínio e quais ainda são apenas composição visual.
 O [plano extra de segurança](docs/security-hardening.md) separa o que é possível validar no frontend/mock (Zod e cenários 429) do que precisa de servidor real (JWT, cookie HttpOnly, Helmet e rate limit efetivo).
 
 ```text
@@ -18,15 +18,16 @@ src/
   app/                 composição da aplicação e mapa de rotas
   features/            módulos de domínio independentes
     catalog/           API, queries e rotas de descoberta/detalhe
-    auth/              sessão, login, cadastro (próxima implementação)
+    auth/              sessão, login e cadastro
     favorites/         favoritos (próxima implementação)
-    cart/              carrinho e cupons (próxima implementação)
+    cart/              carrinho autenticado, cupons e cotação
     checkout/          revisão e envio de pedido (próxima implementação)
     orders/            estado e recibo imutável (próxima implementação)
     profile/           perfil/avatar/senha (próxima implementação)
     wallets/           carteiras (próxima implementação)
   shared/              código transversal
-    api/               Axios, contratos HTTP e schemas Zod
+    api/               Axios e cliente HTTP configurado
+    contracts/         contratos HTTP e schemas Zod compartilhados
     query/             QueryClient e política base de cache
     lib/               utilitários de domínio, incluindo ETH decimal
     ui/                componentes compartilhados

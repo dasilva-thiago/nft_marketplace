@@ -93,3 +93,53 @@ export const LoginRequestSchema = z.object({
   email: z.string().trim().toLowerCase().email('Informe um e-mail válido.'),
   password: passwordSchema,
 });
+
+export const CartLineSchema = z.object({
+  nftId: z.string().min(1),
+  quantity: positiveInteger,
+  nft: NftSummarySchema,
+});
+
+export const CartSchema = z.object({
+  userId: z.string().min(1).nullable(),
+  items: z.array(CartLineSchema),
+  version: positiveInteger,
+});
+
+export const AddCartItemRequestSchema = z.object({
+  nftId: z.string().min(1),
+  quantity: positiveInteger,
+});
+
+export const UpdateCartItemRequestSchema = z.object({
+  quantity: positiveInteger,
+});
+
+export const QuoteRequestSchema = z.object({
+  items: z.array(z.object({ nftId: z.string().min(1), quantity: positiveInteger })).min(1),
+  couponCode: z.string().trim().min(1).optional(),
+  walletId: z.string().min(1).optional(),
+  network: z.string().min(1).optional(),
+});
+
+export const QuoteLineSchema = z.object({
+  nftId: z.string().min(1),
+  name: z.string().min(1),
+  imageUrl: z.string().min(1),
+  unitPriceEth: ethDecimal,
+  quantity: positiveInteger,
+  lineTotalEth: ethDecimal,
+});
+
+export const QuoteSchema = z.object({
+  quoteId: z.string().min(1),
+  items: z.array(QuoteLineSchema),
+  couponCode: z.string().nullable(),
+  subtotalEth: ethDecimal,
+  discountEth: ethDecimal,
+  networkFeeEth: ethDecimal,
+  totalEth: ethDecimal,
+  createdAt: z.string().datetime({ offset: true }),
+  expiresAt: z.string().datetime({ offset: true }),
+  version: positiveInteger,
+});
