@@ -10,20 +10,26 @@ import type {
 } from '@/shared/contracts';
 import {
   AddCartItemRequestSchema,
+  ChangePasswordRequestSchema,
+  CreateWalletRequestSchema,
   CreateOrderRequestSchema,
   LoginRequestSchema,
   PageRequestSchema,
   QuoteRequestSchema,
   RegisterRequestSchema,
+  UpdateProfileRequestSchema,
   UpdateCartItemRequestSchema,
+  UpdateWalletRequestSchema,
 } from '@/shared/contracts/schemas';
 import {
   deleteSessionFromRequest,
+  changeMockPassword,
   getSessionFromRequest,
   getUserByEmail,
   loginMockUser,
   registerMockUser,
   resetMockAuthState,
+  verifyMockPassword,
 } from './auth-state';
 import { nftFixtures } from './fixtures/nfts';
 import {
@@ -43,6 +49,13 @@ import {
 } from './db/favorites-state';
 import { getQuoteForUser, resetMockQuotesState, saveQuoteForUser } from './db/quotes-state';
 import { createOrderForUser, getOrderForUser, resetMockOrdersState } from './db/orders-state';
+import { getProfileForUser, resetMockProfileState, updateProfileForUser } from './db/profile-state';
+import {
+  createWalletForUser,
+  listWalletsForUser,
+  resetMockWalletsState,
+  updateWalletForUser,
+} from './db/wallets-state';
 
 const configuredDelay = appEnv.mockDelayMs;
 
@@ -288,6 +301,8 @@ export const handlers = [
     resetMockFavoritesState();
     resetMockQuotesState();
     resetMockOrdersState();
+    resetMockProfileState();
+    resetMockWalletsState();
     return HttpResponse.json({ scenario: getMockScenario(), reset: true });
   }),
   http.post('/api/auth/register', async ({ request }) => {
@@ -352,6 +367,68 @@ export const handlers = [
   http.post('/api/auth/logout', ({ request }) => {
     deleteSessionFromRequest(request);
     return HttpResponse.json({ loggedOut: true });
+  }),
+  http.get('/api/profile', ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const profile = getProfileForUser(currentSession.session.user.id);
+    return profile ? HttpResponse.json(profile) : notFoundResponse('Perfil não encontrado.');
+  }),
+  http.patch('/api/profile', async ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const parsed = UpdateProfileRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success) return validationResponse('Confira os dados do perfil.', parsed.error);
+    const profile = updateProfileForUser(currentSession.session.user.id, parsed.data);
+    return profile ? HttpResponse.json(profile) : notFoundResponse('Perfil não encontrado.');
+  }),
+  http.patch('/api/profile/password', async ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const parsed = ChangePasswordRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success) return validationResponse('Confira as senhas informadas.', parsed.error);
+    if (!(await verifyMockPassword(currentSession.session.user.id, parsed.data.currentPassword)))
+      return HttpResponse.json(apiError('VALIDATION_ERROR', 'A senha atual não confere.'), {
+        status: 400,
+      });
+    await changeMockPassword(currentSession.session.user.id, parsed.data.newPassword);
+    return HttpResponse.json({ updated: true });
+  }),
+  http.get('/api/wallets', ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    return HttpResponse.json(listWalletsForUser(currentSession.session.user.id));
+  }),
+  http.post('/api/wallets', async ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const parsed = CreateWalletRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success) return validationResponse('Confira os dados da carteira.', parsed.error);
+    const current = listWalletsForUser(currentSession.session.user.id);
+    if (current.some((wallet) => wallet.address === parsed.data.address))
+      return HttpResponse.json(apiError('CONFLICT', 'Essa carteira já está cadastrada.'), {
+        status: 409,
+      });
+    return HttpResponse.json(createWalletForUser(currentSession.session.user.id, parsed.data), {
+      status: 201,
+    });
+  }),
+  http.patch('/api/wallets/:walletId', async ({ request, params }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return unauthorizedResponse();
+    const parsed = UpdateWalletRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success) return validationResponse('Confira os dados da carteira.', parsed.error);
+    const walletId = String(params.walletId);
+    const current = listWalletsForUser(currentSession.session.user.id);
+    if (
+      parsed.data.address &&
+      current.some((wallet) => wallet.id !== walletId && wallet.address === parsed.data.address)
+    )
+      return HttpResponse.json(apiError('CONFLICT', 'Essa carteira já está cadastrada.'), {
+        status: 409,
+      });
+    const wallet = updateWalletForUser(currentSession.session.user.id, walletId, parsed.data);
+    return wallet ? HttpResponse.json(wallet) : notFoundResponse('Carteira não encontrada.');
   }),
   http.get('/api/favorites', ({ request }) => {
     const currentSession = getSessionFromRequest(request);

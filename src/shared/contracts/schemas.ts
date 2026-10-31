@@ -169,3 +169,41 @@ export const OrderSnapshotSchema = z.object({
   updatedAt: z.string().datetime({ offset: true }),
   version: positiveInteger,
 });
+
+export const CollectorProfileSchema = z.object({
+  userId: z.string().min(1),
+  name: z.string().trim().min(2).max(80),
+  email: z.string().email(),
+  avatarUrl: z.string().url().nullable(),
+});
+
+export const UpdateProfileRequestSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  avatarUrl: z.string().url().nullable().optional(),
+});
+
+export const ChangePasswordRequestSchema = z.object({
+  currentPassword: z.string().min(8),
+  newPassword: z.string().min(8).max(128),
+});
+
+export const WalletSchema = z.object({
+  id: z.string().min(1),
+  userId: z.string().min(1),
+  label: z.string().trim().min(2).max(80),
+  address: z.string().trim().min(4).max(128),
+  network: z.enum(['Ethereum', 'Polygon']),
+  isPrimary: z.boolean(),
+  version: positiveInteger,
+});
+
+export const WalletsSchema = z.array(WalletSchema);
+
+export const CreateWalletRequestSchema = z.object({
+  label: z.string().trim().min(2).max(80),
+  address: z.string().trim().min(4).max(128),
+  network: z.enum(['Ethereum', 'Polygon']),
+  isPrimary: z.boolean().optional(),
+});
+
+export const UpdateWalletRequestSchema = CreateWalletRequestSchema.partial();

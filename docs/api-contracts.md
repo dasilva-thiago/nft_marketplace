@@ -12,7 +12,7 @@ Os tipos TypeScript correspondentes ficam em `src/shared/contracts/` e os schema
 - Filtros são combináveis e serializados na URL. `sort` identifica o campo e `sortOrder` aceita `asc`/`desc`.
 - Preços, taxas, descontos e totais ETH trafegam como strings decimais, nunca números JSON. Quantidade/página/versão são inteiros.
 - Identidade de usuário vem da sessão simulada; o cliente não escolhe `userId` no corpo para operar recursos privados.
-- A sessão de demonstração é implementada pelo mock; senhas não são guardadas em localStorage/sessionStorage. O cliente mantém somente um handle opaco de demonstração em `sessionStorage` para reconstruir a sessão após refresh. Esse handle não é JWT, não é segredo e não representa um cookie `HttpOnly`; `HttpOnly` só será alegado quando um servidor real puder emitir o cookie. Use apenas credenciais fictícias.
+- A sessão de demonstração é implementada pelo mock; senhas não são guardadas em localStorage/sessionStorage. O cliente mantém somente um handle opaco de demonstração em `sessionStorage` para reconstruir a sessão após refresh. Use apenas credenciais fictícias.
 - Todas as operações de escrita repetíveis devem ser seguras contra duplo clique; criação de pedido exige `Idempotency-Key`.
 
 ### Erro comum
@@ -141,4 +141,4 @@ Evento duplicado (mesmo `eventId`) ou mais antigo (versão menor) não modifica 
 
 ## Cobertura de contratos a implementar
 
-Os contratos em `src/shared/contracts/` estabelecem os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs, sessão, favoritos, cotação, criação/consulta inicial de pedidos e o núcleo autenticado de carrinho já têm handlers MSW, validação, API Axios, queries/mutations e testes de integração. Estados avançados de pedido, perfil, carteiras, carrinho visitante/mesclagem e eventos de negócio ainda precisam de implementação. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.
+Os contratos em `src/shared/contracts/` estabelecem os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs, sessão, favoritos, cotação, pedidos básicos, perfil, carteiras e o núcleo autenticado de carrinho já têm handlers MSW, validação, API Axios, queries/mutations e testes de integração. Estados avançados de pedido, carrinho visitante/mesclagem e eventos de negócio ainda precisam de implementação. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.

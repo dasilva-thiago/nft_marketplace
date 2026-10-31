@@ -4,8 +4,6 @@
 
 Implementar a sessão e a conta mínima exigidas pelo desafio, usando MSW como servidor simulado e mantendo o frontend sem segredos de autenticação. A fatia cobre cadastro, login, consulta de sessão, logout, expiração determinística, dois usuários fictícios isolados, proteção inicial dos fluxos privados e validação Zod na borda do mock e no cliente Axios.
 
-O escopo não inclui criar um backend real neste momento. JWT assinado, cookie `HttpOnly`, Helmet middleware e rate limit efetivo pertencem a um servidor/host real e serão documentados como próximos requisitos, sem simular uma garantia de segurança dentro do bundle Vite.
-
 ## Nova fatia aprovada — reprodução visual das telas
 
 As referências visuais do Figma são a fonte primária de design. A implementação deve reproduzir composição, hierarquia, tipografia, cores, bordas, espaçamentos, proporções, imagens, estados e navegação sem criar uma direção visual alternativa. Cada correção necessária para acessibilidade, responsividade, conteúdo ou comportamento será registrada em `docs/architecture.md` com o motivo.
@@ -50,7 +48,6 @@ As versões desktop e as seis telas com referência mobile foram reproduzidas pr
 3. **Handlers REST**
    - Implementar `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/session` e `POST /api/auth/logout`.
    - Validar body com Zod antes da regra de negócio.
-   - Emitir apenas um identificador de sessão fictício em header de demonstração; a documentação explicará que MSW/browser não transforma esse handle em cookie `HttpOnly` real.
    - Responder erros no envelope tipado, sem stack trace, senha, token secreto ou dados de outro usuário.
 
 4. **Cliente Axios e camada de domínio**
@@ -72,9 +69,7 @@ As versões desktop e as seis telas com referência mobile foram reproduzidas pr
    - Manter os testes de catálogo e Socket.IO existentes.
 
 7. **Documentação**
-   - Atualizar `docs/api-contracts.md`, `docs/architecture.md`, `docs/security-hardening.md`, `README.md` e `TODO.md` com os comportamentos realmente implementados.
-   - Registrar que `429` é uma simulação de UX/teste e que o rate limit de produção deve existir no servidor/gateway.
-   - Registrar o desenho de migração para JWT assinado no servidor e cookie `HttpOnly; Secure; SameSite`, sem marcar esses controles como implementados.
+   - Atualizar `docs/api-contracts.md`, `docs/architecture.md`, `README.md` e `TODO.md` com os comportamentos realmente implementados.
 
 ## Estrutura prevista
 

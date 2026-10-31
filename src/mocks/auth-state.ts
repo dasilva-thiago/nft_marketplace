@@ -131,6 +131,19 @@ export async function loginMockUser(input: {
   return createSession(user);
 }
 
+export async function verifyMockPassword(userId: string, password: string): Promise<boolean> {
+  const user = users.get(userId);
+  return Boolean(user && user.passwordHash === (await hashMockPassword(password)));
+}
+
+export async function changeMockPassword(userId: string, password: string): Promise<boolean> {
+  const user = users.get(userId);
+  if (!user) return false;
+  user.passwordHash = await hashMockPassword(password);
+  users.set(userId, user);
+  return true;
+}
+
 export function getSessionFromRequest(
   request: Request,
 ): { session: Session; sessionId: string } | null {
@@ -143,7 +156,7 @@ export function getSessionFromRequest(
   }
 
   // O service worker reinicia o módulo em um refresh. O handle codificado
-  // recompõe apenas a identidade fictícia e sua expiração; não é JWT nem segredo.
+  // recompõe apenas a identidade fictícia e sua expiração para a demonstração.
   const decoded = decodeSession(sessionId);
   if (
     !decoded ||
