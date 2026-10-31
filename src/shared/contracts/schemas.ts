@@ -211,3 +211,32 @@ export const CreateWalletRequestSchema = z.object({
 });
 
 export const UpdateWalletRequestSchema = CreateWalletRequestSchema.partial();
+
+export const NftUpdatedPayloadSchema = z.object({
+  nftId: z.string().min(1),
+  priceEth: ethDecimal,
+  availableEditions: nonNegativeInteger,
+});
+
+export const OrderUpdatedPayloadSchema = z.object({
+  orderId: z.string().min(1),
+  status: z.enum(['pending', 'confirmed', 'rejected']),
+  transactionRef: z.string().nullable(),
+});
+
+export const MockSocketEventRequestSchema = z.discriminatedUnion('event', [
+  z.object({
+    userId: z.string().min(1),
+    event: z.literal('nft.updated'),
+    eventId: z.string().min(1),
+    version: positiveInteger,
+    payload: NftUpdatedPayloadSchema,
+  }),
+  z.object({
+    userId: z.string().min(1),
+    event: z.literal('order.updated'),
+    eventId: z.string().min(1),
+    version: positiveInteger,
+    payload: OrderUpdatedPayloadSchema,
+  }),
+]);

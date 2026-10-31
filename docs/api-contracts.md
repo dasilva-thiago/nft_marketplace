@@ -73,7 +73,7 @@ Os handlers MSW mantêm favoritos isolados por usuário e validam a existência 
 | `POST /api/cart/items`          | `AddCartItemRequest` (`nftId`, `quantity`) | `Cart` atualizado | 400 quantidade; 404 NFT; 409 edição indisponível |
 | `PATCH /api/cart/items/:nftId`  | `UpdateCartItemRequest` (`quantity`)       | `Cart` atualizado | 400; 404 item; 409 estoque mudou                 |
 | `DELETE /api/cart/items/:nftId` | —                                          | `Cart` atualizado | 404 item pode ser tratado idempotentemente       |
-| `POST /api/cart/merge`          | `MergeCartRequest` (`items`)               | `Cart` atualizado | 400, 404 NFT, 409 estoque mudou                 |
+| `POST /api/cart/merge`          | `MergeCartRequest` (`items`)               | `Cart` atualizado | 400, 404 NFT, 409 estoque mudou                  |
 
 `Cart` contém `userId` ou `null`, `items` e `version`. Cada `CartLine` tem `nftId`, quantidade inteira e o resumo atual do NFT. Ao login, preservar/mesclar carrinho visitante segundo regra documentada e testada; não descartar itens silenciosamente.
 
@@ -142,4 +142,4 @@ Evento duplicado (mesmo `eventId`) ou mais antigo (versão menor) não modifica 
 
 ## Cobertura de contratos a implementar
 
-Os contratos em `src/shared/contracts/` estabelecem os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs, sessão, favoritos, cotação, pedidos básicos, perfil, carteiras e o núcleo autenticado de carrinho já têm handlers MSW, validação, API Axios, queries/mutations e testes de integração. Estados avançados de pedido, carrinho visitante/mesclagem e eventos de negócio ainda precisam de implementação. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.
+Os contratos em `src/shared/contracts/` estabelecem os tipos; esta documentação estabelece o comportamento esperado. Listagem e detalhe de NFTs, sessão, favoritos, cotação, pedidos básicos, perfil, carteiras, carrinho visitante/mesclagem e eventos realtime já têm handlers MSW, validação, API Axios, queries/mutations e testes de integração. Estados avançados de pedido ainda precisam de implementação. Para cada rota, criar um teste que prove o sucesso e ao menos o erro relevante acima. Não considerar o recurso concluído até o handler, API Axios, query/mutation e teste da interface usarem o mesmo contrato.

@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { useLogoutMutation, useSessionQuery } from '@/features/auth/queries';
 
 const homeSearch = {
@@ -14,6 +16,23 @@ const homeSearch = {
   sortOrder: 'asc' as const,
 };
 
+function RealtimeBridge({ userId }: { userId: string }) {
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    let active = true;
+    let disconnect: () => void = () => undefined;
+    void import('@/realtime/use-marketplace-realtime').then(({ connectMarketplaceRealtime }) => {
+      if (active) disconnect = connectMarketplaceRealtime(userId, queryClient);
+      else disconnect();
+    });
+    return () => {
+      active = false;
+      disconnect();
+    };
+  }, [queryClient, userId]);
+  return null;
+}
+
 export function RootLayout() {
   const sessionQuery = useSessionQuery();
   const logoutMutation = useLogoutMutation();
@@ -23,6 +42,7 @@ export function RootLayout() {
 
   return (
     <>
+      {sessionQuery.data ? <RealtimeBridge userId={sessionQuery.data.user.id} /> : null}
       <header
         className={`site-header${isAuthRoute ? ' auth-route-header' : ''}${isHomeRoute ? ' home-route-header' : ''}${isHomeRoute && sessionQuery.data ? ' home-route-authenticated' : ''}`}
       >

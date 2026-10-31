@@ -51,8 +51,8 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [x] Fixtures de catálogo com variedade para filtros/paginação e cenários default/vazio/lento/fora de ordem/429/503; ainda não há fixtures de dois usuários nem dos demais domínios.
 - [ ] Fixtures para pelo menos dois usuários e cenários de falha de conexão, sessão expirada/sem permissão, conflito, cupom, preço/edição, timeout pós-criação/idempotência e pagamentos.
 - [ ] MSW ativo por configuração em desenvolvimento e build demo, state consistente em catálogo/favoritos/carrinho/perfil/carteiras/pedidos, persistência local para refresh e reset para cenário conhecido.
-- [ ] Simular eventos com integração Socket.IO compatível com MSW (avaliar `@mswjs/socket.io-binding`); exercitar `socket.io-client`; documentar transporte e limites. Componentes, hooks e Axios não incluem caminhos de negócio fictícios.
-- [ ] `nft.updated` atualiza catálogo/detalhe/carrinho; `order.updated` atualiza pedido. Eventos têm identidade estável, recurso e versão; duplicatas/antigos não regridem estado nem reaplicam efeitos; reconexão reconcilia via REST; limpar listeners/subscriptions; eventos de sessão antiga nunca alteram usuário atual.
+- [x] Simular eventos com integração Socket.IO compatível com MSW usando `@mswjs/socket.io-binding`; exercitar `socket.io-client`; documentar transporte e limites. Componentes, hooks e Axios não incluem caminhos de negócio fictícios.
+- [x] `nft.updated` atualiza catálogo/detalhe/carrinho; `order.updated` atualiza pedido. Eventos têm identidade estável, recurso e versão; duplicatas/antigos não regridem estado nem reaplicam efeitos; reconexão reconcilia via REST; listeners/subscriptions são limpos; eventos de sessão antiga não alteram usuário atual.
 - [ ] Cenário ponta a ponta: NFT no carrinho sofre alteração → UI informa e atualiza resumo → checkout bloqueia cotação antiga. Queda com pedido pendente → reconexão/refresh recupera estado sem segunda compra; estados confirmados/recusados são terminais.
 
 ## Interface e acessibilidade

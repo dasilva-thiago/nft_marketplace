@@ -9,10 +9,14 @@ test('Socket.IO client recebe confirmação do handler MSW pelo binding', async 
     const { createMarketplaceSocket } = await import('/src/realtime/socket-client.ts');
     const socket = createMarketplaceSocket(activeUserId);
     return await new Promise<string>((resolve, reject) => {
+      const errors: string[] = [];
       const timeout = window.setTimeout(() => {
         socket.disconnect();
-        reject(new Error('Timeout esperando session.ready via Socket.IO/MSW'));
+        reject(
+          new Error(`Timeout esperando session.ready via Socket.IO/MSW: ${errors.join('; ')}`),
+        );
       }, 5000);
+      socket.on('connect_error', (error) => errors.push(error.message));
       socket.on('session.ready', ({ userId: acknowledgedUserId }) => {
         window.clearTimeout(timeout);
         socket.disconnect();

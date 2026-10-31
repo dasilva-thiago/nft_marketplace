@@ -15,6 +15,7 @@ import {
   CreateOrderRequestSchema,
   LoginRequestSchema,
   MergeCartRequestSchema,
+  MockSocketEventRequestSchema,
   PageRequestSchema,
   QuoteRequestSchema,
   RegisterRequestSchema,
@@ -39,7 +40,7 @@ import {
   resetMockScenario,
   setMockScenario,
 } from './scenarios/scenario-state';
-import { socketIoMockHandler } from './socket-io-handler';
+import { publishMockSocketEvent, socketIoMockHandler } from './socket-io-handler';
 import { appEnv } from '@/app/config/env';
 import { getCartForUser, resetMockCartState, saveCartForUser } from './db/cart-state';
 import {
@@ -294,6 +295,24 @@ export const handlers = [
     }
     setMockScenario(parsed.data);
     return HttpResponse.json({ scenario: getMockScenario() });
+  }),
+  http.post('/api/__mock/events', async ({ request }) => {
+    const parsed = MockSocketEventRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success)
+      return HttpResponse.json(apiError('VALIDATION_ERROR', 'Evento de mock inválido.'), {
+        status: 400,
+      });
+    publishMockSocketEvent(parsed.data.userId, parsed.data.event, {
+      eventId: parsed.data.eventId,
+      resourceId:
+        parsed.data.event === 'nft.updated'
+          ? parsed.data.payload.nftId
+          : parsed.data.payload.orderId,
+      version: parsed.data.version,
+      occurredAt: new Date().toISOString(),
+      payload: parsed.data.payload,
+    });
+    return HttpResponse.json({ published: true, eventId: parsed.data.eventId });
   }),
   http.post('/api/__mock/reset', () => {
     resetMockScenario();
