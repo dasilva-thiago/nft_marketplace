@@ -1,4 +1,4 @@
-# Backlog do desafio — status após a fundação
+# Backlog do desafio — status após a fundação e fatia de sessão
 
 Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não transforma rotas em funcionalidades concluídas.
 
@@ -19,6 +19,16 @@ Legenda: **[x]** implementado com evidência; **[ ]** pendente. O scaffold não 
 - [ ] Aplicar schemas Zod aos demais domínios e tratar 429 na interface sem repetir mutations automaticamente.
 - [ ] Configurar cabeçalhos de segurança do deploy quando a plataforma for escolhida.
 - [ ] JWT, Helmet middleware e cookie HttpOnly exigem servidor real; não implementar como segredo/controle de segurança no bundle ou no mock do navegador.
+
+### Fatia aprovada — sessão e segurança simulada
+
+- [x] Implementar `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/session` e `POST /api/auth/logout` com MSW, contratos tipados, validação Zod na entrada e na resposta, erros `VALIDATION_ERROR`, `SESSION_INVALID` e `CONFLICT`, sem retornar ou armazenar senhas.
+- [x] Disponibilizar pelo menos dois usuários fictícios, com credenciais documentadas, sessões recuperáveis após refresh, expiração determinística e dados privados isolados por usuário; resetar integralmente o estado simulado.
+- [x] Criar `authApi` usando Axios com `withCredentials`, query/mutations TanStack Query e política sem retry automático de mutations; validar respostas no cliente antes de entregá-las à interface.
+- [x] Implementar telas de login e cadastro com labels, validação, mensagens de erro associadas, estados loading/sucesso/falha, conflito de cadastro e retorno ao destino solicitado.
+- [x] Implementar logout e limpeza do cache privado/subscriptions da sessão; exibir identidade autenticada somente a partir da sessão consultada pela API. A limpeza de queries usa o prefixo `private`; subscriptions de domínio ainda serão adicionadas nas próximas fatias.
+- [x] Testar pela API e pela interface credencial inválida, cadastro conflitante, validação, sessão ausente/expirada, refresh, logout, troca de usuário e isolamento entre usuários.
+- [x] Documentar que o handle usado pelo MSW é apenas de demonstração; JWT assinado, cookie `HttpOnly; Secure; SameSite`, Helmet e rate limit efetivo permanecem requisitos de um backend/host real.
 
 ## Catálogo, detalhe e favoritos
 

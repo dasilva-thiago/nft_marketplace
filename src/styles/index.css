@@ -85,6 +85,27 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .catalog-message strong { color: #f2eee8; font-size: 1rem; }
 .catalog-message span { font-size: .78rem; }
 .secondary-button { margin-top: 4px; padding: 10px 14px; }
+.session-header-actions { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.session-status, .session-user { color: #b7aaa0; font: .65rem 'DM Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+.session-logout { border: 0; border-bottom: 1px solid #8d633e; padding: 2px 0; background: transparent; color: #e9aa68; font: .66rem 'DM Mono', monospace; cursor: pointer; }
+.session-logout:hover { color: #f4c58e; }
+.session-logout:disabled { opacity: .5; cursor: wait; }
+.auth-page { width: min(100% - 32px, 560px); min-height: calc(100vh - 68px); margin: 0 auto; display: grid; place-items: center; padding: 64px 0; }
+.auth-card { width: 100%; border: 1px solid #3c2a21; background: #15100f; padding: clamp(24px, 5vw, 52px); box-shadow: 12px 12px 0 rgba(38, 25, 19, .45); }
+.auth-card h1 { margin: 0; color: #f2eee8; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1; letter-spacing: -.055em; font-weight: 600; }
+.auth-description { max-width: 400px; margin: 18px 0 30px; color: #b7aaa0; font-size: .88rem; line-height: 1.7; }
+.auth-form { display: grid; gap: 18px; }
+.auth-field { display: grid; gap: 8px; color: #c9bdb2; font: .68rem 'DM Mono', monospace; letter-spacing: .04em; }
+.auth-field input { width: 100%; min-height: 46px; border: 1px solid #493328; border-radius: 0; padding: 0 13px; background: #1b1411; color: #f2eee8; outline: 0; font: .84rem 'Space Grotesk', sans-serif; }
+.auth-field input:hover { border-color: #705039; }
+.auth-field input:focus { border-color: #e99a45; box-shadow: 0 0 0 1px #e99a45; }
+.auth-field input[aria-invalid='true'] { border-color: #d97962; }
+.field-error, .form-error { color: #e89c85; font-size: .68rem; line-height: 1.5; }
+.form-error { margin: -3px 0 0; padding: 11px 12px; border: 1px solid #704236; background: #2a1915; }
+.auth-submit { width: 100%; min-height: 46px; margin-top: 4px; }
+.auth-switch { margin: 25px 0 0; color: #95867a; font-size: .75rem; line-height: 1.6; }
+.auth-switch a { color: #e9aa68; text-decoration: underline; text-underline-offset: 3px; }
+.auth-demo-note { margin: 20px 0 0; padding-top: 16px; border-top: 1px solid #30231d; color: #75685f; font: .6rem 'DM Mono', monospace; line-height: 1.7; }
 .nft-card-skeleton { min-width: 0; padding-bottom: 12px; border: 1px solid #30231d; background: #171210; }
 .nft-card-skeleton div { aspect-ratio: 1.08; background: linear-gradient(100deg, #211915 20%, #30231d 40%, #211915 60%); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
 .nft-card-skeleton span { display: block; height: 9px; width: 55%; margin: 14px 12px 0; background: #2b201b; }
@@ -104,6 +125,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .site-header nav { gap: 13px; font-size: .68rem; }
   .wordmark { font-size: .82rem; letter-spacing: .15em; }
   .login-link { padding: 8px 10px; font-size: .7rem; white-space: nowrap; }
+  .session-user, .session-status { max-width: 82px; font-size: .56rem; }
+  .session-header-actions { margin-left: auto; }
   .marketplace-page { width: calc(100% - 32px); }
   .market-hero { grid-template-columns: 1fr; gap: 28px; padding: 44px 0 35px; }
   .hero-copy { padding: 0; }
@@ -126,6 +149,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .nft-card-price { flex-direction: row; justify-content: space-between; text-align: left; margin-top: 10px; }
   .nft-card-footer { padding: 8px 9px; font-size: .5rem; }
   .edition-badge { top: 6px; left: 6px; padding: 4px 5px; font-size: .47rem; }
+  .auth-page { min-height: calc(100vh - 60px); padding: 34px 0; }
+  .auth-card { padding: 26px 20px; box-shadow: 7px 7px 0 rgba(38, 25, 19, .45); }
 }
 @media (max-width: 360px) {
   .site-header nav { gap: 8px; font-size: .62rem; }

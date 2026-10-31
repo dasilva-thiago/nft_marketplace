@@ -58,3 +58,28 @@ export function PageResponseSchema<T extends z.ZodType>(itemSchema: T) {
     totalPages: nonNegativeInteger,
   });
 }
+
+export const UserSummarySchema = z.object({
+  id: z.string().min(1),
+  name: z.string().trim().min(2).max(80),
+  email: z.string().email(),
+  avatarUrl: z.string().url().nullable(),
+});
+
+export const SessionSchema = z.object({
+  user: UserSummarySchema,
+  expiresAt: z.string().datetime({ offset: true }),
+});
+
+const passwordSchema = z.string().min(8, 'A senha deve ter pelo menos 8 caracteres.').max(128);
+
+export const RegisterRequestSchema = z.object({
+  name: z.string().trim().min(2, 'Informe seu nome.').max(80),
+  email: z.string().trim().toLowerCase().email('Informe um e-mail válido.'),
+  password: passwordSchema,
+});
+
+export const LoginRequestSchema = z.object({
+  email: z.string().trim().toLowerCase().email('Informe um e-mail válido.'),
+  password: passwordSchema,
+});

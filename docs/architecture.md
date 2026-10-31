@@ -4,7 +4,7 @@
 
 A aplicação é uma SPA React + TypeScript para o desafio NFT Marketplace. A arquitetura coloca todos os dados de negócio atrás de contratos REST tipados e uma API simulada MSW. Socket.IO é uma via de atualização em tempo real separada, que deve reconciliar os recursos com REST após reconexão. A carteira, a cotação e o pagamento são simulações — não há conexão blockchain, extensão de carteira nem gateway.
 
-O projeto contém configuração e diretórios por domínio, roteamento, cliente Axios, QueryClient, contratos REST documentados, schemas Zod de catálogo, utilitário decimal, cliente Socket.IO, habilitação opt-in do MSW, catálogo simulado de leitura com busca/filtros/ordenação/paginação/detalhe, cenários iniciais e testes de integração. Os fluxos visuais e os handlers de sessão, favoritos, carrinho, cotação, pedido, perfil e carteiras ainda estão pendentes em `TODO.md`; rotas existentes não significam fluxos prontos.
+O projeto contém configuração e diretórios por domínio, roteamento, cliente Axios, QueryClient, contratos REST documentados, schemas Zod de catálogo e autenticação, utilitário decimal, cliente Socket.IO, habilitação opt-in do MSW, catálogo simulado de leitura com busca/filtros/ordenação/paginação/detalhe, sessão simulada com dois usuários, cenários reproduzíveis e testes de integração. Os fluxos visuais e os handlers de favoritos, carrinho, cotação, pedido, perfil e carteiras ainda estão pendentes em `TODO.md`; rotas existentes não significam fluxos prontos.
 
 ## Direção das dependências
 
@@ -28,9 +28,9 @@ realtime/* -> socket.io-client; emite atualizações -> cache TanStack Query
 
 A camada de domínio chama Axios; Axios recebe `AbortSignal` fornecido pelo TanStack Query. O handler MSW intercepta a requisição em desenvolvimento/teste/demo quando `VITE_ENABLE_MOCKS=true`. Contratos devem distinguir resposta bem-sucedida de erros tipados para validação, sessão inválida, autorização, recurso ausente, conflito e falha transitória.
 
-Query keys são serializáveis e incluem todos os parâmetros da consulta. Recursos privados também incluem `userId`/identidade estável na chave. Ao fazer logout, expirar a sessão ou trocar de usuário, limpar queries privadas e subscriptions antes de carregar a nova sessão. Não compartilhar cache privado mesmo que duas contas peçam a mesma rota.
+Query keys são serializáveis e incluem todos os parâmetros da consulta. Recursos privados também incluem `userId`/identidade estável na chave. A query `session` é recuperável após refresh por um handle exclusivo do mock; ao fazer logout, expirar a sessão ou trocar de usuário, limpar queries privadas e subscriptions antes de carregar a nova sessão. Não compartilhar cache privado mesmo que duas contas peçam a mesma rota.
 
-Retry é limitado a consultas seguras e erros transitórios; não repetir mutations automaticamente. Pedido exige chave de idempotência e o cliente consulta/recupera a tentativa já iniciada após timeout. Mutations otimizadas revertem snapshot do cache em erro. Após mutations REST, invalidar apenas recursos relacionados; após evento, atualizar/inutilizar cache de forma idempotente.
+Retry é limitado a consultas seguras e erros transitórios; não repetir mutations automaticamente. Pedido exige chave de idempotência e o cliente consulta/recupera a tentativa já iniciada após timeout. Mutations otimizadas revertem snapshot do cache em erro. Após mutations REST, invalidar apenas recursos relacionados; após evento, atualizar/inutilizar cache de forma idempotente. A mutation de logout grava `null` na query `session` e remove queries futuras com prefixo `private`; as próximas features devem usar esse prefixo para manter o isolamento.
 
 ## Precisão e pedido
 

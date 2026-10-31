@@ -11,7 +11,7 @@ Este repositório é uma aplicação frontend em React/Vite, e o enunciado pede 
 | Zod | Validar parâmetros de busca, bodies de entrada do MSW e respostas recebidas pelo cliente. Exibir erros úteis e não propagar dados malformados para a UI. | Validar novamente no servidor; validação do browser pode ser contornada. |
 | Rate limit | Cenário determinístico do MSW que devolve HTTP 429 e testa feedback/retry respeitando `Retry-After`. É uma simulação do comportamento da tela. | Contador em servidor/gateway, por usuário/IP e rota, compartilhado entre instâncias; limites monitorados. |
 | Helmet / headers | Documentar cabeçalhos de segurança do host e configurar headers estáticos no ambiente de deploy quando definido. A aplicação Vite não instancia Express/Helmet. | Middleware Helmet em servidor HTTP real e CSP ajustada aos assets, scripts, conexões e fontes usados. |
-| JWT | Não criar nem assinar JWT no browser. Fixtures podem simular sessão válida, inválida e expirada, sem guardar senha/token real. | Backend assina e verifica tokens, limita issuer/audience/expiração/algoritmo, roda TLS e faz rotação de chaves. Segredo nunca entra no bundle Vite. |
+| JWT | Não criar nem assinar JWT no browser. O mock simula sessão válida, inválida e expirada; credenciais fictícias são comparadas contra hash de demonstração e o handle de sessão não é JWT nem segredo. | Backend assina e verifica tokens, limita issuer/audience/expiração/algoritmo, roda TLS e faz rotação de chaves. Segredo nunca entra no bundle Vite. |
 | Cookie `HttpOnly` | Documentar como requisito de arquitetura, mas não declarar um cookie de MSW ou `document.cookie` como proteção HttpOnly. | Somente o servidor pode emitir `Set-Cookie` com `HttpOnly; Secure; SameSite=...`; definir renovação, CSRF e logout no servidor. |
 
 ## Regras de implementação
@@ -25,6 +25,6 @@ Este repositório é uma aplicação frontend em React/Vite, e o enunciado pede 
 
 ## Estado
 
-- Implementado nesta fatia: schemas Zod para parâmetros, fixtures e respostas do catálogo; cenário selecionável `rate-limited` com resposta HTTP 429 e `Retry-After`; teste de integração que confirma 429 e reset do cenário.
+- Implementado nesta fatia: schemas Zod para parâmetros, fixtures e respostas do catálogo; requests de cadastro/login e resposta de sessão; dois usuários fictícios isolados; cenário selecionável `rate-limited` com resposta HTTP 429 e `Retry-After`; cenário `session-expired`; sessão recuperável após refresh; logout; testes de API e interface para validação, conflito, expiração e isolamento.
 - Ainda não implementado: aplicar schemas Zod a todos os recursos, mostrar UI/retry para 429, headers estáticos de produção e backend real.
 - JWT real, Helmet middleware e cookie HttpOnly só podem ser marcados como concluídos com servidor que os implemente; não contam como implementados pelo frontend/MSW.

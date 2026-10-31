@@ -54,7 +54,7 @@ pnpm dev
 
 No PowerShell, use `Copy-Item .env.example .env.local` no lugar de `cp`.
 
-A camada MSW é ativada com `VITE_ENABLE_MOCKS=true`, inclusive para builds de demonstração. Defina `VITE_API_BASE_URL` e `VITE_SOCKET_URL` para configurar os pontos REST e socket. Os cenários selecionáveis são `default`, `empty`, `slow`, `out-of-order`, `rate-limited` e `unavailable`; `VITE_MOCK_DELAY_MS` adiciona latência. O endpoint de controle `/api/__mock/scenario` é exclusivo da demonstração/testes. Ele não é segurança de produção. O worker já está versionado: só execute `pnpm mocks:init` se atualizar a versão do MSW e precisar regenerá-lo. Use apenas credenciais fictícias.
+A camada MSW é ativada com `VITE_ENABLE_MOCKS=true`, inclusive para builds de demonstração. Defina `VITE_API_BASE_URL` e `VITE_SOCKET_URL` para configurar os pontos REST e socket. Os cenários selecionáveis são `default`, `empty`, `slow`, `out-of-order`, `rate-limited`, `unavailable` e `session-expired`; `VITE_MOCK_DELAY_MS` adiciona latência. O cenário selecionado pelo endpoint de controle `/api/__mock/scenario` é mantido na `sessionStorage` apenas para reproduzir refresh nos testes; o endpoint é exclusivo da demonstração/testes e não é segurança de produção. O worker já está versionado: só execute `pnpm mocks:init` se atualizar a versão do MSW e precisar regenerá-lo. Use apenas credenciais fictícias.
 
 ## Comandos
 
@@ -67,6 +67,19 @@ pnpm audit:lighthouse
 ```
 
 Playwright já está configurado para Chromium desktop 1440 px e viewport mobile, com relatório HTML e trace em falhas. Há testes da home, da API de catálogo, URL/busca/filtros/histórico e reset/rate limit simulado; isso ainda não satisfaz a cobertura E2E completa exigida no desafio. Lighthouse CI já declara as duas rotas e três medições, mas só pode ser considerado evidência depois que as páginas funcionais estiverem implementadas. Consulte `TODO.md` para os requisitos pendentes.
+
+## Sessão de demonstração
+
+A primeira fatia de conta implementa cadastro, login, consulta de sessão, logout, expiração determinística e proteção inicial das rotas privadas por MSW. Os dados são fictícios e ficam isolados por usuário.
+
+| Usuário | E-mail | Senha fictícia |
+| --- | --- | --- |
+| Ana Silva | `ana@kurio.demo` | `Kurio#2026!` |
+| Bruno Costa | `bruno@kurio.demo` | `Market#2026!` |
+
+O cliente mantém somente um handle de demonstração em `sessionStorage` para permitir que a sessão simulada sobreviva ao refresh. Esse handle não é JWT, não é um segredo e não é um cookie `HttpOnly`. Em uma implantação real, o backend deverá emitir e validar JWT ou sessão própria, enviar cookie `HttpOnly; Secure; SameSite`, proteger contra CSRF, aplicar rate limit por rota/identidade e configurar Helmet/CSP no servidor ou host. O mock usa Zod para validar entrada/saída, mas a validação do browser nunca substitui a validação do servidor.
+
+Para reproduzir uma sessão expirada nos testes ou na demonstração, selecione o cenário `session-expired` pelo endpoint de controle `/api/__mock/scenario`; use `POST /api/__mock/reset` para voltar ao cenário conhecido. Esses endpoints pertencem somente ao MSW e não são controles de segurança de produção.
 
 ## Referências do desafio
 

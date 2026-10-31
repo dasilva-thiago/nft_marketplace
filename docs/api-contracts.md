@@ -12,7 +12,7 @@ Os tipos TypeScript correspondentes ficam em `src/shared/api/contracts.ts`. Se u
 - Filtros são combináveis e serializados na URL. `sort` identifica o campo e `sortOrder` aceita `asc`/`desc`.
 - Preços, taxas, descontos e totais ETH trafegam como strings decimais, nunca números JSON. Quantidade/página/versão são inteiros.
 - Identidade de usuário vem da sessão simulada; o cliente não escolhe `userId` no corpo para operar recursos privados.
-- A sessão ainda será implementada como parte do mock; não guardar senha em localStorage/sessionStorage. `HttpOnly` só será alegado quando um servidor real puder emitir o cookie. Use apenas credenciais fictícias.
+- A sessão de demonstração é implementada pelo mock; senhas não são guardadas em localStorage/sessionStorage. O cliente mantém somente um handle opaco de demonstração em `sessionStorage` para reconstruir a sessão após refresh. Esse handle não é JWT, não é segredo e não representa um cookie `HttpOnly`; `HttpOnly` só será alegado quando um servidor real puder emitir o cookie. Use apenas credenciais fictícias.
 - Todas as operações de escrita repetíveis devem ser seguras contra duplo clique; criação de pedido exige `Idempotency-Key`.
 
 ### Erro comum
@@ -41,6 +41,8 @@ Códigos tipados: `VALIDATION_ERROR` (400), `SESSION_INVALID` (401), `FORBIDDEN`
 | `POST /api/auth/logout` | — | `200 { "loggedOut": true }`, expira cookie | 401 pode ser tratado como sessão já encerrada |
 
 `Session` tem `user` (`id`, `name`, `email`, `avatarUrl`) e `expiresAt`. Use duas contas fictícias de teste documentadas no README; cada uma deve ter dados privados separados.
+
+Na demonstração atual, o MSW implementa os quatro endpoints acima e valida requests/responses com Zod. O mock usa o header interno `X-Mock-Session` para transportar um handle codificado entre o cliente Axios e o handler; o valor é reconstruível após refresh somente para sustentar o cenário local. Logout remove o handle do navegador e encerra o registro em memória do mock. O cenário `session-expired` faz `GET /api/session` retornar `401 SESSION_INVALID` e é persistido na `sessionStorage` do cenário somente para reproduzir refresh em testes.
 
 ### NFTs
 

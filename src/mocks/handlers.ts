@@ -1,15 +1,24 @@
 import Big from 'big.js';
 import { delay, http, HttpResponse } from 'msw';
 import type { ApiError, NftSummary, PageRequest } from '@/shared/api/contracts';
-import { PageRequestSchema } from '@/shared/api/schemas';
+import { LoginRequestSchema, PageRequestSchema, RegisterRequestSchema } from '@/shared/api/schemas';
+import { deleteSessionFromRequest, getSessionFromRequest, getUserByEmail, loginMockUser, registerMockUser, resetMockAuthState } from './auth-state';
 import { nftFixtures } from './fixtures/nfts';
 import { MockScenarioSchema, getMockScenario, resetMockScenario, setMockScenario } from './scenarios/scenario-state';
 import { socketIoMockHandler } from './socket-io-handler';
 
 const configuredDelay = Number(import.meta.env.VITE_MOCK_DELAY_MS ?? '0');
 
-function apiError(code: ApiError['code'], message: string, retryable = false): ApiError {
-  return { code, message, requestId: `mock-${Date.now()}`, retryable };
+function apiError(code: ApiError['code'], message: string, retryable = false, fields?: Record<string, string>): ApiError {
+  return { code, message, requestId: `mock-${Date.now()}`, retryable, ...(fields ? { fields } : {}) };
+}
+
+function validationFields(error: { issues: Array<{ path: PropertyKey[]; message: string }> }): Record<string, string> {
+  return Object.fromEntries(error.issues.map((issue) => [String(issue.path[0] ?? 'form'), issue.message]));
+}
+
+async function readJson(request: Request): Promise<unknown> {
+  return request.json().catch(() => null);
 }
 
 function readPageRequest(url: URL): PageRequest | ApiError {
@@ -92,7 +101,39 @@ export const handlers = [
   }),
   http.post('/api/__mock/reset', () => {
     resetMockScenario();
+    resetMockAuthState();
     return HttpResponse.json({ scenario: getMockScenario(), reset: true });
+  }),
+  http.post('/api/auth/register', async ({ request }) => {
+    const parsed = RegisterRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success) {
+      return HttpResponse.json(apiError('VALIDATION_ERROR', 'Confira os campos do cadastro.', false, validationFields(parsed.error)), { status: 400 });
+    }
+    if (getUserByEmail(parsed.data.email)) {
+      return HttpResponse.json(apiError('CONFLICT', 'Já existe uma conta com este e-mail.', false, { email: 'Este e-mail já está cadastrado.' }), { status: 409 });
+    }
+    const created = await registerMockUser(parsed.data);
+    return HttpResponse.json(created.session, { status: 201, headers: { 'X-Mock-Session': created.sessionId } });
+  }),
+  http.post('/api/auth/login', async ({ request }) => {
+    const parsed = LoginRequestSchema.safeParse(await readJson(request));
+    if (!parsed.success) {
+      return HttpResponse.json(apiError('VALIDATION_ERROR', 'Confira os campos de acesso.', false, validationFields(parsed.error)), { status: 400 });
+    }
+    const authenticated = await loginMockUser(parsed.data);
+    if (!authenticated) {
+      return HttpResponse.json(apiError('SESSION_INVALID', 'E-mail ou senha inválidos.'), { status: 401 });
+    }
+    return HttpResponse.json(authenticated.session, { headers: { 'X-Mock-Session': authenticated.sessionId } });
+  }),
+  http.get('/api/session', ({ request }) => {
+    const currentSession = getSessionFromRequest(request);
+    if (!currentSession) return HttpResponse.json(apiError('SESSION_INVALID', 'Sua sessão expirou ou não foi encontrada.'), { status: 401 });
+    return HttpResponse.json(currentSession.session);
+  }),
+  http.post('/api/auth/logout', ({ request }) => {
+    deleteSessionFromRequest(request);
+    return HttpResponse.json({ loggedOut: true });
   }),
   http.get('/api/nfts', async ({ request }) => {
     const params = readPageRequest(new URL(request.url));

@@ -78,6 +78,8 @@ export interface Session {
   expiresAt: string;
 }
 
+export interface AuthResponse extends Session {}
+
 export interface RegisterRequest {
   name: string;
   email: string;
