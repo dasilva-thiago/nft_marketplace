@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from '@tanstack/react-router';
 import { useSessionQuery } from '@/features/auth/queries';
-import { PlaceholderPage } from './placeholder-page';
+import { PlaceholderPage } from '@/shared/ui/placeholder-page';
 
 type ProtectedProps = { title?: string; children?: ReactNode };
 

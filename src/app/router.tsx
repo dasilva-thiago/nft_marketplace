@@ -15,7 +15,7 @@ import { CheckoutPage } from '@/features/checkout/routes/checkout-page';
 import { OrderPage } from '@/features/orders/routes/order-page';
 import { ProfilePage } from '@/features/profile/routes/profile-page';
 import { WalletsPage } from '@/features/wallets/routes/wallets-page';
-import { ProtectedPlaceholderPage } from '@/shared/ui/protected-placeholder-page';
+import { ProtectedPlaceholderPage } from '@/features/auth/components/protected-placeholder-page';
 import { PlaceholderPage } from '@/shared/ui/placeholder-page';
 
 interface RouterContext {

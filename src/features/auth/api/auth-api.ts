@@ -1,18 +1,18 @@
-import type { LoginRequest, RegisterRequest, Session } from '@/shared/api/contracts';
+import type { LoginRequest, RegisterRequest, Session } from '@/shared/contracts';
 import {
   ApiErrorSchema,
   LoginRequestSchema,
   RegisterRequestSchema,
   SessionSchema,
-} from '@/shared/api/schemas';
-import { http } from '@/shared/api/http';
-import { setMockSessionHandle, clearMockSessionHandle } from '@/shared/session/mock-session';
+} from '@/shared/contracts/schemas';
+import { http } from '@/shared/api/http-client';
+import { setSessionCredential, clearSessionCredential } from '@/shared/storage/session-credential';
 
 function readSession(response: { data: unknown; headers: Record<string, unknown> }): Session {
   const session = SessionSchema.parse(response.data);
   const sessionHandle = response.headers['x-mock-session'];
   if (typeof sessionHandle === 'string' && sessionHandle.length > 0)
-    setMockSessionHandle(sessionHandle);
+    setSessionCredential(sessionHandle);
   return session;
 }
 
@@ -46,7 +46,7 @@ export const authApi = {
         apiError?.code === 'SESSION_INVALID' ||
         (error as { response?: { status?: number } })?.response?.status === 401
       ) {
-        clearMockSessionHandle();
+        clearSessionCredential();
         return null;
       }
       throw error;
@@ -57,7 +57,7 @@ export const authApi = {
     try {
       await http.post('/auth/logout');
     } finally {
-      clearMockSessionHandle();
+      clearSessionCredential();
     }
   },
 };

@@ -1,6 +1,6 @@
 import { ws } from 'msw';
 import { toSocketIo } from '@mswjs/socket.io-binding';
-import type { VersionedEvent } from '@/shared/api/contracts';
+import type { VersionedEvent } from '@/shared/contracts';
 
 export type MockSocketEventName = 'nft.updated' | 'order.updated';
 type BoundSocketConnection = ReturnType<typeof toSocketIo>['client'];

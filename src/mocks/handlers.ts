@@ -1,7 +1,11 @@
 import Big from 'big.js';
 import { delay, http, HttpResponse } from 'msw';
-import type { ApiError, NftSummary, PageRequest } from '@/shared/api/contracts';
-import { LoginRequestSchema, PageRequestSchema, RegisterRequestSchema } from '@/shared/api/schemas';
+import type { ApiError, NftSummary, PageRequest } from '@/shared/contracts';
+import {
+  LoginRequestSchema,
+  PageRequestSchema,
+  RegisterRequestSchema,
+} from '@/shared/contracts/schemas';
 import {
   deleteSessionFromRequest,
   getSessionFromRequest,
@@ -18,8 +22,9 @@ import {
   setMockScenario,
 } from './scenarios/scenario-state';
 import { socketIoMockHandler } from './socket-io-handler';
+import { appEnv } from '@/app/config/env';
 
-const configuredDelay = Number(import.meta.env.VITE_MOCK_DELAY_MS ?? '0');
+const configuredDelay = appEnv.mockDelayMs;
 
 function apiError(
   code: ApiError['code'],

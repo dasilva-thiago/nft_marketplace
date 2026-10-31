@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type { LoginRequest, RegisterRequest, Session } from '@/shared/api/contracts';
+import type { LoginRequest, RegisterRequest, Session } from '@/shared/contracts';
 import { authApi } from './api/auth-api';
 
 export const sessionQueryKey = ['session'] as const;

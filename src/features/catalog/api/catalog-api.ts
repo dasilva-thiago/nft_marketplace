@@ -1,6 +1,6 @@
-import { http } from '@/shared/api/http';
-import type { Nft, NftSummary, PageRequest, PageResponse } from '@/shared/api/contracts';
-import { NftSchema, NftSummarySchema, PageResponseSchema } from '@/shared/api/schemas';
+import { http } from '@/shared/api/http-client';
+import type { Nft, NftSummary, PageRequest, PageResponse } from '@/shared/contracts';
+import { NftSchema, NftSummarySchema, PageResponseSchema } from '@/shared/contracts/schemas';
 
 const nftListSchema = PageResponseSchema(NftSummarySchema);
 

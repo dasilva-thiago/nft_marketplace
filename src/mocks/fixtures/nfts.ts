@@ -1,5 +1,5 @@
-import type { Nft } from '@/shared/api/contracts';
-import { NftSchema } from '@/shared/api/schemas';
+import type { Nft } from '@/shared/contracts';
+import { NftSchema } from '@/shared/contracts/schemas';
 
 const monkey1 = '/assets/monkey1.webp';
 const monkey2 = '/assets/monkey2.webp';

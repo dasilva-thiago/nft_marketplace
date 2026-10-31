@@ -1,17 +1,18 @@
 import axios from 'axios';
-import { getMockSessionHandle } from '@/shared/session/mock-session';
+import { appEnv } from '@/app/config/env';
+import { getSessionCredential } from '@/shared/storage/session-credential';
 
 export const http = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
+  baseURL: appEnv.apiBaseUrl,
   timeout: 10_000,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
 
 http.interceptors.request.use((config) => {
-  if (import.meta.env.VITE_ENABLE_MOCKS === 'true') {
-    const sessionHandle = getMockSessionHandle();
-    if (sessionHandle) config.headers.set('X-Mock-Session', sessionHandle);
+  if (appEnv.enableMocks) {
+    const sessionCredential = getSessionCredential();
+    if (sessionCredential) config.headers.set('X-Mock-Session', sessionCredential);
   }
   return config;
 });

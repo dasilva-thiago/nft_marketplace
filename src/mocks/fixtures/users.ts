@@ -1,4 +1,4 @@
-import type { UserSummary } from '@/shared/api/contracts';
+import type { UserSummary } from '@/shared/contracts';
 
 export interface MockUserRecord extends UserSummary {
   passwordHash: string;

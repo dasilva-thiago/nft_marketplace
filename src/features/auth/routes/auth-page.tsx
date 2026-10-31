@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { Facebook, Search } from 'lucide-react';
-import { LoginRequestSchema, RegisterRequestSchema } from '@/shared/api/schemas';
+import { LoginRequestSchema, RegisterRequestSchema } from '@/shared/contracts/schemas';
 import { readApiError } from '../api/auth-api';
 import { useLoginMutation, useRegisterMutation } from '../queries';
 import { safeReturnTo } from '../return-to';

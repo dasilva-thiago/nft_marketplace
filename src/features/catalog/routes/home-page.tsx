@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { catalogListQuery } from '@/features/catalog/queries';
 import { useSessionQuery } from '@/features/auth/queries';
-import type { NftSummary, PageRequest } from '@/shared/api/contracts';
+import type { NftSummary, PageRequest } from '@/shared/contracts';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
 
 const PAGE_SIZE = 9;

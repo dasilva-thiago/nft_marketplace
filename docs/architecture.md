@@ -8,6 +8,12 @@ O projeto contém configuração e diretórios por domínio, roteamento, cliente
 
 As referências visuais do Figma são a fonte primária e estão catalogadas em `docs/visual-reference-inventory.md`. A composição deve permanecer fiel ao Figma em 390/768/1440 px; correções necessárias de acessibilidade, responsividade, conteúdo ou comportamento devem ser registradas nesta arquitetura. Não há frame mobile correspondente para confirmação, perfil e carteiras; essas três variantes usam adaptações responsivas conservadoras da composição desktop, e toda diferença inevitável é documentada aqui.
 
+## Estrutura arquitetural aplicada
+
+A composição da aplicação está centralizada em `src/app`: `config/env.ts` concentra as variáveis de ambiente e `providers/app-providers.tsx` fornece o `QueryClient` à árvore do Router. O roteamento continua em um único registro em `src/app/router.tsx`; páginas e fluxos permanecem nas respectivas features.
+
+Os contratos e schemas compartilhados ficam em `src/shared/contracts/`, o transporte REST em `src/shared/api/http-client.ts`, a persistência da credencial opaca de sessão em `src/shared/storage/` e os componentes genéricos em `src/shared/ui/`. O componente de área protegida foi movido para `features/auth/components/`, pois depende do estado de autenticação. Assim, `shared` não importa features, features não importam mocks e o MSW permanece isolado em `src/mocks/`.
+
 ## Direção das dependências
 
 ```text

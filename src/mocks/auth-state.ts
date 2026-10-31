@@ -1,4 +1,4 @@
-import type { Session, UserSummary } from '@/shared/api/contracts';
+import type { Session, UserSummary } from '@/shared/contracts';
 import { getMockScenario } from './scenarios/scenario-state';
 import { userFixtures, type MockUserRecord } from './fixtures/users';
 

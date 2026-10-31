@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import { catalogApi } from './api/catalog-api';
-import type { PageRequest } from '@/shared/api/contracts';
+import type { PageRequest } from '@/shared/contracts';
 
 export const catalogKeys = {
   all: ['catalog'] as const,

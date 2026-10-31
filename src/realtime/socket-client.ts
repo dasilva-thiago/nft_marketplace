@@ -1,5 +1,5 @@
 import { io, type Socket } from 'socket.io-client';
-import type { VersionedEvent } from '@/shared/api/contracts';
+import type { VersionedEvent } from '@/shared/contracts';
 
 export type MarketplaceServerEvents = {
   'nft.updated': (event: VersionedEvent<unknown>) => void;

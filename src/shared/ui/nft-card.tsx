@@ -1,6 +1,6 @@
 import { ArrowRight, Heart } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
-import type { NftSummary } from '@/shared/api/contracts';
+import type { NftSummary } from '@/shared/contracts';
 
 export function NftCard({ nft, compact = false }: { nft: NftSummary; compact?: boolean }) {
   return (
