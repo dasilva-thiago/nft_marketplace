@@ -4,23 +4,23 @@ As referências foram fornecidas pelo usuário em `telas-nft-marketplace.zip`. E
 
 ## Arquivos recebidos
 
-| Arquivo | Dimensão | Fluxo | Plataforma |
-| --- | ---: | --- | --- |
-| `desktop-inicio.png` | 448 × 1109 | Início | Desktop |
-| `desktop-login.png` | 462 × 656 | Login | Desktop/modal |
-| `desktop-cadastro.png` | 734 × 977 | Cadastro | Desktop/modal |
-| `desktop-detalhes.png` | 736 × 1116 | Detalhe do NFT | Desktop |
-| `desktop-carrinho.png` | 728 × 835 | Carrinho | Desktop |
-| `desktop-carteiras.png` | 784 × 598 | Carteiras | Desktop |
-| `desktop-confirmacao.png` | 750 × 844 | Confirmação de pedido | Desktop/modal |
-| `desktop-pagamento.png` | 713 × 818 | Pagamento | Desktop |
-| `desktop-perfil.png` | 731 × 632 | Perfil | Desktop |
-| `mobile-inicio.png` | 512 × 965 | Início | Mobile |
-| `mobile-login.png` | 509 × 978 | Login | Mobile |
-| `mobile-cadastro.png` | 512 × 987 | Cadastro | Mobile |
-| `mobile-detalhes-do-nft.png` | 512 × 970 | Detalhe do NFT | Mobile |
-| `mobile-carrinho.png` | 521 × 972 | Carrinho | Mobile |
-| `mobile-pagamento.png` | 519 × 971 | Pagamento | Mobile |
+| Arquivo                      |   Dimensão | Fluxo                 | Plataforma    |
+| ---------------------------- | ---------: | --------------------- | ------------- |
+| `desktop-inicio.png`         | 448 × 1109 | Início                | Desktop       |
+| `desktop-login.png`          |  462 × 656 | Login                 | Desktop/modal |
+| `desktop-cadastro.png`       |  734 × 977 | Cadastro              | Desktop/modal |
+| `desktop-detalhes.png`       | 736 × 1116 | Detalhe do NFT        | Desktop       |
+| `desktop-carrinho.png`       |  728 × 835 | Carrinho              | Desktop       |
+| `desktop-carteiras.png`      |  784 × 598 | Carteiras             | Desktop       |
+| `desktop-confirmacao.png`    |  750 × 844 | Confirmação de pedido | Desktop/modal |
+| `desktop-pagamento.png`      |  713 × 818 | Pagamento             | Desktop       |
+| `desktop-perfil.png`         |  731 × 632 | Perfil                | Desktop       |
+| `mobile-inicio.png`          |  512 × 965 | Início                | Mobile        |
+| `mobile-login.png`           |  509 × 978 | Login                 | Mobile        |
+| `mobile-cadastro.png`        |  512 × 987 | Cadastro              | Mobile        |
+| `mobile-detalhes-do-nft.png` |  512 × 970 | Detalhe do NFT        | Mobile        |
+| `mobile-carrinho.png`        |  521 × 972 | Carrinho              | Mobile        |
+| `mobile-pagamento.png`       |  519 × 971 | Pagamento             | Mobile        |
 
 ## Observações visuais
 

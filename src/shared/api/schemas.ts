@@ -2,13 +2,23 @@ import { z } from 'zod';
 
 const nonNegativeInteger = z.number().int().min(0);
 const positiveInteger = z.number().int().min(1);
-const ethDecimal = z.string().regex(/^(0|[1-9]\d*)(\.\d+)?$/, 'ETH deve ser uma string decimal positiva ou zero.');
+const ethDecimal = z
+  .string()
+  .regex(/^(0|[1-9]\d*)(\.\d+)?$/, 'ETH deve ser uma string decimal positiva ou zero.');
 
 export const ApiErrorSchema = z.object({
   code: z.enum([
-    'VALIDATION_ERROR', 'SESSION_INVALID', 'FORBIDDEN', 'NOT_FOUND',
-    'AVAILABILITY_CONFLICT', 'CONFLICT', 'COUPON_INVALID', 'COUPON_EXPIRED',
-    'PAYMENT_REJECTED', 'RATE_LIMITED', 'TRANSIENT_ERROR',
+    'VALIDATION_ERROR',
+    'SESSION_INVALID',
+    'FORBIDDEN',
+    'NOT_FOUND',
+    'AVAILABILITY_CONFLICT',
+    'CONFLICT',
+    'COUPON_INVALID',
+    'COUPON_EXPIRED',
+    'PAYMENT_REJECTED',
+    'RATE_LIMITED',
+    'TRANSIENT_ERROR',
   ]),
   message: z.string().min(1),
   fields: z.record(z.string(), z.string()).optional(),

@@ -33,12 +33,12 @@ Códigos tipados: `VALIDATION_ERROR` (400), `SESSION_INVALID` (401), `FORBIDDEN`
 
 ### Sessão e conta
 
-| Método e rota | Entrada | Sucesso | Erros relevantes |
-|---|---|---|---|
-| `POST /api/auth/register` | `RegisterRequest` (`name`, `email`, `password`) | `201 Session`; email existente é conflito | 400 validação, 409 conflito |
-| `POST /api/auth/login` | `LoginRequest` | `200 Session` e cookie de sessão | 400 validação, 401 credencial/sessão inválida |
-| `GET /api/session` | — | `200 Session` | 401 ausente/expirada |
-| `POST /api/auth/logout` | — | `200 { "loggedOut": true }`, expira cookie | 401 pode ser tratado como sessão já encerrada |
+| Método e rota             | Entrada                                         | Sucesso                                    | Erros relevantes                              |
+| ------------------------- | ----------------------------------------------- | ------------------------------------------ | --------------------------------------------- |
+| `POST /api/auth/register` | `RegisterRequest` (`name`, `email`, `password`) | `201 Session`; email existente é conflito  | 400 validação, 409 conflito                   |
+| `POST /api/auth/login`    | `LoginRequest`                                  | `200 Session` e cookie de sessão           | 400 validação, 401 credencial/sessão inválida |
+| `GET /api/session`        | —                                               | `200 Session`                              | 401 ausente/expirada                          |
+| `POST /api/auth/logout`   | —                                               | `200 { "loggedOut": true }`, expira cookie | 401 pode ser tratado como sessão já encerrada |
 
 `Session` tem `user` (`id`, `name`, `email`, `avatarUrl`) e `expiresAt`. Use duas contas fictícias de teste documentadas no README; cada uma deve ter dados privados separados.
 
@@ -46,68 +46,68 @@ Na demonstração atual, o MSW implementa os quatro endpoints acima e valida req
 
 ### NFTs
 
-| Método e rota | Entrada | Sucesso | Erros relevantes |
-|---|---|---|---|
-| `GET /api/nfts` | query: `page`, `pageSize`, `search`, `sort`, `sortOrder` e filtros repetíveis | `PageResponse<NftSummary>` | 400 parâmetros inválidos, 503 falha transitória |
-| `GET /api/nfts/:nftId` | identificador na rota | `Nft` | 404 não encontrado |
+| Método e rota          | Entrada                                                                       | Sucesso                    | Erros relevantes                                |
+| ---------------------- | ----------------------------------------------------------------------------- | -------------------------- | ----------------------------------------------- |
+| `GET /api/nfts`        | query: `page`, `pageSize`, `search`, `sort`, `sortOrder` e filtros repetíveis | `PageResponse<NftSummary>` | 400 parâmetros inválidos, 503 falha transitória |
+| `GET /api/nfts/:nftId` | identificador na rota                                                         | `Nft`                      | 404 não encontrado                              |
 
 `NftSummary` contém `id`, `name`, `imageUrl`, `collection`, `priceEth`, `availableEditions`, `network` e `version`. `Nft` acrescenta `description`, `gallery`, edição atual/total e `attributes` (`trait`, `value`). Quantidade indisponível não é 404: é um conflito de disponibilidade na tentativa de carrinho/cotação.
 
 ### Favoritos
 
-| Método e rota | Entrada | Sucesso | Erros relevantes |
-|---|---|---|---|
-| `GET /api/favorites` | sessão | `Favorite[]` | 401 |
-| `PUT /api/favorites/:nftId` | sem corpo | `Favorite` (operação idempotente) | 401, 404 NFT |
-| `DELETE /api/favorites/:nftId` | sem corpo | `204` | 401 |
+| Método e rota                  | Entrada   | Sucesso                           | Erros relevantes |
+| ------------------------------ | --------- | --------------------------------- | ---------------- |
+| `GET /api/favorites`           | sessão    | `Favorite[]`                      | 401              |
+| `PUT /api/favorites/:nftId`    | sem corpo | `Favorite` (operação idempotente) | 401, 404 NFT     |
+| `DELETE /api/favorites/:nftId` | sem corpo | `204`                             | 401              |
 
 `Favorite` é vinculado ao usuário da sessão e NFT. Remover favorito inexistente pode responder 204 para ser idempotente.
 
 ### Carrinho
 
-| Método e rota | Entrada | Sucesso | Erros relevantes |
-|---|---|---|---|
-| `GET /api/cart` | sessão ou visitante | `Cart` | 401 se sessão expirou em operação protegida |
-| `POST /api/cart/items` | `AddCartItemRequest` (`nftId`, `quantity`) | `Cart` atualizado | 400 quantidade; 404 NFT; 409 edição indisponível |
-| `PATCH /api/cart/items/:nftId` | `UpdateCartItemRequest` (`quantity`) | `Cart` atualizado | 400; 404 item; 409 estoque mudou |
-| `DELETE /api/cart/items/:nftId` | — | `Cart` atualizado | 404 item pode ser tratado idempotentemente |
+| Método e rota                   | Entrada                                    | Sucesso           | Erros relevantes                                 |
+| ------------------------------- | ------------------------------------------ | ----------------- | ------------------------------------------------ |
+| `GET /api/cart`                 | sessão ou visitante                        | `Cart`            | 401 se sessão expirou em operação protegida      |
+| `POST /api/cart/items`          | `AddCartItemRequest` (`nftId`, `quantity`) | `Cart` atualizado | 400 quantidade; 404 NFT; 409 edição indisponível |
+| `PATCH /api/cart/items/:nftId`  | `UpdateCartItemRequest` (`quantity`)       | `Cart` atualizado | 400; 404 item; 409 estoque mudou                 |
+| `DELETE /api/cart/items/:nftId` | —                                          | `Cart` atualizado | 404 item pode ser tratado idempotentemente       |
 
 `Cart` contém `userId` ou `null`, `items` e `version`. Cada `CartLine` tem `nftId`, quantidade inteira e o resumo atual do NFT. Ao login, preservar/mesclar carrinho visitante segundo regra documentada e testada; não descartar itens silenciosamente.
 
 ### Cotação e cupom
 
-| Método e rota | Entrada | Sucesso | Erros relevantes |
-|---|---|---|---|
+| Método e rota      | Entrada                                                                             | Sucesso              | Erros relevantes                                                |
+| ------------------ | ----------------------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------- |
 | `POST /api/quotes` | `QuoteRequest`: itens (`nftId`, `quantity`), `couponCode?`, `walletId?`, `network?` | `Quote` atual da API | 401, 404 NFT/carteira, 409 estoque, 422 cupom inválido/expirado |
 
 `Quote` contém `quoteId`, linhas cotadas (`QuoteLine`), cupom aplicado, `subtotalEth`, `discountEth`, `networkFeeEth`, `totalEth`, `createdAt`, `expiresAt`, `version`. Toda mudança de item, cupom, preço, disponibilidade, carteira ou rede requer cotação nova. Checkout não aceita cotação expirada ou antiga; divergência deve ser mostrada e exigir confirmação do usuário.
 
 ### Pedidos
 
-| Método e rota | Entrada | Sucesso | Erros relevantes |
-|---|---|---|---|
-| `POST /api/orders` | Header `Idempotency-Key` obrigatório; corpo `CreateOrderRequest` (`quoteId`, `walletId`, `network`) | `201 OrderSnapshot`; mesma chave e mesmo conteúdo recuperam a mesma tentativa | 400 chave ausente; 401; 403; 409 chave com outro conteúdo/estoque; 422 pagamento recusado |
-| `GET /api/orders/:orderId` | sessão | `OrderSnapshot` | 401, 403 pedido de outro usuário, 404 |
+| Método e rota              | Entrada                                                                                             | Sucesso                                                                       | Erros relevantes                                                                          |
+| -------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `POST /api/orders`         | Header `Idempotency-Key` obrigatório; corpo `CreateOrderRequest` (`quoteId`, `walletId`, `network`) | `201 OrderSnapshot`; mesma chave e mesmo conteúdo recuperam a mesma tentativa | 400 chave ausente; 401; 403; 409 chave com outro conteúdo/estoque; 422 pagamento recusado |
+| `GET /api/orders/:orderId` | sessão                                                                                              | `OrderSnapshot`                                                               | 401, 403 pedido de outro usuário, 404                                                     |
 
 `OrderSnapshot` registra `id`, `userId`, estado `pending`/`confirmed`/`rejected`, linhas e cotação usadas como snapshot imutável, `transactionRef` (string simulada ou null), timestamps e `version`. Um timeout após criação não cancela necessariamente o pedido: consultar/recuperar pela chave antes de tentar enviar outra compra. Pedido confirmado ou recusado é terminal.
 
 ### Perfil
 
-| Método e rota | Entrada | Sucesso | Erros relevantes |
-|---|---|---|---|
-| `GET /api/profile` | sessão | `CollectorProfile` | 401 |
-| `PATCH /api/profile` | `UpdateProfileRequest` (`name`, `avatarUrl?`) | perfil atualizado | 400 validação, 401 |
-| `PATCH /api/profile/password` | `ChangePasswordRequest` | `200 { "updated": true }` | 400 validação/senha atual, 401 |
+| Método e rota                 | Entrada                                       | Sucesso                   | Erros relevantes               |
+| ----------------------------- | --------------------------------------------- | ------------------------- | ------------------------------ |
+| `GET /api/profile`            | sessão                                        | `CollectorProfile`        | 401                            |
+| `PATCH /api/profile`          | `UpdateProfileRequest` (`name`, `avatarUrl?`) | perfil atualizado         | 400 validação, 401             |
+| `PATCH /api/profile/password` | `ChangePasswordRequest`                       | `200 { "updated": true }` | 400 validação/senha atual, 401 |
 
 O avatar usa caminho/URL local de fixture no demo. Nunca armazenar senha em claro ou retornar senha nas respostas.
 
 ### Carteiras
 
-| Método e rota | Entrada | Sucesso | Erros relevantes |
-|---|---|---|---|
-| `GET /api/wallets` | sessão | `Wallet[]` | 401 |
-| `POST /api/wallets` | `CreateWalletRequest` | `201 Wallet` | 400 validação/endereço/rede, 401, 409 conflito |
-| `PATCH /api/wallets/:walletId` | `UpdateWalletRequest` (campos alteráveis) | `Wallet` atualizado | 400 validação, 401, 404, 409 |
+| Método e rota                  | Entrada                                   | Sucesso             | Erros relevantes                               |
+| ------------------------------ | ----------------------------------------- | ------------------- | ---------------------------------------------- |
+| `GET /api/wallets`             | sessão                                    | `Wallet[]`          | 401                                            |
+| `POST /api/wallets`            | `CreateWalletRequest`                     | `201 Wallet`        | 400 validação/endereço/rede, 401, 409 conflito |
+| `PATCH /api/wallets/:walletId` | `UpdateWalletRequest` (campos alteráveis) | `Wallet` atualizado | 400 validação, 401, 404, 409                   |
 
 `Wallet` tem `id`, `userId`, `label`, `address`, `network`, `isPrimary`, `version`. Principal/secundária e seleção de rede são dados simulados, não endereços reais necessários.
 
@@ -115,10 +115,10 @@ O avatar usa caminho/URL local de fixture no demo. Nunca armazenar senha em clar
 
 Estas rotas são interceptadas pelo service worker, não fazem parte da API de produção e existem para tornar testes repetíveis.
 
-| Método e rota | Entrada | Sucesso |
-|---|---|---|
-| `PUT /api/__mock/scenario` | `{ "scenario": "default" | "empty" | "slow" | "out-of-order" | "rate-limited" | "unavailable" }` | `{ "scenario": "..." }` |
-| `POST /api/__mock/reset` | — | `{ "scenario": "...", "reset": true }` |
+| Método e rota              | Entrada                  | Sucesso                                |
+| -------------------------- | ------------------------ | -------------------------------------- | ------ | -------------- | -------------- | ---------------- | ----------------------- |
+| `PUT /api/__mock/scenario` | `{ "scenario": "default" | "empty"                                | "slow" | "out-of-order" | "rate-limited" | "unavailable" }` | `{ "scenario": "..." }` |
+| `POST /api/__mock/reset`   | —                        | `{ "scenario": "...", "reset": true }` |
 
 O cenário escolhido afeta apenas os handlers MSW em memória. Controle global é serializado no Playwright para evitar que um teste contamine outro. Não expor controles desse tipo em uma API real.
 

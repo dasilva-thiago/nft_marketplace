@@ -1,12 +1,18 @@
 import type { LoginRequest, RegisterRequest, Session } from '@/shared/api/contracts';
-import { ApiErrorSchema, LoginRequestSchema, RegisterRequestSchema, SessionSchema } from '@/shared/api/schemas';
+import {
+  ApiErrorSchema,
+  LoginRequestSchema,
+  RegisterRequestSchema,
+  SessionSchema,
+} from '@/shared/api/schemas';
 import { http } from '@/shared/api/http';
 import { setMockSessionHandle, clearMockSessionHandle } from '@/shared/session/mock-session';
 
 function readSession(response: { data: unknown; headers: Record<string, unknown> }): Session {
   const session = SessionSchema.parse(response.data);
   const sessionHandle = response.headers['x-mock-session'];
-  if (typeof sessionHandle === 'string' && sessionHandle.length > 0) setMockSessionHandle(sessionHandle);
+  if (typeof sessionHandle === 'string' && sessionHandle.length > 0)
+    setMockSessionHandle(sessionHandle);
   return session;
 }
 
@@ -36,7 +42,10 @@ export const authApi = {
       return SessionSchema.parse(response.data);
     } catch (error: unknown) {
       const apiError = readApiError(error);
-      if (apiError?.code === 'SESSION_INVALID' || (error as { response?: { status?: number } })?.response?.status === 401) {
+      if (
+        apiError?.code === 'SESSION_INVALID' ||
+        (error as { response?: { status?: number } })?.response?.status === 401
+      ) {
         clearMockSessionHandle();
         return null;
       }

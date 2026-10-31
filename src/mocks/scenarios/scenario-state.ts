@@ -1,12 +1,21 @@
 import { z } from 'zod';
 
-export const MockScenarioSchema = z.enum(['default', 'empty', 'slow', 'out-of-order', 'rate-limited', 'unavailable', 'session-expired']);
+export const MockScenarioSchema = z.enum([
+  'default',
+  'empty',
+  'slow',
+  'out-of-order',
+  'rate-limited',
+  'unavailable',
+  'session-expired',
+]);
 export type MockScenario = z.infer<typeof MockScenarioSchema>;
 
 const SCENARIO_STORAGE_KEY = 'kurio.mock.scenario';
 
 function initialScenario(): MockScenario {
-  const stored = typeof window !== 'undefined' ? window.sessionStorage.getItem(SCENARIO_STORAGE_KEY) : null;
+  const stored =
+    typeof window !== 'undefined' ? window.sessionStorage.getItem(SCENARIO_STORAGE_KEY) : null;
   return MockScenarioSchema.parse(stored ?? import.meta.env.VITE_MOCK_SCENARIO ?? 'default');
 }
 

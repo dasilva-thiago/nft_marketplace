@@ -72,9 +72,9 @@ Playwright já está configurado para Chromium desktop 1440 px e viewport mobile
 
 A primeira fatia de conta implementa cadastro, login, consulta de sessão, logout, expiração determinística e proteção inicial das rotas privadas por MSW. Os dados são fictícios e ficam isolados por usuário.
 
-| Usuário | E-mail | Senha fictícia |
-| --- | --- | --- |
-| Ana Silva | `ana@kurio.demo` | `Kurio#2026!` |
+| Usuário     | E-mail             | Senha fictícia |
+| ----------- | ------------------ | -------------- |
+| Ana Silva   | `ana@kurio.demo`   | `Kurio#2026!`  |
 | Bruno Costa | `bruno@kurio.demo` | `Market#2026!` |
 
 O cliente mantém somente um handle de demonstração em `sessionStorage` para permitir que a sessão simulada sobreviva ao refresh. Esse handle não é JWT, não é um segredo e não é um cookie `HttpOnly`. Em uma implantação real, o backend deverá emitir e validar JWT ou sessão própria, enviar cookie `HttpOnly; Secure; SameSite`, proteger contra CSRF, aplicar rate limit por rota/identidade e configurar Helmet/CSP no servidor ou host. O mock usa Zod para validar entrada/saída, mas a validação do browser nunca substitui a validação do servidor.

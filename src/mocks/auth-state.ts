@@ -36,24 +36,45 @@ async function hashMockPassword(password: string): Promise<string> {
 function encodeSession(payload: EncodedSession): string {
   const bytes = new TextEncoder().encode(JSON.stringify(payload));
   let binary = '';
-  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
   return `mock-session-${btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replaceAll('=', '')}`;
 }
 
 function decodeSession(sessionId: string): EncodedSession | null {
   if (!sessionId.startsWith('mock-session-')) return null;
   try {
-    const encoded = sessionId.slice('mock-session-'.length).replaceAll('-', '+').replaceAll('_', '/');
+    const encoded = sessionId
+      .slice('mock-session-'.length)
+      .replaceAll('-', '+')
+      .replaceAll('_', '/');
     const padded = encoded.padEnd(Math.ceil(encoded.length / 4) * 4, '=');
     const binary = atob(padded);
     const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
     const decoded = new TextDecoder().decode(bytes);
     const payload: unknown = JSON.parse(decoded);
-    if (!payload || typeof payload !== 'object' || !('user' in payload) || !('expiresAt' in payload)) return null;
+    if (
+      !payload ||
+      typeof payload !== 'object' ||
+      !('user' in payload) ||
+      !('expiresAt' in payload)
+    )
+      return null;
     const candidate = payload as { user: unknown; expiresAt: unknown };
-    if (!candidate.user || typeof candidate.user !== 'object' || typeof candidate.expiresAt !== 'string') return null;
+    if (
+      !candidate.user ||
+      typeof candidate.user !== 'object' ||
+      typeof candidate.expiresAt !== 'string'
+    )
+      return null;
     const user = candidate.user as Partial<UserSummary>;
-    if (typeof user.id !== 'string' || typeof user.name !== 'string' || typeof user.email !== 'string') return null;
+    if (
+      typeof user.id !== 'string' ||
+      typeof user.name !== 'string' ||
+      typeof user.email !== 'string'
+    )
+      return null;
     return {
       user: { id: user.id, name: user.name, email: user.email, avatarUrl: user.avatarUrl ?? null },
       expiresAt: candidate.expiresAt,
@@ -84,7 +105,11 @@ export function getUserByEmail(email: string): MockUserRecord | undefined {
   return [...users.values()].find((user) => user.email === normalizedEmail);
 }
 
-export async function registerMockUser(input: { name: string; email: string; password: string }): Promise<{ session: Session; sessionId: string }> {
+export async function registerMockUser(input: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<{ session: Session; sessionId: string }> {
   const email = normalizeEmail(input.email);
   const user: MockUserRecord = {
     id: `collector-${Date.now()}`,
@@ -97,13 +122,18 @@ export async function registerMockUser(input: { name: string; email: string; pas
   return createSession(user);
 }
 
-export async function loginMockUser(input: { email: string; password: string }): Promise<{ session: Session; sessionId: string } | null> {
+export async function loginMockUser(input: {
+  email: string;
+  password: string;
+}): Promise<{ session: Session; sessionId: string } | null> {
   const user = getUserByEmail(input.email);
-  if (!user || user.passwordHash !== await hashMockPassword(input.password)) return null;
+  if (!user || user.passwordHash !== (await hashMockPassword(input.password))) return null;
   return createSession(user);
 }
 
-export function getSessionFromRequest(request: Request): { session: Session; sessionId: string } | null {
+export function getSessionFromRequest(
+  request: Request,
+): { session: Session; sessionId: string } | null {
   const sessionId = request.headers.get('x-mock-session');
   if (!sessionId) return null;
   const active = sessions.get(sessionId);
@@ -115,8 +145,18 @@ export function getSessionFromRequest(request: Request): { session: Session; ses
   // O service worker reinicia o módulo em um refresh. O handle codificado
   // recompõe apenas a identidade fictícia e sua expiração; não é JWT nem segredo.
   const decoded = decodeSession(sessionId);
-  if (!decoded || Date.parse(decoded.expiresAt) <= Date.now() || getMockScenario() === 'session-expired') return null;
-  const reconstructed: MockSessionRecord = { sessionId, userId: decoded.user.id, user: decoded.user, expiresAt: decoded.expiresAt };
+  if (
+    !decoded ||
+    Date.parse(decoded.expiresAt) <= Date.now() ||
+    getMockScenario() === 'session-expired'
+  )
+    return null;
+  const reconstructed: MockSessionRecord = {
+    sessionId,
+    userId: decoded.user.id,
+    user: decoded.user,
+    expiresAt: decoded.expiresAt,
+  };
   sessions.set(sessionId, reconstructed);
   return { session: { user: reconstructed.user, expiresAt: reconstructed.expiresAt }, sessionId };
 }

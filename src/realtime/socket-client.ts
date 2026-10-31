@@ -15,7 +15,8 @@ export function createMarketplaceSocket(userId: string): MarketplaceSocket {
   const socket = io(import.meta.env.VITE_SOCKET_URL ?? window.location.origin, {
     autoConnect: false,
     path: '/socket.io/',
-    transports: import.meta.env.VITE_ENABLE_MOCKS === 'true' ? ['websocket'] : ['websocket', 'polling'],
+    transports:
+      import.meta.env.VITE_ENABLE_MOCKS === 'true' ? ['websocket'] : ['websocket', 'polling'],
     auth: { userId },
   });
   socket.on('connect', () => socket.emit('session.subscribe', { userId }));

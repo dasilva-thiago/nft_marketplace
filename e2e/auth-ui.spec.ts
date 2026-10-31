@@ -2,7 +2,9 @@ import { expect, test } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'SEJA DONO DO FUTURO DA ARTE DIGITAL' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'SEJA DONO DO FUTURO DA ARTE DIGITAL' }),
+  ).toBeVisible();
   await page.evaluate(async () => {
     const response = await fetch('/api/__mock/reset', { method: 'POST' });
     if (!response.ok) throw new Error(`Reset do mock falhou: ${response.status}`);
@@ -35,7 +37,9 @@ test('cadastro valida campos, cria a conta e recupera a sessão no refresh', asy
   await page.getByLabel('E-mail').fill(`nova-${Date.now()}@kurio.demo`);
   await page.getByLabel('Senha').fill('Secure#2026');
   await page.getByRole('button', { name: 'Criar conta' }).click();
-  await expect(page).toHaveURL(/\/\?page=1&search=&collection=&sort=priceEth&sortOrder=asc$/);
+  await expect(page).toHaveURL(
+    /\/\?page=1&search=&collection=&network=&trait=&priceMin=&priceMax=&sort=priceEth&sortOrder=asc$/,
+  );
   await expect(page.getByText('Nova Colecionadora')).toBeVisible();
 
   await page.reload();
@@ -64,7 +68,11 @@ test('sessão expirada durante navegação retorna à proteção de rota', async
   await expect(page.getByText('Ana Silva')).toBeVisible();
 
   await page.evaluate(async () => {
-    await fetch('/api/__mock/scenario', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario: 'session-expired' }) });
+    await fetch('/api/__mock/scenario', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenario: 'session-expired' }),
+    });
   });
   await page.goto('/account/profile');
   await expect(page.getByRole('heading', { name: 'Entre para continuar' })).toBeVisible();

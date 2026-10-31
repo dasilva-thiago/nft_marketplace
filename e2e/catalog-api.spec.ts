@@ -5,9 +5,23 @@ test('catálogo filtra e pagina dados recebidos pelo Axios/MSW', async ({ page }
   await page.getByRole('heading', { name: 'Peças em destaque' }).waitFor();
   const result = await page.evaluate(async () => {
     const { catalogApi } = await import('/src/features/catalog/api/catalog-api.ts');
-    const firstPage = await catalogApi.list({ page: 1, pageSize: 4, sort: 'priceEth', sortOrder: 'asc' });
-    const secondPage = await catalogApi.list({ page: 2, pageSize: 4, sort: 'priceEth', sortOrder: 'asc' });
-    const filtered = await catalogApi.list({ page: 1, pageSize: 12, filters: { collection: 'Neo Apes' } });
+    const firstPage = await catalogApi.list({
+      page: 1,
+      pageSize: 4,
+      sort: 'priceEth',
+      sortOrder: 'asc',
+    });
+    const secondPage = await catalogApi.list({
+      page: 2,
+      pageSize: 4,
+      sort: 'priceEth',
+      sortOrder: 'asc',
+    });
+    const filtered = await catalogApi.list({
+      page: 1,
+      pageSize: 12,
+      filters: { collection: 'Neo Apes' },
+    });
     return { firstPage, secondPage, filtered };
   });
 
