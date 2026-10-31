@@ -98,7 +98,7 @@ Os fixtures de demonstração aceitam `KURIO10`, que aplica 10% de desconto, e r
 
 `OrderSnapshot` registra `id`, `userId`, estado `pending`/`confirmed`/`rejected`, linhas e cotação usadas como snapshot imutável, `transactionRef` (string simulada ou null), timestamps e `version`. Um timeout após criação não cancela necessariamente o pedido: consultar/recuperar pela chave antes de tentar enviar outra compra. Pedido confirmado ou recusado é terminal.
 
-Atualmente o mock persiste a cotação por usuário, valida expiração no `POST /api/orders`, cria snapshots e guarda a associação entre usuário, chave de idempotência e conteúdo. O replay da mesma chave e payload retorna o mesmo pedido; a mesma chave com payload diferente retorna `409 CONFLICT`. Os cenários `payment-pending` e `payment-rejected` produzem snapshots com estado `pending` ou `rejected`, sem `transactionRef`; o cenário `default` produz `confirmed`. Timeout/reconexão e remoção seletiva dos itens do carrinho permanecem nas próximas etapas.
+O mock persiste a cotação por usuário, valida expiração no `POST /api/orders`, cria snapshots e guarda a associação entre usuário, chave de idempotência e conteúdo. O replay da mesma chave e payload retorna o mesmo pedido; a mesma chave com payload diferente retorna `409 CONFLICT`. Os cenários `payment-pending` e `payment-rejected` produzem snapshots com estado `pending` ou `rejected`, sem `transactionRef`; o cenário `default` produz `confirmed`. Recuperação de timeout/reconexão e remoção seletiva dos itens do carrinho são pendências do domínio de pedidos.
 
 ### Perfil
 
