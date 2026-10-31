@@ -110,7 +110,7 @@ pnpm test:e2e:report
 pnpm audit:lighthouse
 ```
 
-A configuração do Playwright lista atualmente 35 casos por projeto Chromium desktop e mobile (70 execuções em 22 arquivos). A cobertura inclui autenticação, catálogo, favoritos, carrinho visitante, checkout, pedidos, perfil, carteiras, cenários MSW, acessibilidade e eventos Socket.IO. A matriz E2E e as regressões visuais exigidas pelo desafio ainda precisam ser ampliadas; veja [`TODO.md`](TODO.md).
+A configuração do Playwright lista atualmente 36 casos por projeto Chromium desktop e mobile (72 execuções em 22 arquivos). A cobertura inclui autenticação, catálogo, favoritos, carrinho visitante, checkout, pedidos, perfil, carteiras, cenários MSW, acessibilidade, responsividade e eventos Socket.IO. A matriz E2E e as regressões visuais exigidas pelo desafio ainda precisam ser ampliadas; veja [`TODO.md`](TODO.md).
 
 ## Credenciais fictícias
 

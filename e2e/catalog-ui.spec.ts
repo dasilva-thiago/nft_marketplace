@@ -53,3 +53,34 @@ test('filtros combinados de coleção, rede, trait e preço ficam na URL', async
   await expect(page.getByRole('link', { name: /Lunar Ape #077/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /Emerald Ape #042/ })).toHaveCount(0);
 });
+
+test('hero mobile mantém texto e arte lado a lado em uma composição compacta', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(
+    page.getByRole('heading', { name: 'SEJA DONO DO FUTURO DA ARTE DIGITAL' }),
+  ).toBeVisible();
+
+  const layout = await page.evaluate(() => {
+    const hero = document.querySelector('.home-reference .market-hero')!.getBoundingClientRect();
+    const copy = document.querySelector('.home-reference .hero-copy')!.getBoundingClientRect();
+    const art = document.querySelector('.home-reference .hero-art-wrap')!.getBoundingClientRect();
+    return {
+      heroHeight: hero.height,
+      copyRight: copy.right,
+      copyBottom: copy.bottom,
+      artLeft: art.left,
+      artTop: art.top,
+      artRight: art.right,
+      heroRight: hero.right,
+      documentWidth: document.documentElement.scrollWidth,
+      viewportWidth: window.innerWidth,
+    };
+  });
+
+  expect(layout.heroHeight).toBeLessThan(250);
+  expect(layout.artLeft).toBeGreaterThanOrEqual(layout.copyRight);
+  expect(layout.artTop).toBeLessThan(layout.copyBottom);
+  expect(layout.artRight).toBeLessThanOrEqual(layout.heroRight);
+  expect(layout.documentWidth).toBeLessThanOrEqual(layout.viewportWidth + 1);
+});

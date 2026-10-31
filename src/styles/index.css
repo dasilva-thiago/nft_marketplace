@@ -3199,25 +3199,42 @@ select:focus-visible {
 
   .home-reference .market-hero {
     min-height: 0;
-    grid-template-columns: 1fr;
-    gap: 22px;
-    padding: 28px 0 25px;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    gap: 8px;
+    align-items: center;
+    padding: 16px 12px 22px;
   }
 
   .home-reference .hero-copy h1 {
-    font-size: clamp(2rem, 10vw, 2.8rem);
+    max-width: 100%;
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(0.95rem, 4vw, 1.06rem);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
   }
 
   .home-reference .hero-description {
-    font-size: 0.72rem;
+    max-width: 100%;
+    margin: 8px 0 7px;
+    font-size: 0.6rem;
+    line-height: 1.4;
   }
 
   .home-reference .hero-art-wrap {
     position: relative;
     top: auto;
     right: auto;
-    width: min(100%, 300px);
-    justify-self: center;
+    width: min(100%, 146px);
+    justify-self: end;
+  }
+
+  .home-reference .hero-art-frame {
+    aspect-ratio: 1;
+    border-radius: 13px;
+  }
+
+  .home-reference .hero-art-overlay {
+    padding: 16px 9px 9px;
   }
 
   .home-reference .catalog-section {
