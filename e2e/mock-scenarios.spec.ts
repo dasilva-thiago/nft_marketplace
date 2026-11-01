@@ -2,7 +2,7 @@ import { expect, test } from './fixtures';
 
 async function openDemo(page: import('@playwright/test').Page) {
   await page.goto('/');
-  await page.getByRole('heading', { name: 'Peças em destaque' }).waitFor();
+  await page.locator('.nft-card').first().waitFor();
 }
 
 test('rate limit simulado devolve 429 e Retry-After; reset restaura o catálogo', async ({

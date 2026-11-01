@@ -39,7 +39,11 @@ test('reset restaura fixtures e limpa estado persistido do cliente e do MSW', as
   expect(result.localStorageKeys).toHaveLength(0);
 
   await page.reload();
-  await expect(page.getByRole('link', { name: 'Entrar' })).toBeVisible();
+  if ((page.viewportSize()?.width ?? 1440) <= 620) {
+    await expect(page.locator('.mobile-bottom-nav').getByRole('link', { name: 'Entrar' })).toBeVisible();
+  } else {
+    await expect(page.getByRole('banner').getByRole('button', { name: 'Entrar', exact: true })).toBeVisible();
+  }
   const defaults = await page.evaluate(async () => {
     const { getGuestLines } = await import('/src/features/cart/guest-cart.ts');
     return { scenario: sessionStorage.getItem('kurio.mock.scenario'), guest: getGuestLines() };

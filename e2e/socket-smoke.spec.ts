@@ -2,7 +2,7 @@ import { expect, test } from './fixtures';
 
 test('Socket.IO client recebe confirmação do handler MSW pelo binding', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('heading', { name: 'Peças em destaque' }).waitFor();
+  await page.locator('.nft-card').first().waitFor();
   await page.waitForTimeout(300);
   const userId = `test-user-${Date.now()}`;
   const result = await page.evaluate(async (activeUserId) => {

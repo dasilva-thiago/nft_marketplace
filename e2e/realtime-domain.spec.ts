@@ -18,7 +18,7 @@ test('nft.updated atualiza caches e ignora evento com versão antiga', async ({ 
     await authApi.login({ email: 'ana@kurio.demo', password: 'Kurio#2026!' });
   });
   await page.reload();
-  await page.getByRole('heading', { name: 'Peças em destaque' }).waitFor();
+  await page.locator('.nft-card').first().waitFor();
   await page.waitForTimeout(700);
 
   const result = await page.evaluate(async () => {
@@ -59,7 +59,7 @@ test('order.updated persiste no REST e impede regressão após estado terminal',
     await authApi.login({ email: 'ana@kurio.demo', password: 'Kurio#2026!' });
   });
   await page.reload();
-  await page.getByRole('heading', { name: 'Peças em destaque' }).waitFor();
+  await page.locator('.nft-card').first().waitFor();
   await page.waitForTimeout(700);
   await page.evaluate(async () => {
     await fetch('/api/__mock/scenario', {

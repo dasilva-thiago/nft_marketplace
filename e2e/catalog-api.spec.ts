@@ -2,7 +2,7 @@ import { expect, test } from './fixtures';
 
 test('catálogo filtra e pagina dados recebidos pelo Axios/MSW', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('heading', { name: 'Peças em destaque' }).waitFor();
+  await page.locator('.nft-card').first().waitFor();
   const result = await page.evaluate(async () => {
     const { catalogApi } = await import('/src/features/catalog/api/catalog-api.ts');
     const firstPage = await catalogApi.list({
@@ -36,7 +36,7 @@ test('catálogo filtra e pagina dados recebidos pelo Axios/MSW', async ({ page }
 
 test('detalhe existe e identificador desconhecido devolve 404', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('heading', { name: 'Peças em destaque' }).waitFor();
+  await page.locator('.nft-card').first().waitFor();
   const result = await page.evaluate(async () => {
     const { catalogApi } = await import('/src/features/catalog/api/catalog-api.ts');
     const nft = await catalogApi.get('emerald-ape-042');
@@ -52,7 +52,7 @@ test('detalhe existe e identificador desconhecido devolve 404', async ({ page })
 
 test('parâmetros de página inválidos são rejeitados pelo contrato Zod no MSW', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('heading', { name: 'Peças em destaque' }).waitFor();
+  await page.locator('.nft-card').first().waitFor();
   const status = await page.evaluate(async () => {
     const { catalogApi } = await import('/src/features/catalog/api/catalog-api.ts');
     return catalogApi.list({ page: 0, pageSize: 0 }).then(

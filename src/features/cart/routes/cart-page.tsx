@@ -63,9 +63,9 @@ export function CartPage() {
         <Link className="back-link" to="/" search={homeSearch}>
           ← Início / Mercado
         </Link>
+        <h1 className="cart-desktop-title">Carrinho de NFTs</h1>
         <div className="cart-layout">
           <div>
-            <h1 className="cart-desktop-title">Carrinho de NFTs</h1>
             <div className="cart-table-head">
               <span>NFTs</span>
               <span>Preço</span>
@@ -150,26 +150,6 @@ export function CartPage() {
           ) : (
             <aside className="cart-summary">
               <h2>Resumo da carteira</h2>
-              <label>
-                Código promocional
-                <input
-                  value={couponDraft}
-                  onChange={(event) => setCouponDraft(event.target.value)}
-                  placeholder="Digite o código promocional..."
-                  aria-describedby="coupon-help"
-                />
-              </label>
-              <button
-                type="button"
-                className="apply-button"
-                disabled={!cart?.items.length || quoteQuery.isFetching}
-                onClick={() => setAppliedCoupon(couponDraft.trim() || undefined)}
-              >
-                Aplicar
-              </button>
-              <p id="coupon-help" className="field-help">
-                Cupom de demonstração: KURIO10.
-              </p>
               <dl>
                 <div>
                   <dt>Subtotal</dt>
@@ -190,10 +170,32 @@ export function CartPage() {
                   <dd>{quoteQuery.data?.totalEth ? `${quoteQuery.data.totalEth} ETH` : '—'}</dd>
                 </div>
               </dl>
+              <div className="cart-promo-row">
+                <label>
+                  <span className="sr-only">Código promocional</span>
+                  <input
+                    value={couponDraft}
+                    onChange={(event) => setCouponDraft(event.target.value)}
+                    placeholder="Digite o código promocional..."
+                    aria-describedby="coupon-help"
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="apply-button"
+                  disabled={!cart?.items.length || quoteQuery.isFetching}
+                  onClick={() => setAppliedCoupon(couponDraft.trim() || undefined)}
+                >
+                  Aplicar
+                </button>
+              </div>
+              <p id="coupon-help" className="field-help">
+                Cupom de demonstração: KURIO10.
+              </p>
               {walletsQuery.isPending ? (
                 <div className="visual-empty">Carregando carteiras…</div>
               ) : primaryWallet && cart?.items.length ? (
-                <Link to="/checkout" className="primary-button">
+                <Link to="/checkout/collector" className="primary-button">
                   Conectar e finalizar
                 </Link>
               ) : primaryWallet ? (
@@ -215,8 +217,10 @@ export function CartPage() {
           <div className="section-line-title">Colecionadores também viram</div>
           <div className="related-grid">
             {recommendationsQuery.data?.items.map((item) => (
-              <div key={item.id} className="visual-nft-card">
-                <img src={item.imageUrl} alt={`Arte de ${item.name}`} />
+              <Link key={item.id} to="/nft/$nftId" params={{ nftId: item.id }} className="visual-nft-card visual-nft-card-link">
+                <div className="visual-nft-image">
+                  <img src={item.imageUrl} alt={`Arte de ${item.name}`} />
+                </div>
                 <div className="visual-nft-meta">
                   <div>
                     <span>{item.collection}</span>
@@ -224,7 +228,7 @@ export function CartPage() {
                   </div>
                   <strong>{item.priceEth} ETH</strong>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </section>

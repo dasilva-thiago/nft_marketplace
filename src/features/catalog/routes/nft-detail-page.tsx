@@ -9,6 +9,7 @@ import { useFavoritesQuery, useToggleFavoriteMutation } from '@/features/favorit
 import { NftCard } from '@/shared/ui/nft-card';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
 import { Skeleton } from '@/shared/ui/skeleton';
+import { Badge } from '@/shared/ui/badge';
 import { getResponsiveNftImageSrcSet } from '@/shared/ui/responsive-nft-image';
 
 export function NftDetailPage() {
@@ -259,11 +260,23 @@ export function NftDetailPage() {
                 {isFavorite ? 'Favoritado' : 'Favoritar'}
               </button>
             </div>
-            {addMutation.isError || favoriteMutation.isError ? (
+            {addMutation.isSuccess ? (
+              <p className="form-success" role="status" aria-live="polite">
+                Item adicionado ao carrinho.
+              </p>
+            ) : addMutation.isError || favoriteMutation.isError ? (
               <p className="form-error" role="alert">
                 Não foi possível concluir a ação. Confira sua sessão e tente novamente.
               </p>
             ) : null}
+            <div className="detail-badges" aria-label="Metadados do NFT">
+              <Badge variant="outline">Rede {nft.network}</Badge>
+              <Badge variant="secondary">{nft.collection}</Badge>
+              {soldOut && <Badge variant="destructive">Esgotado</Badge>}
+              {nft.attributes.map((attribute) => (
+                <Badge key={attribute.trait} variant="outline">{attribute.value}</Badge>
+              ))}
+            </div>
             <dl className="detail-attributes">
               <div>
                 <dt>ID do token:</dt>

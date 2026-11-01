@@ -23,10 +23,10 @@ Implementado:
 
 Pendências principais:
 
-- concluir a fidelidade visual fina aos frames nas larguras 390, 768 e 1440 px; a auditoria inicial identificou diferenças na tipografia, proporções e espaçamentos, detalhadas em [`docs/visual-reference-inventory.md`](docs/visual-reference-inventory.md);
+- concluir a fidelidade visual fina aos frames nas larguras 390, 768 e 1440 px; a auditoria inicial identificou diferenças na tipografia, proporções e espaçamentos, detalhadas em [`ARCHITECTURE.md`](ARCHITECTURE.md);
 - completar a revisão manual global de acessibilidade, em especial zoom/reflow e feedback de eventos; os testes cobrem teclado, foco, labels, landmarks e associações de erro, e os pares cromáticos representativos foram verificados;
 - otimizar a carga inicial: as medianas Lighthouse de Performance são 87% mobile e 68% desktop, abaixo da meta de 90%; a causa é estrutural (LCP gateado por MSW lazy init + chamada de API sem SSR); causas e relatórios estão em [`reports/lighthouse/summary.md`](reports/lighthouse/summary.md) e [`ARCHITECTURE.md`](ARCHITECTURE.md);
-- realizar o deploy público e validar acesso direto, refresh, mocks e realtime. A configuração de build/fallback Vercel está preparada; falta autorização/acesso à conta do provedor.
+- realizar o deploy público e validar acesso direto, refresh, mocks e realtime. A configuração de build/fallback para Cloudflare Pages está preparada (`public/_headers` e `public/_redirects`); falta autorização/acesso à conta do provedor.
 
 O backlog detalhado e verificável está em [`TODO.md`](TODO.md).
 
@@ -138,8 +138,4 @@ A sessão simulada mantém apenas um handle opaco em `sessionStorage`; senhas n�
 
 ## Documentação técnica
 
-- [`ARCHITECTURE.md`](ARCHITECTURE.md): arquitetura geral, limites da simulação, estado, cache, tempo real, acessibilidade e decisões responsivas;
-- [`docs/architecture.md`](docs/architecture.md): camadas, dependências, estado, precisão decimal e tempo real;
-- [`docs/api-contracts.md`](docs/api-contracts.md): endpoints REST, schemas, erros e eventos Socket.IO;
-- [`docs/visual-reference-inventory.md`](docs/visual-reference-inventory.md): inventário dos frames, decisões responsivas e auditoria visual inicial da home;
-- [`TODO.md`](TODO.md): requisitos concluídos e pendências verificáveis;
+- [`ARCHITECTURE.md`](ARCHITECTURE.md): arquitetura, camadas, contratos REST, eventos Socket.IO, política de sessão, estado do carrinho, estratégia de cache, reconciliação REST/Socket.IO, decisões de UX, desvios do Figma, acessibilidade, performance e deploy;

@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, ShoppingCart, UserRound } from 'lucide-react';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLogoutMutation, useSessionQuery } from '@/features/auth/queries';
+import { AuthModalOverlay } from '@/features/auth/components/auth-modal-overlay';
 
 const homeSearch = {
   page: 1,
@@ -36,6 +37,15 @@ function RealtimeBridge({ userId }: { userId: string }) {
 export function RootLayout() {
   const sessionQuery = useSessionQuery();
   const logoutMutation = useLogoutMutation();
+  const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null);
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const mode = (e as CustomEvent<{ mode: 'login' | 'register' }>).detail?.mode ?? 'login';
+      setAuthModal(mode);
+    };
+    window.addEventListener('kurio:open-auth', handler);
+    return () => window.removeEventListener('kurio:open-auth', handler);
+  }, []);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isAuthRoute = pathname === '/login' || pathname === '/register';
   const isHomeRoute = pathname === '/';
@@ -53,6 +63,9 @@ export function RootLayout() {
   return (
     <>
       {sessionQuery.data ? <RealtimeBridge userId={sessionQuery.data.user.id} /> : null}
+      <a href="#main-content" className="skip-link">
+        Pular para o conteúdo principal
+      </a>
       <header
         className={`site-header${isAuthRoute ? ' auth-route-header' : ''}${isHomeRoute ? ' home-route-header' : ''}${isHomeRoute && sessionQuery.data ? ' home-route-authenticated' : ''}${isCheckoutRoute ? ' checkout-route-header' : ''}${isCartRoute ? ' cart-route-header' : ''}${isDetailRoute ? ' detail-route-header' : ''}`}
       >
@@ -60,7 +73,7 @@ export function RootLayout() {
           KURIO
         </Link>
         <nav aria-label="Navegação principal">
-          <Link to="/" search={homeSearch}>
+          <Link to="/" search={homeSearch} activeProps={{ className: 'is-active' }} activeOptions={{ exact: true }}>
             Início
           </Link>
           <a href={isHomeRoute ? '#catalogo' : '/#catalogo'}>Mercado</a>
@@ -102,16 +115,27 @@ export function RootLayout() {
                 </button>
               </>
             ) : !sessionQuery.isPending ? (
-              <Link to="/login" search={{ returnTo: '/' }} className="login-link">
+              <button
+                type="button"
+                className="login-link"
+                onClick={() => setAuthModal('login')}
+              >
                 Entrar
-              </Link>
+              </button>
             ) : null}
           </div>
         </div>
       </header>
-      <main className={mainClassName || undefined}>
+      <main id="main-content" className={mainClassName || undefined}>
         <Outlet />
       </main>
+      {authModal && (
+        <AuthModalOverlay
+          mode={authModal}
+          onClose={() => setAuthModal(null)}
+          onSwitchMode={setAuthModal}
+        />
+      )}
     </>
   );
 }

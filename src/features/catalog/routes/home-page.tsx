@@ -19,6 +19,7 @@ import { useFavoritesQuery, useToggleFavoriteMutation } from '@/features/favorit
 import type { NftSummary, PageRequest } from '@/shared/contracts';
 import { MarketingFooter } from '@/shared/ui/marketing-footer';
 import { NftCardSkeleton } from '@/shared/ui/skeleton';
+import { Badge } from '@/shared/ui/badge';
 import { getResponsiveNftImageSrcSet } from '@/shared/ui/responsive-nft-image';
 
 const PAGE_SIZE = 9;
@@ -135,7 +136,7 @@ export function HomePage() {
 
   async function toggleFavorite(nftId: string) {
     if (!sessionQuery.data) {
-      await navigate({ to: '/login', search: { returnTo: '/' } });
+      window.dispatchEvent(new CustomEvent('kurio:open-auth', { detail: { mode: 'login' } }));
       return;
     }
     try {
@@ -213,8 +214,13 @@ export function HomePage() {
   const networks = uniqueValues(facetItems, 'network');
   const currentCollection = searchState.collection || 'Todas';
 
-  function updateSearch(values: Partial<typeof searchState>) {
+  function updateSearch(values: Partial<typeof searchState>, scrollToCatalog = false) {
     void navigate({ search: (previous) => ({ ...previous, ...values }), resetScroll: false });
+    if (scrollToCatalog) {
+      setTimeout(() => {
+        document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+    }
   }
   function onSubmitSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -277,7 +283,10 @@ export function HomePage() {
             <p className="eyebrow">
               <Sparkles size={14} aria-hidden="true" /> BEM-VINDO À KURIO
             </p>
-            <h1 id="hero-title">SEJA DONO DO FUTURO DA ARTE DIGITAL</h1>
+            <h1 id="hero-title" aria-label="SEJA DONO DO FUTURO DA ARTE DIGITAL">
+              <span className="hero-title-desktop" aria-hidden="true">SEJA DONO DO FUTURO DA ARTE DIGITAL</span>
+              <span className="hero-title-mobile" aria-hidden="true">SEJA DONO DA CULTURA DIGITAL</span>
+            </h1>
             <p className="hero-description">
               Descubra peças digitais únicas, criadas para colecionadores que enxergam o próximo
               capítulo da arte.
@@ -285,10 +294,6 @@ export function HomePage() {
             <a className="primary-button" href="#catalogo">
               Explorar coleção <ArrowRight size={16} aria-hidden="true" />
             </a>
-            <div className="hero-proof">
-              <span className="proof-dot" /> Arte selecionada{' '}
-              <span className="proof-divider">/</span> Coleções independentes
-            </div>
           </div>
           <div className="hero-art-wrap">
             <div className="hero-art-frame">
@@ -308,30 +313,10 @@ export function HomePage() {
                 {heroFeatured && <span>{formatEth(heroFeatured.priceEth)}</span>}
               </div>
             </div>
-            <div className="hero-index" aria-hidden="true">
-              01 <span /> 04
-            </div>
           </div>
         </section>
 
         <section className="catalog-section" id="catalogo" aria-labelledby="catalog-heading">
-          <div className="catalog-mobile-tabs">
-            <button type="button" className="is-active" onClick={() => clearFilters()}>
-              Todos os NFTs
-            </button>
-            <button
-              type="button"
-              onClick={() => updateSearch({ sort: 'priceEth', sortOrder: 'desc', page: 1 })}
-            >
-              Novos lançamentos
-            </button>
-            <button
-              type="button"
-              onClick={() => updateSearch({ sort: 'priceEth', sortOrder: 'desc', page: 1 })}
-            >
-              Em alta
-            </button>
-          </div>
           <div className="catalog-heading-row">
             <div>
               <p className="eyebrow">EXPLORE O MARKETPLACE</p>
@@ -414,15 +399,6 @@ export function HomePage() {
                   </button>
                 ))}
               </fieldset>
-              <label className="trait-filter" htmlFor="trait-filter">
-                Atributo
-                <input
-                  id="trait-filter"
-                  value={searchState.trait}
-                  onChange={(event) => updateSearch({ trait: event.target.value, page: 1 })}
-                  placeholder="Ex.: Cream"
-                />
-              </label>
               <fieldset className="price-filter">
                 <legend>Faixa de preço</legend>
                 <div className="price-range-inputs">
@@ -484,6 +460,23 @@ export function HomePage() {
               {featured && <LimitedFeaturedCard nft={featured} />}
             </aside>
             <div className="catalog-results" aria-live="polite" aria-busy={isPending || isFetching}>
+              <div className="catalog-mobile-tabs">
+                <button type="button" className="is-active" onClick={() => clearFilters()}>
+                  Todos os NFTs
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateSearch({ sort: 'priceEth', sortOrder: 'desc', page: 1 })}
+                >
+                  Novos lançamentos
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateSearch({ sort: 'priceEth', sortOrder: 'desc', page: 1 })}
+                >
+                  Em alta
+                </button>
+              </div>
               <div className="results-toolbar">
                 <span>{data ? `${data.totalItems} peças encontradas` : 'Carregando peças'}</span>
                 <span className="results-sort-note">Preço em ETH</span>
@@ -536,11 +529,9 @@ export function HomePage() {
                             fetchPriority={index === 0 ? 'high' : undefined}
                             loading={index === 0 ? 'eager' : 'lazy'}
                           />
-                          <span className="edition-badge">
-                            {nft.availableEditions > 0
-                              ? `${nft.availableEditions} disponíveis`
-                              : 'Esgotado'}
-                          </span>
+                          {nft.availableEditions === 0 && (
+                            <span className="edition-badge">Esgotado</span>
+                          )}
                           <button
                             type="button"
                             className="card-favorite"
@@ -569,7 +560,9 @@ export function HomePage() {
                           </div>
                         </div>
                         <div className="nft-card-footer">
-                          <span>{nft.network}</span>
+                          <Badge variant="outline" className="text-[0.66rem] px-2 py-0">
+                            {nft.network}
+                          </Badge>
                           <span className="view-item">
                             Ver peça <ArrowRight size={13} aria-hidden="true" />
                           </span>
@@ -584,7 +577,7 @@ export function HomePage() {
                   <button
                     type="button"
                     disabled={searchState.page <= 1}
-                    onClick={() => updateSearch({ page: searchState.page - 1 })}
+                    onClick={() => updateSearch({ page: searchState.page - 1 }, true)}
                     aria-label="Página anterior"
                   >
                     <ArrowLeft size={16} />
@@ -595,7 +588,7 @@ export function HomePage() {
                   <button
                     type="button"
                     disabled={searchState.page >= data.totalPages}
-                    onClick={() => updateSearch({ page: searchState.page + 1 })}
+                    onClick={() => updateSearch({ page: searchState.page + 1 }, true)}
                     aria-label="Próxima página"
                   >
                     <ArrowRight size={16} />

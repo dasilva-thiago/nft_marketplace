@@ -108,9 +108,15 @@ test('erro de credencial é acessível e logout encerra a sessão', async ({ pag
   await page.getByRole('button', { name: 'Entrar na conta' }).click();
   await expect(page.getByText('Ana Silva')).toBeVisible();
   await page.getByRole('button', { name: 'Sair' }).click();
-  await expect(
-    page.getByRole('banner').getByRole('link', { name: 'Entrar', exact: true }),
-  ).toBeVisible();
+  if ((page.viewportSize()?.width ?? 1440) <= 620) {
+    await expect(
+      page.locator('.mobile-bottom-nav').getByRole('link', { name: 'Entrar' }),
+    ).toBeVisible();
+  } else {
+    await expect(
+      page.getByRole('banner').getByRole('button', { name: 'Entrar', exact: true }),
+    ).toBeVisible();
+  }
 });
 
 test('sessão expirada durante navegação retorna à proteção de rota', async ({ page }) => {

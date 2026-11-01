@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from '@tanstack/react-router';
+import { User, Wallet as WalletIcon, Activity, Heart, Tag, Download, HelpCircle, LogOut } from 'lucide-react';
 import {
   useCreateWalletMutation,
   useUpdateWalletMutation,
@@ -7,14 +8,14 @@ import {
 } from '@/features/wallets/queries';
 import type { Wallet } from '@/shared/contracts';
 
-const menu = [
-  'Dados do perfil',
-  'Carteiras',
-  'Atividade',
-  'Lista de interesse',
-  'Ofertas',
-  'Arquivos baixados',
-  'Suporte',
+const menu: Array<{ label: string; icon: React.ReactNode }> = [
+  { label: 'Dados do perfil', icon: <User size={15} /> },
+  { label: 'Carteiras', icon: <WalletIcon size={15} /> },
+  { label: 'Atividade', icon: <Activity size={15} /> },
+  { label: 'Lista de interesse', icon: <Heart size={15} /> },
+  { label: 'Ofertas', icon: <Tag size={15} /> },
+  { label: 'Arquivos baixados', icon: <Download size={15} /> },
+  { label: 'Suporte', icon: <HelpCircle size={15} /> },
 ];
 
 export function WalletsPage() {
@@ -75,16 +76,16 @@ export function WalletsPage() {
     <section className="account-page visual-page-shell">
       <nav className="account-sidebar" aria-label="Navegação da conta">
         <h2>Meu perfil</h2>
-        {menu.map((item, index) => (
+        {menu.map(({ label, icon }, index) => (
           <Link
-            key={item}
+            key={label}
             className={index === 1 ? 'is-active' : ''}
             to={index === 1 ? '/account/wallets' : '/account/profile'}
           >
-            {item}
+            {icon} {label}
           </Link>
         ))}
-        <button type="button">Sair</button>
+        <button type="button"><LogOut size={15} /> Sair</button>
       </nav>
       <form
         className="account-form wallet-form"

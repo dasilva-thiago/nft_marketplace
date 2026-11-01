@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
-import { Link, useLocation } from '@tanstack/react-router';
+import { useLocation } from '@tanstack/react-router';
 import { useSessionQuery } from '@/features/auth/queries';
 import { PlaceholderPage } from '@/shared/ui/placeholder-page';
+import { SessionRequiredPage } from './session-required-page';
 
 type ProtectedProps = { title?: string; children?: ReactNode };
 
@@ -34,17 +35,6 @@ export function ProtectedPlaceholderPage({ title = 'Área privada', children }: 
       </section>
     );
   if (!sessionQuery.data)
-    return (
-      <section className="page-shell protected-required">
-        <p className="eyebrow">SESSION / REQUIRED</p>
-        <h1>Entre para continuar</h1>
-        <p className="lead">
-          Esta área é privada e exige uma sessão ativa. O destino será preservado depois do login.
-        </p>
-        <Link className="primary-button" to="/login" search={{ returnTo }}>
-          Entrar
-        </Link>
-      </section>
-    );
+    return <SessionRequiredPage returnTo={returnTo} />;
   return children ?? <PlaceholderPage title={title} />;
 }

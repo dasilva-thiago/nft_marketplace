@@ -25,6 +25,10 @@ const NftDetailPage = lazyRouteComponent(
   'NftDetailPage',
 );
 const CartPage = lazyRouteComponent(() => import('@/features/cart/routes/cart-page'), 'CartPage');
+const CollectorPage = lazyRouteComponent(
+  () => import('@/features/checkout/routes/collector-page'),
+  'CollectorPage',
+);
 const CheckoutPage = lazyRouteComponent(
   () => import('@/features/checkout/routes/checkout-page'),
   'CheckoutPage',
@@ -88,6 +92,15 @@ const cartRoute = createRoute({
     </ProtectedPlaceholderPage>
   ),
 });
+const collectorRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/checkout/collector',
+  component: () => (
+    <ProtectedPlaceholderPage>
+      <CollectorPage />
+    </ProtectedPlaceholderPage>
+  ),
+});
 const checkoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/checkout',
@@ -144,6 +157,7 @@ const routeTree = rootRoute.addChildren([
   homeRoute,
   nftRoute,
   cartRoute,
+  collectorRoute,
   checkoutRoute,
   orderRoute,
   loginRoute,

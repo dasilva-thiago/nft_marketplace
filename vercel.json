@@ -1,7 +1,0 @@
-{
-  "framework": "vite",
-  "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "VITE_ENABLE_MOCKS=true VITE_MOCK_SCENARIO=default pnpm build",
-  "outputDirectory": "dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
-}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useSessionQuery } from '@/features/auth/queries';
@@ -7,7 +7,6 @@ import { useCartQuery, useConsumeCartMutation, useQuoteQuery } from '@/features/
 import { useCreateOrderMutation, useRecoverOrderMutation } from '@/features/orders/queries';
 import {
   useConnectWalletMutation,
-  useDisconnectWalletMutation,
   useWalletsQuery,
 } from '@/features/wallets/queries';
 import { useNftRealtimeUpdate } from '@/realtime/realtime-signal';
@@ -17,6 +16,63 @@ import type { WalletConnectionStatus } from '@/shared/contracts';
 const CHECKOUT_IDEMPOTENCY_STORAGE_KEY = 'kurio.checkout.idempotency-key';
 const WALLET_PROVIDERS = ['WalletConnect', 'MetaMask', 'Coinbase Wallet'] as const;
 type WalletProvider = (typeof WALLET_PROVIDERS)[number];
+
+function WalletConnectIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true" fill="none">
+      <circle cx="16" cy="16" r="16" fill="#3396FF" />
+      <path
+        fill="#fff"
+        d="M9.58 12.76c3.54-3.46 9.28-3.46 12.82 0l.43.42a.44.44 0 0 1 0 .63l-1.46 1.43a.23.23 0 0 1-.32 0l-.59-.57c-2.47-2.42-6.47-2.42-8.94 0l-.63.62a.23.23 0 0 1-.32 0L9.11 13.86a.44.44 0 0 1 0-.63l.47-.47Zm15.84 2.95 1.3 1.27a.44.44 0 0 1 0 .63l-5.85 5.72a.46.46 0 0 1-.64 0l-4.15-4.06a.11.11 0 0 0-.16 0l-4.15 4.06a.46.46 0 0 1-.64 0L5.28 17.6a.44.44 0 0 1 0-.63l1.3-1.27a.46.46 0 0 1 .64 0l4.15 4.06c.04.04.12.04.16 0l4.15-4.06a.46.46 0 0 1 .64 0l4.15 4.06c.04.04.12.04.16 0l4.15-4.06a.46.46 0 0 1 .64 0Z"
+      />
+    </svg>
+  );
+}
+
+function MetaMaskIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true" fill="none">
+      <circle cx="16" cy="16" r="16" fill="#1A1A1A" />
+      <g transform="translate(5,4) scale(0.69)">
+        <polygon fill="#E2761B" stroke="#E2761B" strokeLinecap="round" strokeLinejoin="round" points="32.19,1.5 18.8,11.3 21.31,5.12" />
+        <polygon fill="#E4761B" stroke="#E4761B" strokeLinecap="round" strokeLinejoin="round" points="1.79,1.5 15.06,11.39 12.69,5.12" />
+        <polygon fill="#E4761B" stroke="#E4761B" strokeLinecap="round" strokeLinejoin="round" points="27.23,23.09 23.55,28.79 31.44,31 33.74,23.22" />
+        <polygon fill="#E4761B" stroke="#E4761B" strokeLinecap="round" strokeLinejoin="round" points="0.27,23.22 2.56,31 10.45,28.79 6.77,23.09" />
+        <polygon fill="#E4761B" stroke="#E4761B" strokeLinecap="round" strokeLinejoin="round" points="10.01,14.84 7.76,18.2 15.59,18.56 15.3,10.1" />
+        <polygon fill="#E4761B" stroke="#E4761B" strokeLinecap="round" strokeLinejoin="round" points="23.98,14.84 18.62,10 18.8,18.56 26.23,18.2" />
+        <polygon fill="#D7C1B3" stroke="#D7C1B3" strokeLinecap="round" strokeLinejoin="round" points="10.45,28.79 15.1,26.46 11.07,23.27" />
+        <polygon fill="#D7C1B3" stroke="#D7C1B3" strokeLinecap="round" strokeLinejoin="round" points="18.89,26.46 23.55,28.79 22.92,23.27" />
+        <polygon fill="#233447" stroke="#233447" strokeLinecap="round" strokeLinejoin="round" points="23.55,28.79 18.89,26.46 19.27,29.54 19.22,30.9" />
+        <polygon fill="#233447" stroke="#233447" strokeLinecap="round" strokeLinejoin="round" points="10.45,28.79 14.77,30.9 14.73,29.54 15.1,26.46" />
+        <polygon fill="#CD6116" stroke="#CD6116" strokeLinecap="round" strokeLinejoin="round" points="14.83,21.73 10.96,20.6 13.65,19.35" />
+        <polygon fill="#CD6116" stroke="#CD6116" strokeLinecap="round" strokeLinejoin="round" points="19.16,21.73 20.34,19.35 23.04,20.6" />
+        <polygon fill="#E4751F" stroke="#E4751F" strokeLinecap="round" strokeLinejoin="round" points="10.45,28.79 11.12,23.09 6.77,23.22" />
+        <polygon fill="#E4751F" stroke="#E4751F" strokeLinecap="round" strokeLinejoin="round" points="22.87,23.09 23.55,28.79 27.23,23.22" />
+        <polygon fill="#E4751F" stroke="#E4751F" strokeLinecap="round" strokeLinejoin="round" points="26.23,18.2 18.8,18.56 19.17,21.73 20.35,19.35 23.05,20.6" />
+        <polygon fill="#E4751F" stroke="#E4751F" strokeLinecap="round" strokeLinejoin="round" points="10.96,20.6 13.66,19.35 14.83,21.73 15.59,18.56 7.76,18.2" />
+        <polygon fill="#F6851B" stroke="#F6851B" strokeLinecap="round" strokeLinejoin="round" points="7.76,18.2 11.07,23.27 10.96,20.6" />
+        <polygon fill="#F6851B" stroke="#F6851B" strokeLinecap="round" strokeLinejoin="round" points="23.05,20.6 22.93,23.27 26.23,18.2" />
+        <polygon fill="#F6851B" stroke="#F6851B" strokeLinecap="round" strokeLinejoin="round" points="15.59,18.56 14.83,21.73 15.79,26.63 16,23.35" />
+        <polygon fill="#F6851B" stroke="#F6851B" strokeLinecap="round" strokeLinejoin="round" points="18.8,18.56 18,23.35 18.2,26.63 19.17,21.73" />
+        <polygon fill="#FCD9AD" stroke="#FCD9AD" strokeLinecap="round" strokeLinejoin="round" points="19.17,21.73 18.2,26.63 18.89,26.46 22.93,23.27 23.05,20.6" />
+        <polygon fill="#FCD9AD" stroke="#FCD9AD" strokeLinecap="round" strokeLinejoin="round" points="10.96,20.6 11.07,23.27 15.1,26.46 15.79,26.63 14.83,21.73" />
+      </g>
+    </svg>
+  );
+}
+
+function CoinbaseIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true" fill="none">
+      <circle cx="16" cy="16" r="16" fill="#0052FF" />
+      <circle cx="16" cy="16" r="9.6" fill="#fff" />
+      <path
+        fill="#0052FF"
+        d="M13.6 13.6h4.8a.4.4 0 0 1 .4.4v4a.4.4 0 0 1-.4.4h-4.8a.4.4 0 0 1-.4-.4v-4a.4.4 0 0 1 .4-.4Z"
+      />
+    </svg>
+  );
+}
 
 function getCheckoutIdempotencyKey(): string {
   if (typeof window === 'undefined') return `checkout-${crypto.randomUUID()}`;
@@ -45,7 +101,6 @@ export function CheckoutPage() {
   const recoverOrderMutation = useRecoverOrderMutation();
   const walletsQuery = useWalletsQuery();
   const connectWalletMutation = useConnectWalletMutation();
-  const disconnectWalletMutation = useDisconnectWalletMutation();
   const wallets = useMemo(() => walletsQuery.data ?? [], [walletsQuery.data]);
   const [network, setNetwork] = useState<'Ethereum' | 'Polygon'>('Ethereum');
   const [walletId, setWalletId] = useState('');
@@ -123,20 +178,13 @@ export function CheckoutPage() {
       const result = await connectWalletMutation.mutateAsync(selectedWallet.id);
       setWalletConnection(result.status);
       setConnectionMessage(result.message);
+      if (result.status === 'connected') {
+        window.sessionStorage.setItem('kurio.checkout.wallet-provider', provider);
+        window.sessionStorage.setItem('kurio.checkout.wallet-label', selectedWallet.label);
+      }
     } catch {
       setWalletConnection('disconnected');
       setConnectionMessage('Não foi possível conectar a carteira. Tente novamente.');
-    }
-  }
-
-  async function disconnectWallet() {
-    if (!selectedWallet) return;
-    try {
-      const result = await disconnectWalletMutation.mutateAsync(selectedWallet.id);
-      setWalletConnection(result.status);
-      setConnectionMessage(result.message);
-    } catch {
-      setConnectionMessage('Não foi possível desconectar a carteira. Tente novamente.');
     }
   }
 
@@ -200,117 +248,10 @@ export function CheckoutPage() {
   return (
     <>
       <section className="visual-page-shell checkout-page">
-        <Link className="back-link" to="/cart">
-          <ArrowLeft size={14} /> Início / Mercado / Pagamento
+        <Link className="back-link" to="/checkout/collector">
+          <ArrowLeft size={14} /> Início / Mercado / Dados / Pagamento
         </Link>
-        <div className="checkout-layout">
-          <form
-            className="collector-form checkout-desktop-form"
-            id="checkout-collector-form"
-            aria-labelledby="checkout-form-title"
-            onSubmit={(event: FormEvent<HTMLFormElement>) => {
-              event.preventDefault();
-              void submitOrder();
-            }}
-          >
-            <h1 id="checkout-form-title">Perfil do colecionador</h1>
-            <div className="form-grid">
-              <label>
-                Nome de exibição*
-                <input
-                  id="checkout-display-name"
-                  required={!isMobileCheckout}
-                  defaultValue="Colecionador Kurio"
-                />
-              </label>
-              <label>
-                Nome de usuário*
-                <input
-                  id="checkout-username"
-                  required={!isMobileCheckout}
-                  placeholder="Seu usuário"
-                />
-              </label>
-              <label>
-                Rede*
-                <select
-                  id="checkout-network"
-                  required={!isMobileCheckout}
-                  value={network}
-                  onChange={(event) => {
-                    setNetwork(event.target.value as 'Ethereum' | 'Polygon');
-                    setWalletId('');
-                    setWalletProvider(null);
-                    setWalletConnection('disconnected');
-                    setConnectionMessage('');
-                  }}
-                >
-                  <option>Ethereum</option>
-                  <option>Polygon</option>
-                </select>
-              </label>
-              <label>
-                Nome do perfil*
-                <input
-                  id="checkout-profile-name"
-                  required={!isMobileCheckout}
-                  placeholder="Seu perfil"
-                />
-              </label>
-              <label>
-                Endereço da carteira*
-                <input
-                  id="checkout-wallet-address"
-                  required={!isMobileCheckout}
-                  value={selectedWallet?.address ?? ''}
-                  readOnly
-                  placeholder="Endereço 0x da carteira"
-                />
-              </label>
-              <label>
-                E-mail*
-                <input
-                  id="checkout-email"
-                  required={!isMobileCheckout}
-                  type="email"
-                  placeholder="contato@email.com"
-                />
-              </label>
-              <label>
-                Carteira cadastrada*
-                <select
-                  id="checkout-wallet"
-                  required={!isMobileCheckout}
-                  value={walletId}
-                  onChange={(event) => {
-                    setWalletId(event.target.value);
-                    setWalletConnection('disconnected');
-                    setConnectionMessage('');
-                  }}
-                >
-                  {compatibleWallets.length ? (
-                    compatibleWallets.map((wallet) => (
-                      <option key={wallet.id} value={wallet.id}>
-                        {wallet.label}
-                      </option>
-                    ))
-                  ) : (
-                    <option value="" disabled>
-                      Nenhuma carteira nesta rede
-                    </option>
-                  )}
-                </select>
-              </label>
-              <label>
-                Nome ENS
-                <input id="checkout-ens" placeholder=".eth" />
-              </label>
-            </div>
-            <label className="full-field">
-              Observação do colecionador (opcional)
-              <textarea id="checkout-note" rows={4} />
-            </label>
-          </form>
+        <div className="checkout-layout checkout-layout-single">
           <aside
             className="checkout-summary"
             aria-labelledby={isMobileCheckout ? 'checkout-mobile-title' : 'checkout-summary-title'}
@@ -410,6 +351,9 @@ export function CheckoutPage() {
                 Nenhuma carteira cadastrada. <Link to="/account/wallets">Adicionar carteira</Link>
               </p>
             )}
+            <Link to="/account/wallets" className="checkout-add-wallet-link">
+              + Adicionar carteira reserva
+            </Link>
             <h3 className="checkout-provider-heading">Carteira e rede</h3>
             {selectedWallet ? (
               <div
@@ -424,11 +368,11 @@ export function CheckoutPage() {
                     key={provider}
                     aria-label={`Conectar carteira com ${provider}`}
                     aria-pressed={walletProvider === provider}
-                    disabled={connectWalletMutation.isPending || disconnectWalletMutation.isPending}
+                    disabled={connectWalletMutation.isPending}
                     onClick={() => void connectWallet(provider)}
                   >
                     <span className="wallet-provider-mark" aria-hidden="true">
-                      {provider === 'WalletConnect' ? 'W' : provider === 'MetaMask' ? 'M' : 'C'}
+                      {provider === 'WalletConnect' ? <WalletConnectIcon /> : provider === 'MetaMask' ? <MetaMaskIcon /> : <CoinbaseIcon />}
                     </span>
                     <span className="wallet-provider-name">{provider}</span>
                     <span className="wallet-provider-radio" aria-hidden="true" />
@@ -441,7 +385,7 @@ export function CheckoutPage() {
                 className={`wallet-connection is-${walletConnection}`}
                 role={walletConnection === 'rejected' ? 'alert' : 'status'}
                 aria-live={walletConnection === 'rejected' ? 'assertive' : 'polite'}
-                aria-busy={connectWalletMutation.isPending || disconnectWalletMutation.isPending}
+                aria-busy={connectWalletMutation.isPending}
               >
                 <span>
                   {connectWalletMutation.isPending
@@ -451,16 +395,6 @@ export function CheckoutPage() {
                         ? `${selectedWallet.label} conectada via ${walletProvider ?? 'provedor simulado'}.`
                         : 'Selecione um provedor para continuar.')}
                 </span>
-                {walletConnection === 'connected' ? (
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={() => void disconnectWallet()}
-                    disabled={connectWalletMutation.isPending || disconnectWalletMutation.isPending}
-                  >
-                    {disconnectWalletMutation.isPending ? 'Aguarde…' : 'Desconectar carteira'}
-                  </button>
-                ) : null}
               </div>
             ) : null}
             {timedOut ? (
@@ -524,8 +458,8 @@ export function CheckoutPage() {
               </p>
             ) : null}
             <button
-              type="submit"
-              form="checkout-collector-form"
+              type="button"
+              onClick={() => void submitOrder()}
               className="primary-button checkout-confirm"
               disabled={
                 !quoteQuery.data ||
