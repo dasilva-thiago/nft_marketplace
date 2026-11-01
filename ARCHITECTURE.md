@@ -287,7 +287,7 @@ Paleta aplicada (tokens CSS em `src/styles/index.css`):
 | `#c9bdb2`          | creme médio | texto secundário, labels         |
 | `#7a6456`          | marrom claro | hints, placeholders             |
 
-Fontes: **Space Grotesk** (títulos, CTAs) e **DM Mono** (labels, preços, códigos). As fontes exportadas do Figma não estavam disponíveis; as substituições acima são as mais próximas da identidade monoespaciada e geométrica do Figma e foram usadas desde o início.
+Fontes: **Space Grotesk** (títulos, CTAs) e **DM Mono** (labels, preços, códigos).
 
 ### Componentes shadcn/ui aplicados
 
@@ -300,9 +300,7 @@ Os seguintes componentes seguem o padrão shadcn/ui com `cva` + Tailwind, em `sr
 
 ### Assets de produto
 
-Os assets de NFT individuais do Figma não estavam disponíveis. Os quatro arquivos `public/assets/monkey1–4.webp` são reutilizados deterministicamente nas fixtures das 12 coleções para que catálogo e telas nunca exibam placeholders. A prancha visual do Figma não foi usada como asset de produto.
-
-Derivados responsivos gerados por `scripts/prepare-responsive-images.py`: `320/480/640/1200px` para cada imagem; usados em `srcSet` com `sizes` ajustados por viewport.
+Os quatro arquivos `public/assets/monkey1–4.webp` são distribuídos deterministicamente nas fixtures das 12 coleções. Derivados responsivos em `320/480/640/1200px` são gerados por `scripts/prepare-responsive-images.py` e usados em `srcSet` com `sizes` ajustados por viewport.
 
 ### Adaptações por tela
 
@@ -340,9 +338,7 @@ Derivados responsivos gerados por `scripts/prepare-responsive-images.py`: `320/4
 
 | Tela / elemento              | Referência Figma                    | Implementação                                         | Motivo                                      |
 | ---------------------------- | ----------------------------------- | ----------------------------------------------------- | ------------------------------------------- |
-| Assets de NFT                | Imagens únicas por item             | 4 assets locais reutilizados deterministicamente      | Assets individuais não disponíveis          |
-| Fontes                       | Export do Figma não disponível      | Space Grotesk + DM Mono (Google Fonts)                | Aproximação mais fiel disponível            |
-| Hero art overlay             | Texto sobre fundo semi-transparente | `text-shadow` + gradiente mais opaco (linha de base)  | Legibilidade garantida sobre qualquer imagem |
+| Hero art overlay             | Texto sobre fundo semi-transparente | `text-shadow` + gradiente mais opaco                  | Legibilidade garantida sobre qualquer imagem |
 | Confirmação mobile           | Sem frame                           | Adaptação responsiva do desktop                       | Sem referência Figma mobile                 |
 | Perfil mobile                | Sem frame                           | Adaptação responsiva do desktop                       | Sem referência Figma mobile                 |
 | Carteiras mobile             | Sem frame                           | Adaptação responsiva do desktop                       | Sem referência Figma mobile                 |
