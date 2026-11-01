@@ -300,7 +300,7 @@ Os seguintes componentes seguem o padrão shadcn/ui com `cva` + Tailwind, em `sr
 
 ### Assets de produto
 
-Os quatro arquivos `public/assets/monkey1–4.webp` são distribuídos deterministicamente nas fixtures das 12 coleções. Derivados responsivos em `320/480/640/1200px` são gerados por `scripts/prepare-responsive-images.py` e usados em `srcSet` com `sizes` ajustados por viewport.
+Os quatro arquivos `public/assets/monkey1–4.webp` foram gerados com Gemini a partir de capturas dos frames do Figma, convertidos para WebP e otimizados para menos de 200 KB cada. São distribuídos deterministicamente nas fixtures das 12 coleções. Derivados responsivos em `320/480/640/1200px` são gerados por `scripts/prepare-responsive-images.py` e usados em `srcSet` com `sizes` ajustados por viewport.
 
 ### Adaptações por tela
 
