@@ -1,11 +1,80 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── Design tokens (dark defaults) ─────────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --color-bg:         #100d0c;
+  --color-bg-header:  #15100f;
+  --color-bg-card:    #171210;
+  --color-bg-surface: #1a1310;
+  /* Borders */
+  --color-border:     #30231d;
+  --color-border-mid: #3a2215;
+  --color-border-deep:#57311e;
+  /* Accent (amber) */
+  --color-accent:       #e99a45;
+  --color-accent-2:     #dfa05a;
+  --color-accent-hover: #f4b66e;
+  --color-accent-fg:    #1b110c;
+  /* Text */
+  --color-text:      #f2eee8;
+  --color-text-alt:  #f0e4d9;
+  --color-text-sub:  #c9bdb2;
+  --color-text-muted:#a8978b;
+  --color-text-dim:  #7a5e4a;
+  /* Semantic */
+  --color-error:     #d46b52;
+}
+
+/* ── Light theme overrides ──────────────────────────────────────────────── */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --color-bg:          #f7f3ef;
+    --color-bg-header:   #ffffff;
+    --color-bg-card:     #fffcf9;
+    --color-bg-surface:  #ede8e2;
+    --color-border:      #ddd0c5;
+    --color-border-mid:  #cbbfb6;
+    --color-border-deep: #b8a89e;
+    --color-accent:       #c97a20;
+    --color-accent-2:     #a86218;
+    --color-accent-hover: #a86218;
+    --color-accent-fg:    #ffffff;
+    --color-text:      #1a1310;
+    --color-text-alt:  #2a1a14;
+    --color-text-sub:  #5c5049;
+    --color-text-muted:#7a6355;
+    --color-text-dim:  #6b5d54;
+    --color-error:     #b8402b;
+  }
+}
+
+:root[data-theme='light'] {
+  --color-bg:          #f7f3ef;
+  --color-bg-header:   #ffffff;
+  --color-bg-card:     #fffcf9;
+  --color-bg-surface:  #ede8e2;
+  --color-border:      #ddd0c5;
+  --color-border-mid:  #cbbfb6;
+  --color-border-deep: #b8a89e;
+  --color-accent:       #c97a20;
+  --color-accent-2:     #a86218;
+  --color-accent-hover: #a86218;
+  --color-accent-fg:    #ffffff;
+  --color-text:      #1a1310;
+  --color-text-alt:  #2a1a14;
+  --color-text-sub:  #5c5049;
+  --color-text-muted:#7a6355;
+  --color-text-dim:  #6b5d54;
+  --color-error:     #b8402b;
+}
+
 :root {
   font-family: 'Space Grotesk', sans-serif;
-  color: #f2eee8;
-  background: #100d0c;
+  color: var(--color-text);
+  background: var(--color-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   font-optical-sizing: auto;
@@ -20,7 +89,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: #100d0c;
+  background: var(--color-bg);
 }
 a {
   color: inherit;
@@ -35,7 +104,7 @@ a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 2px solid #e99a45;
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 .site-header {
@@ -46,7 +115,7 @@ select:focus-visible {
   align-items: center;
   gap: 24px;
   border-bottom: 1px solid #31241e;
-  background: #15100f;
+  background: var(--color-bg-header);
   position: relative;
   z-index: 2;
 }
@@ -59,7 +128,7 @@ select:focus-visible {
   display: flex;
   justify-content: center;
   gap: clamp(16px, 3vw, 42px);
-  color: #c9bdb2;
+  color: var(--color-text-sub);
   font-size: 0.82rem;
 }
 .header-tools {
@@ -72,13 +141,29 @@ select:focus-visible {
   place-items: center;
   width: 28px;
   height: 28px;
-  color: #c9bdb2;
+  color: var(--color-text-sub);
+}
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--color-text-sub);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+.theme-toggle:hover {
+  color: var(--color-accent);
 }
 .site-header a:hover {
-  color: #e99a45;
+  color: var(--color-accent);
 }
 .site-header nav a.is-active {
-  color: #e99a45;
+  color: var(--color-accent);
   position: relative;
 }
 .site-header nav a.is-active::after {
@@ -88,12 +173,12 @@ select:focus-visible {
   left: 0;
   right: 0;
   height: 2px;
-  background: #e99a45;
+  background: var(--color-accent);
 }
 .login-link {
   padding: 10px 17px;
-  background: #e99a45;
-  color: #1b110c;
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
   border: none;
   border-radius: 3px;
   font-weight: 600;
@@ -103,8 +188,8 @@ select:focus-visible {
   transition: background 0.18s ease;
 }
 .login-link:hover {
-  background: #f4b66e;
-  color: #1b110c !important;
+  background: var(--color-accent-hover);
+  color: var(--color-accent-fg) !important;
 }
 .marketplace-page {
   width: min(100% - 48px, 1320px);
@@ -117,13 +202,13 @@ select:focus-visible {
   gap: clamp(34px, 8vw, 120px);
   align-items: center;
   padding: 54px 0 68px;
-  border-bottom: 1px solid #30231d;
+  border-bottom: 1px solid var(--color-border);
 }
 .hero-copy {
   padding: 14px 0 0 clamp(0px, 2vw, 28px);
 }
 .eyebrow {
-  color: #dfa05a;
+  color: var(--color-accent-2);
   font-family: 'DM Mono', monospace;
   font-size: 0.68rem;
   letter-spacing: 0.16em;
@@ -145,7 +230,7 @@ select:focus-visible {
 }
 .hero-description {
   max-width: 440px;
-  color: #b7aaa0;
+  color: var(--color-text-muted);
   font-size: 1.1rem;
   line-height: 1.75;
   margin: 24px 0 26px;
@@ -157,8 +242,8 @@ select:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  background: #e99a45;
-  color: #1b110c;
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
   padding: 12px 18px;
   font-size: 0.82rem;
   font-weight: 700;
@@ -170,11 +255,11 @@ select:focus-visible {
 }
 .primary-button:hover,
 .secondary-button:hover {
-  background: #f4b66e;
+  background: var(--color-accent-hover);
   transform: translateY(-1px);
 }
 .hero-proof {
-  color: #b6a190;
+  color: var(--color-text-muted);
   font:
     0.65rem 'DM Mono',
     monospace;
@@ -187,11 +272,11 @@ select:focus-visible {
 .proof-dot {
   width: 6px;
   height: 6px;
-  background: #e99a45;
+  background: var(--color-accent);
   border-radius: 50%;
 }
 .proof-divider {
-  color: #a08c7f;
+  color: var(--color-text-muted);
 }
 .hero-art-wrap {
   position: relative;
@@ -203,7 +288,7 @@ select:focus-visible {
   position: relative;
   aspect-ratio: 1.12;
   overflow: hidden;
-  background: #211713;
+  background: var(--color-bg-surface);
   border: 1px solid #403027;
 }
 .hero-art {
@@ -236,7 +321,7 @@ select:focus-visible {
   font:
     600 1.02rem 'Space Grotesk',
     sans-serif;
-  color: #f5f0eb;
+  color: var(--color-text-alt);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
 .hero-art-overlay span:last-child {
@@ -248,7 +333,7 @@ select:focus-visible {
   position: absolute;
   right: 0;
   bottom: 0;
-  color: #8d7c70;
+  color: var(--color-text-muted);
   font:
     0.62rem 'DM Mono',
     monospace;
@@ -260,7 +345,7 @@ select:focus-visible {
   display: block;
   width: 30px;
   height: 1px;
-  background: #8d7c70;
+  background: var(--color-text-muted);
 }
 .catalog-section {
   padding: 56px 0 88px;
@@ -288,27 +373,27 @@ select:focus-visible {
   gap: 10px;
   width: min(100%, 370px);
   padding: 0 6px 0 13px;
-  background: #171210;
+  background: var(--color-bg-card);
   border: 1px solid #3a2a21;
-  color: #9f8d80;
+  color: var(--color-text-dim);
 }
 .catalog-search input {
   flex: 1;
   min-width: 0;
   height: 100%;
-  color: #f2eee8;
+  color: var(--color-text);
   background: transparent;
   border: 0;
   outline: 0;
   font-size: 0.75rem;
 }
 .catalog-search input::placeholder {
-  color: #a08c7f;
+  color: var(--color-text-muted);
 }
 .catalog-search button {
   border: 0;
   background: #2a1e18;
-  color: #e9aa68;
+  color: var(--color-accent-2);
   padding: 8px 12px;
   font-size: 0.69rem;
   cursor: pointer;
@@ -324,18 +409,18 @@ select:focus-visible {
 .catalog-sidebar {
   align-self: start;
   border: 1px solid #32251e;
-  background: #15100f;
+  background: var(--color-bg-header);
   padding: 18px 16px;
 }
 .filter-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #eadfd5;
+  color: var(--color-text-alt);
   font-size: 0.82rem;
   font-weight: 600;
   padding-bottom: 14px;
-  border-bottom: 1px solid #30231d;
+  border-bottom: 1px solid var(--color-border);
 }
 .filter-group {
   border: 0;
@@ -349,7 +434,7 @@ select:focus-visible {
 }
 .filter-group legend,
 .sort-label {
-  color: #a8978b;
+  color: var(--color-text-muted);
   font:
     0.72rem 'DM Mono',
     monospace;
@@ -382,13 +467,13 @@ select:focus-visible {
   position: relative;
 }
 .is-selected .filter-radio {
-  border-color: #e99a45;
+  border-color: var(--color-accent);
 }
 .is-selected .filter-radio::after {
   content: '';
   position: absolute;
   inset: 3px;
-  background: #e99a45;
+  background: var(--color-accent);
   border-radius: 50%;
 }
 .sort-label {
@@ -397,11 +482,11 @@ select:focus-visible {
 }
 .select-wrap {
   height: 36px;
-  border: 1px solid #3c2d24;
+  border: 1px solid var(--color-border-mid);
   display: flex;
   align-items: center;
   padding: 0 9px;
-  color: #a8978b;
+  color: var(--color-text-muted);
 }
 .select-wrap select {
   width: 100%;
@@ -413,14 +498,14 @@ select:focus-visible {
   font-size: 0.82rem;
 }
 .select-wrap option {
-  background: #171210;
+  background: var(--color-bg-card);
 }
 .clear-filters {
   margin-top: 18px;
   padding: 0;
   background: none;
   border: 0;
-  color: #9e7954;
+  color: var(--color-text-muted);
   font-size: 0.78rem;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -435,13 +520,13 @@ select:focus-visible {
   display: flex;
   align-items: start;
   justify-content: space-between;
-  color: #a8978b;
+  color: var(--color-text-muted);
   font:
     0.78rem 'DM Mono',
     monospace;
 }
 .results-sort-note {
-  color: #b6a190;
+  color: var(--color-text-muted);
 }
 .nft-grid {
   display: grid;
@@ -450,8 +535,8 @@ select:focus-visible {
 }
 .nft-card {
   min-width: 0;
-  background: #171210;
-  border: 1px solid #30231d;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
   transition:
@@ -460,7 +545,7 @@ select:focus-visible {
     box-shadow 0.18s ease;
 }
 .nft-card:hover {
-  border-color: #80552f;
+  border-color: var(--color-text-muted);
   transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
@@ -471,7 +556,7 @@ select:focus-visible {
   position: relative;
   aspect-ratio: 1.08;
   overflow: hidden;
-  background: #211713;
+  background: var(--color-bg-surface);
 }
 .nft-card-image-wrap img {
   display: block;
@@ -518,13 +603,13 @@ select:focus-visible {
   flex-shrink: 0;
 }
 .nft-card-price span {
-  color: #b6a190;
+  color: var(--color-text-muted);
   font:
     0.68rem 'DM Mono',
     monospace;
 }
 .nft-card-price strong {
-  color: #f1e4d7;
+  color: var(--color-text-alt);
   font:
     600 0.88rem 'DM Mono',
     monospace;
@@ -552,7 +637,7 @@ select:focus-visible {
   justify-content: center;
   gap: 20px;
   padding-top: 28px;
-  color: #a8978b;
+  color: var(--color-text-muted);
   font-size: 0.72rem;
 }
 .pagination button {
@@ -570,7 +655,7 @@ select:focus-visible {
   cursor: not-allowed;
 }
 .pagination strong {
-  color: #f2eee8;
+  color: var(--color-text);
 }
 .catalog-message {
   min-height: 230px;
@@ -580,13 +665,13 @@ select:focus-visible {
   justify-content: center;
   gap: 12px;
   border: 1px dashed #4c392c;
-  background: #15100f;
+  background: var(--color-bg-header);
   color: #b6a69a;
   text-align: center;
   padding: 24px;
 }
 .catalog-message strong {
-  color: #f2eee8;
+  color: var(--color-text);
   font-size: 1rem;
 }
 .catalog-message span {
@@ -596,8 +681,8 @@ select:focus-visible {
   margin-top: 4px;
   padding: 10px 14px;
   background: transparent;
-  color: #e99a45;
-  border: 1px solid #e99a45;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
 }
 .secondary-button:hover {
   background: rgba(233, 154, 69, 0.1);
@@ -611,7 +696,7 @@ select:focus-visible {
 }
 .session-status,
 .session-user {
-  color: #b7aaa0;
+  color: var(--color-text-muted);
   font:
     0.65rem 'DM Mono',
     monospace;
@@ -622,17 +707,17 @@ select:focus-visible {
 }
 .session-logout {
   border: 0;
-  border-bottom: 1px solid #8d633e;
+  border-bottom: 1px solid var(--color-text-muted);
   padding: 2px 0;
   background: transparent;
-  color: #e9aa68;
+  color: var(--color-accent-2);
   font:
     0.66rem 'DM Mono',
     monospace;
   cursor: pointer;
 }
 .session-logout:hover {
-  color: #f4c58e;
+  color: var(--color-accent-2);
 }
 .session-logout:disabled {
   opacity: 0.5;
@@ -649,13 +734,13 @@ select:focus-visible {
 .auth-card {
   width: 100%;
   border: 1px solid #3c2a21;
-  background: #15100f;
+  background: var(--color-bg-header);
   padding: clamp(24px, 5vw, 52px);
   box-shadow: 12px 12px 0 rgba(38, 25, 19, 0.45);
 }
 .auth-card h1 {
   margin: 0;
-  color: #f2eee8;
+  color: var(--color-text);
   font-size: clamp(2rem, 5vw, 3.2rem);
   line-height: 1;
   letter-spacing: -0.055em;
@@ -664,7 +749,7 @@ select:focus-visible {
 .auth-description {
   max-width: 400px;
   margin: 18px 0 30px;
-  color: #b7aaa0;
+  color: var(--color-text-muted);
   font-size: 0.88rem;
   line-height: 1.7;
 }
@@ -675,7 +760,7 @@ select:focus-visible {
 .auth-field {
   display: grid;
   gap: 8px;
-  color: #c9bdb2;
+  color: var(--color-text-sub);
   font:
     0.68rem 'DM Mono',
     monospace;
@@ -688,7 +773,7 @@ select:focus-visible {
   border-radius: 0;
   padding: 0 13px;
   background: #1b1411;
-  color: #f2eee8;
+  color: var(--color-text);
   outline: 0;
   font:
     0.84rem 'Space Grotesk',
@@ -698,8 +783,8 @@ select:focus-visible {
   border-color: #705039;
 }
 .auth-field input:focus {
-  border-color: #e99a45;
-  box-shadow: 0 0 0 1px #e99a45;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
 }
 .auth-field input[aria-invalid='true'] {
   border-color: #d97962;
@@ -721,7 +806,7 @@ select:focus-visible {
   gap: 8px;
 }
 .checkout-summary .form-error strong {
-  color: #f2c27d;
+  color: var(--color-accent-hover);
 }
 .checkout-summary .form-error span {
   display: block;
@@ -736,19 +821,19 @@ select:focus-visible {
 }
 .auth-switch {
   margin: 25px 0 0;
-  color: #95867a;
+  color: var(--color-text-muted);
   font-size: 0.75rem;
   line-height: 1.6;
 }
 .auth-switch a {
-  color: #e9aa68;
+  color: var(--color-accent-2);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 .auth-demo-note {
   margin: 20px 0 0;
   padding-top: 16px;
-  border-top: 1px solid #30231d;
+  border-top: 1px solid var(--color-border);
   color: #75685f;
   font:
     0.6rem 'DM Mono',
@@ -758,12 +843,12 @@ select:focus-visible {
 .nft-card-skeleton {
   min-width: 0;
   padding-bottom: 12px;
-  border: 1px solid #30231d;
-  background: #171210;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
 }
 .skeleton-shimmer {
   display: block;
-  background: linear-gradient(100deg, #211915 20%, #30231d 40%, #211915 60%);
+  background: linear-gradient(100deg, var(--color-bg-surface) 20%, var(--color-border) 40%, var(--color-bg-surface) 60%);
   background-size: 200% 100%;
   animation: shimmer 1.4s linear infinite;
 }
@@ -805,8 +890,8 @@ select:focus-visible {
   left: 16px;
   z-index: 9999;
   padding: 10px 18px;
-  background: #e99a45;
-  color: #1b110c;
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
   font:
     600 0.82rem 'DM Mono',
     monospace;
@@ -1132,7 +1217,7 @@ select:focus-visible {
 }
 .visual-page-shell h1 {
   margin: 0;
-  color: #f3eee8;
+  color: var(--color-text-alt);
   font:
     600 clamp(1.45rem, 2.6vw, 2.1rem) / 1.1 'DM Mono',
     monospace;
@@ -1150,7 +1235,7 @@ select:focus-visible {
 }
 .back-link:hover,
 .continue-link:hover {
-  color: #f3c489;
+  color: var(--color-accent-2);
 }
 .visual-empty {
   display: grid;
@@ -1164,7 +1249,7 @@ select:focus-visible {
   padding: 20px;
 }
 .visual-empty strong {
-  color: #f4eadf;
+  color: var(--color-text-alt);
   font:
     1rem 'DM Mono',
     monospace;
@@ -1216,7 +1301,7 @@ select:focus-visible {
   place-items: center;
   border: 0;
   cursor: pointer;
-  color: #dfa05a;
+  color: var(--color-accent-2);
   background: #2b1a15;
 }
 .visual-heart {
@@ -1242,13 +1327,13 @@ select:focus-visible {
 }
 .visual-nft-meta h3 {
   margin: 4px 0 0;
-  color: #f1e8df;
+  color: var(--color-text-alt);
   font:
     500 0.74rem 'DM Mono',
     monospace;
 }
 .visual-nft-meta > strong {
-  color: #eaa45c;
+  color: var(--color-accent-2);
   white-space: nowrap;
   font:
     600 0.72rem 'DM Mono',
@@ -1259,7 +1344,7 @@ select:focus-visible {
   justify-content: space-between;
   border-top: 1px solid #342119;
   padding: 8px 12px;
-  color: #806b5b;
+  color: var(--color-text-muted);
   font:
     0.54rem 'DM Mono',
     monospace;
@@ -1268,7 +1353,7 @@ select:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #dfa05a;
+  color: var(--color-accent-2);
 }
 .section-line-title {
   display: flex;
@@ -1284,13 +1369,13 @@ select:focus-visible {
   content: '';
   height: 1px;
   flex: 1;
-  background: #3d281d;
+  background: var(--color-border-mid);
 }
 .marketing-footer {
   width: min(100% - 48px, 1240px);
   margin: 0 auto 24px;
-  background: #21140f;
-  color: #b6a190;
+  background: var(--color-bg-surface);
+  color: var(--color-text-muted);
   font-family: 'DM Mono', monospace;
 }
 .footer-benefits {
@@ -1304,7 +1389,7 @@ select:focus-visible {
   display: flex;
   gap: 12px;
   padding: 20px;
-  border-right: 1px solid #57311e;
+  border-right: 1px solid var(--color-border-deep);
 }
 .footer-benefits article > span {
   flex: 0 0 36px;
@@ -1318,7 +1403,7 @@ select:focus-visible {
 }
 .footer-benefits strong,
 .footer-newsletter > strong {
-  color: #f0e1d2;
+  color: var(--color-text-alt);
   font:
     600 0.82rem 'DM Mono',
     monospace;
@@ -1343,8 +1428,8 @@ select:focus-visible {
   min-width: 0;
   flex: 1;
   border: 1px solid #6b3a1d;
-  background: #1a110e;
-  color: #f3e8dc;
+  background: var(--color-bg-surface);
+  color: var(--color-text-alt);
   padding: 9px 10px;
   font:
     0.64rem 'DM Mono',
@@ -1353,7 +1438,7 @@ select:focus-visible {
 .footer-newsletter button,
 .apply-button {
   border: 0;
-  background: #d98942;
+  background: var(--color-accent-2);
   color: #27150d;
   padding: 0 14px;
   font:
@@ -1371,7 +1456,7 @@ select:focus-visible {
   font-size: 0.75rem;
 }
 .footer-bar strong {
-  color: #f6eadb;
+  color: var(--color-text-alt);
   letter-spacing: 0.14em;
 }
 .footer-links {
@@ -1409,13 +1494,13 @@ select:focus-visible {
   place-items: center;
   width: 32px;
   height: 32px;
-  border: 1px solid #976033;
-  color: #dfa05a;
+  border: 1px solid var(--color-text-muted);
+  color: var(--color-accent-2);
   transition: border-color 0.15s ease, color 0.15s ease;
 }
 .footer-socials a:hover {
-  border-color: #e9a45c;
-  color: #f4b870;
+  border-color: var(--color-accent-2);
+  color: var(--color-accent-2);
 }
 .footer-copyright {
   display: block;
@@ -1448,12 +1533,12 @@ select:focus-visible {
   overflow: hidden;
   border: 2px solid #3a2016;
   border-radius: 6px;
-  background: #211511;
+  background: var(--color-bg-surface);
   cursor: pointer;
   transition: border-color 0.15s;
 }
 .detail-thumbs button.is-active {
-  border-color: #e99a45;
+  border-color: var(--color-accent);
 }
 .detail-thumbs img {
   width: 100%;
@@ -1463,7 +1548,7 @@ select:focus-visible {
 .detail-main-image {
   aspect-ratio: 1 / 1.05;
   overflow: hidden;
-  background: #251915;
+  background: var(--color-bg-surface);
   border-radius: 10px;
 }
 .detail-main-image img {
@@ -1496,7 +1581,7 @@ select:focus-visible {
 }
 .detail-copy h1 + strong {
   display: block;
-  color: #e9a45c;
+  color: var(--color-accent-2);
   margin-top: 10px;
   font-size: 1rem;
   letter-spacing: -0.01em;
@@ -1519,7 +1604,7 @@ select:focus-visible {
   margin-top: 13px;
 }
 .detail-edition > strong {
-  color: #f0e5d9;
+  color: var(--color-text-alt);
 }
 .detail-edition > div {
   display: flex;
@@ -1535,7 +1620,7 @@ select:focus-visible {
 }
 .detail-edition span.is-active {
   border-color: #e69950;
-  color: #e9a45c;
+  color: var(--color-accent-2);
 }
 .detail-purchase {
   display: flex;
@@ -1556,7 +1641,7 @@ select:focus-visible {
   height: 25px;
   border: 0;
   border-radius: 50%;
-  background: #d98942;
+  background: var(--color-accent-2);
   color: #241309;
   cursor: pointer;
 }
@@ -1567,10 +1652,10 @@ select:focus-visible {
   width: 19px;
   height: 19px;
   background: #382219;
-  color: #dfa05a;
+  color: var(--color-accent-2);
 }
 .detail-price {
-  color: #eca45b;
+  color: var(--color-accent-2);
   font-size: 1rem;
 }
 .detail-actions {
@@ -1583,7 +1668,7 @@ select:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  border: 1px solid #89572f;
+  border: 1px solid var(--color-text-muted);
   background: transparent;
   color: #d99a58;
   padding: 10px 13px;
@@ -1602,11 +1687,11 @@ select:focus-visible {
   gap: 8px;
 }
 .detail-attributes dt {
-  color: #b6a190;
+  color: var(--color-text-muted);
 }
 .detail-attributes dd {
   margin: 0;
-  color: #c9ae98;
+  color: var(--color-text-muted);
 }
 .share-button {
   margin-top: 13px;
@@ -1624,7 +1709,7 @@ select:focus-visible {
   display: flex;
   gap: 22px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #543522;
+  border-bottom: 1px solid var(--color-border-mid);
 }
 .detail-tabs strong {
   color: #e5a058;
@@ -1669,7 +1754,7 @@ select:focus-visible {
 .detail-skeleton-main-image {
   aspect-ratio: 1 / 1.08;
   overflow: hidden;
-  background: #251915;
+  background: var(--color-bg-surface);
   border-radius: 5px;
 }
 .detail-skeleton-main-image img {
@@ -1798,18 +1883,18 @@ select:focus-visible {
     600 0.64rem 'DM Mono',
     monospace;
   letter-spacing: 0.1em;
-  color: #e99a45;
+  color: var(--color-accent);
   margin-bottom: 8px;
 }
 .collector-page-header h1 {
   font-size: 1.55rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #f2eee8;
+  color: var(--color-text);
   margin-bottom: 8px;
 }
 .collector-page-desc {
-  color: #a89282;
+  color: var(--color-text-muted);
   font:
     0.82rem/1.5 'DM Mono',
     monospace;
@@ -1818,8 +1903,8 @@ select:focus-visible {
   margin-top: 4px;
 }
 .collector-wallet-address input {
-  background: #130d0b;
-  color: #8a7060;
+  background: var(--color-bg-surface);
+  color: var(--color-text-muted);
   cursor: default;
 }
 .collector-no-wallet {
@@ -1843,22 +1928,22 @@ select:focus-visible {
   font:
     0.78rem 'DM Mono',
     monospace;
-  color: #8a7060;
+  color: var(--color-text-muted);
   text-decoration: none;
 }
 .collector-back-link:hover {
-  color: #c2a48e;
+  color: var(--color-text-muted);
 }
 .collector-page-aside {
   position: sticky;
   top: 24px;
 }
 .collector-aside-card {
-  background: #1a1310;
-  border: 1px solid #3a2318;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-mid);
   border-radius: 14px;
   padding: 22px 20px 24px;
-  color: #a89282;
+  color: var(--color-text-muted);
 }
 .collector-aside-label {
   font:
@@ -1871,7 +1956,7 @@ select:focus-visible {
 .collector-aside-card h3 {
   font-size: 0.96rem;
   font-weight: 600;
-  color: #f2eee8;
+  color: var(--color-text);
   margin-bottom: 8px;
 }
 .collector-aside-card p {
@@ -1895,7 +1980,7 @@ select:focus-visible {
   display: grid;
   grid-template-columns: 1.8fr 0.7fr 0.7fr 0.75fr 26px;
   padding: 0 15px 8px;
-  color: #9d8069;
+  color: var(--color-text-muted);
   font:
     0.78rem 'DM Mono',
     monospace;
@@ -1930,12 +2015,12 @@ select:focus-visible {
 .cart-line-name small,
 .checkout-line small,
 .order-line small {
-  color: #8e7161;
+  color: var(--color-text-muted);
   font-size: 0.72rem;
 }
 .cart-line-price,
 .cart-line-total {
-  color: #e6a15c;
+  color: var(--color-accent-2);
   white-space: nowrap;
 }
 .icon-button {
@@ -1944,7 +2029,7 @@ select:focus-visible {
 }
 .cart-summary {
   position: relative;
-  border: 1px solid #543522;
+  border: 1px solid var(--color-border-mid);
   padding: 16px;
   align-self: start;
   color: #c4a48b;
@@ -1955,7 +2040,7 @@ select:focus-visible {
 .cart-summary h2,
 .checkout-summary h2 {
   margin: 0 0 18px;
-  color: #f0e5d9;
+  color: var(--color-text-alt);
   font:
     0.82rem 'DM Mono',
     monospace;
@@ -1967,8 +2052,8 @@ select:focus-visible {
 .cart-summary input {
   min-width: 0;
   width: 100%;
-  border: 1px solid #493125;
-  background: #1a100d;
+  border: 1px solid var(--color-border-mid);
+  background: var(--color-bg-surface);
   padding: 9px;
   color: #eee3d9;
   font:
@@ -2027,14 +2112,14 @@ select:focus-visible {
 .cart-summary dd,
 .checkout-summary dd,
 .order-total dd {
-  color: #eca45b;
+  color: var(--color-accent-2);
 }
 .cart-summary .total,
 .checkout-summary .total,
 .order-total div:last-child {
   padding-top: 13px;
   border-top: 1px solid #694128;
-  color: #f0e5d9;
+  color: var(--color-text-alt);
   font-weight: 700;
 }
 .cart-summary .primary-button,
@@ -2050,7 +2135,7 @@ select:focus-visible {
   display: inline-block;
   margin: 6px 0 14px;
   font-size: 0.72rem;
-  color: #e99a45;
+  color: var(--color-accent);
   opacity: 0.75;
   transition: opacity 0.15s;
 }
@@ -2107,9 +2192,9 @@ select:focus-visible {
 .full-field textarea,
 .password-fields input {
   width: 100%;
-  border: 1px solid #38251d;
+  border: 1px solid var(--color-border-mid);
   background: transparent;
-  color: #eadfd5;
+  color: var(--color-text-alt);
   min-height: 36px;
   padding: 8px 10px;
   font:
@@ -2117,7 +2202,7 @@ select:focus-visible {
     monospace;
 }
 .form-grid option {
-  background: #1a110e;
+  background: var(--color-bg-surface);
 }
 .full-field {
   margin-top: 15px;
@@ -2135,7 +2220,7 @@ select:focus-visible {
 .checkout-summary h2 small {
   display: block;
   margin-top: 3px;
-  color: #9b795e;
+  color: var(--color-text-muted);
   font-size: 0.55rem;
   font-weight: 400;
 }
@@ -2145,7 +2230,7 @@ select:focus-visible {
   gap: 8px;
   align-items: center;
   padding: 6px 0;
-  border-bottom: 1px solid #38251d;
+  border-bottom: 1px solid var(--color-border-mid);
 }
 .checkout-line > img {
   width: 40px;
@@ -2156,11 +2241,11 @@ select:focus-visible {
   gap: 3px;
 }
 .checkout-line > strong {
-  color: #e6a15c;
+  color: var(--color-accent-2);
 }
 .checkout-summary h3 {
   margin: 17px 0 8px;
-  color: #f0e5d9;
+  color: var(--color-text-alt);
   font-size: 0.7rem;
 }
 .wallet-choice {
@@ -2172,7 +2257,7 @@ select:focus-visible {
   border: 1px solid #4d3024;
 }
 .wallet-choice input {
-  accent-color: #e99a45;
+  accent-color: var(--color-accent);
 }
 .wallet-choice span {
   display: inline-flex;
@@ -2209,7 +2294,7 @@ select:focus-visible {
 .session-required-bg-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(160deg, rgba(16,13,12,0.82) 0%, rgba(16,13,12,0.96) 60%, #100d0c 100%);
+  background: linear-gradient(160deg, rgba(16,13,12,0.82) 0%, rgba(16,13,12,0.96) 60%, var(--color-bg) 100%);
 }
 .session-required-card {
   position: relative;
@@ -2229,14 +2314,14 @@ select:focus-visible {
   background: rgba(233,154,69,0.08);
   display: grid;
   place-items: center;
-  color: #e99a45;
+  color: var(--color-accent);
   margin-bottom: 24px;
 }
 .session-required-eyebrow {
   font-family: 'DM Mono', monospace;
   font-size: 0.65rem;
   letter-spacing: 0.14em;
-  color: #e99a45;
+  color: var(--color-accent);
   margin: 0 0 14px;
   opacity: 0.9;
 }
@@ -2245,7 +2330,7 @@ select:focus-visible {
   font-weight: 700;
   line-height: 1.12;
   margin: 0 0 18px;
-  color: #f2eee8;
+  color: var(--color-text);
   letter-spacing: -0.01em;
 }
 .session-required-desc {
@@ -2283,7 +2368,7 @@ select:focus-visible {
 }
 .session-required-register:hover {
   border-color: rgba(233,154,69,0.5);
-  color: #e99a45;
+  color: var(--color-accent);
 }
 .session-required-hint {
   font-size: 0.76rem;
@@ -2297,8 +2382,8 @@ select:focus-visible {
   transition: color 0.15s, text-decoration-color 0.15s;
 }
 .session-required-hint a:hover {
-  color: #e99a45;
-  text-decoration-color: #e99a45;
+  color: var(--color-accent);
+  text-decoration-color: var(--color-accent);
 }
 @media (max-width: 620px) {
   .session-required-bg {
@@ -2334,7 +2419,7 @@ select:focus-visible {
   top: 8px;
   border: 0;
   background: none;
-  color: #9b6d48;
+  color: var(--color-text-muted);
   cursor: pointer;
 }
 .order-hero {
@@ -2350,10 +2435,10 @@ select:focus-visible {
 .order-hero.is-rejected .order-hero-icon {
   background: rgba(180, 60, 40, 0.1);
   border-color: rgba(180, 60, 40, 0.35);
-  color: #d46b52;
+  color: var(--color-error);
 }
 .order-hero.is-rejected .order-hero-label {
-  color: #d46b52;
+  color: var(--color-error);
 }
 .order-hero-icon {
   display: grid;
@@ -2363,7 +2448,7 @@ select:focus-visible {
   border-radius: 50%;
   border: 1.5px solid rgba(233, 154, 69, 0.4);
   background: rgba(233, 154, 69, 0.1);
-  color: #e99a45;
+  color: var(--color-accent);
   margin-bottom: 4px;
 }
 .order-hero-label {
@@ -2371,16 +2456,16 @@ select:focus-visible {
   font-family: 'DM Mono', monospace;
   font-size: 0.65rem;
   letter-spacing: 0.14em;
-  color: #e99a45;
+  color: var(--color-accent);
 }
 .order-hero.is-rejected .order-hero-label {
-  color: #d46b52;
+  color: var(--color-error);
 }
 .order-hero-title {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 600;
-  color: #f0e4d9;
+  color: var(--color-text-alt);
   line-height: 1.3;
 }
 .order-meta {
@@ -2388,13 +2473,13 @@ select:focus-visible {
   grid-template-columns: repeat(2, 1fr);
   gap: 14px;
   padding: 10px 0;
-  border-bottom: 1px solid #684026;
+  border-bottom: 1px solid var(--color-border-deep);
   font-size: 0.78rem;
-  color: #987761;
+  color: var(--color-text-dim);
   padding: 14px;
-  border: 1px solid #3a2215;
+  border: 1px solid var(--color-border-mid);
   border-radius: 10px;
-  background: #1c100c;
+  background: var(--color-bg-surface);
 }
 .order-meta-item {
   display: flex;
@@ -2403,7 +2488,7 @@ select:focus-visible {
 }
 .order-meta-item span {
   font-size: 0.7rem;
-  color: #7a5e4a;
+  color: var(--color-text-dim);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -2413,14 +2498,14 @@ select:focus-visible {
   word-break: break-all;
 }
 .order-meta-value {
-  color: #e99a45 !important;
+  color: var(--color-accent) !important;
 }
 .order-section {
   margin-top: 20px;
 }
 .order-section-title {
   margin: 0 0 12px;
-  color: #f0e4d9;
+  color: var(--color-text-alt);
   font-size: 0.82rem;
   font-family: 'DM Mono', monospace;
   letter-spacing: 0.06em;
@@ -2445,11 +2530,11 @@ select:focus-visible {
   gap: 4px;
 }
 .order-line-info strong {
-  color: #f0e4d9;
+  color: var(--color-text-alt);
   font-size: 0.9rem;
 }
 .order-line-info small {
-  color: #8e7161;
+  color: var(--color-text-muted);
   font-size: 0.72rem;
 }
 .order-line-price {
@@ -2463,32 +2548,32 @@ select:focus-visible {
   margin: 16px 0;
   padding: 16px;
   border-radius: 10px;
-  background: #1c100c;
-  border: 1px solid #3a2215;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-mid);
 }
 .order-total div {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   font-size: 0.84rem;
-  color: #987761;
+  color: var(--color-text-dim);
 }
 .order-total dt,
 .order-total dd {
   margin: 0;
 }
 .order-total dd {
-  color: #eca45b;
+  color: var(--color-accent-2);
 }
 .order-total-row {
   padding-top: 10px;
-  border-top: 1px solid #3a2215;
+  border-top: 1px solid var(--color-border-mid);
   font-size: 1rem !important;
   font-weight: 700;
-  color: #f0e4d9 !important;
+  color: var(--color-text-alt) !important;
 }
 .order-total-row dd {
-  color: #e99a45 !important;
+  color: var(--color-accent) !important;
   font-size: 1.05rem;
 }
 .order-note {
@@ -2518,14 +2603,14 @@ select:focus-visible {
 }
 .order-back-link {
   font-size: 0.78rem;
-  color: #7a5e4a;
+  color: var(--color-text-dim);
   text-decoration: underline;
   text-decoration-color: transparent;
   transition: color 0.15s, text-decoration-color 0.15s;
 }
 .order-back-link:hover {
-  color: #e99a45;
-  text-decoration-color: #e99a45;
+  color: var(--color-accent);
+  text-decoration-color: var(--color-accent);
 }
 .order-modal > .primary-button {
   display: flex;
@@ -2542,12 +2627,12 @@ select:focus-visible {
   display: grid;
   gap: 2px;
   padding: 16px 0;
-  background: #251612;
+  background: var(--color-bg-surface);
 }
 .account-sidebar h2 {
   padding: 0 17px 12px;
   margin: 0;
-  color: #f0e5d9;
+  color: var(--color-text-alt);
   font:
     700 0.9rem 'DM Mono',
     monospace;
@@ -2569,7 +2654,7 @@ select:focus-visible {
   cursor: pointer;
 }
 .account-sidebar a.is-active {
-  border-left-color: #e99a45;
+  border-left-color: var(--color-accent);
   color: #f0ad66;
 }
 .account-form {
@@ -2592,7 +2677,7 @@ select:focus-visible {
   height: 34px;
   border-radius: 50%;
   background: #5a3826;
-  color: #eaa45c;
+  color: var(--color-accent-2);
 }
 .avatar-control > img {
   width: 34px;
@@ -2602,12 +2687,12 @@ select:focus-visible {
 }
 .avatar-picker {
   margin: 10px 0 0;
-  border: 1px solid #493125;
+  border: 1px solid var(--color-border-mid);
   padding: 9px;
 }
 .avatar-picker legend {
   padding: 0 4px;
-  color: #c9ae98;
+  color: var(--color-text-muted);
   font-size: 0.56rem;
 }
 .avatar-picker [role='radiogroup'] {
@@ -2618,13 +2703,13 @@ select:focus-visible {
   width: 38px;
   height: 38px;
   padding: 2px;
-  border: 1px solid #493125;
+  border: 1px solid var(--color-border-mid);
   border-radius: 50%;
-  background: #1a100d;
+  background: var(--color-bg-surface);
   cursor: pointer;
 }
 .avatar-picker button[aria-pressed='true'] {
-  border-color: #e99a45;
+  border-color: var(--color-accent);
   box-shadow: 0 0 0 2px rgba(233, 154, 69, 0.22);
 }
 .avatar-picker img {
@@ -2637,7 +2722,7 @@ select:focus-visible {
 .text-button {
   border: 0;
   background: none;
-  color: #eaa45c;
+  color: var(--color-accent-2);
   cursor: pointer;
   font:
     0.6rem 'DM Mono',
@@ -2646,7 +2731,7 @@ select:focus-visible {
 .avatar-control button:not(.text-button) {
   padding: 8px 11px;
   background: #df914a;
-  color: #24140d;
+  color: var(--color-accent-fg);
 }
 .password-fields {
   display: grid;
@@ -2674,7 +2759,7 @@ select:focus-visible {
 .account-heading p,
 .secondary-wallet span {
   margin: 0;
-  color: #907361;
+  color: var(--color-text-muted);
   font-size: 0.78rem;
 }
 .account-form .primary-button,
@@ -2687,7 +2772,7 @@ select:focus-visible {
   gap: 14px;
   margin-top: 25px;
   padding-top: 18px;
-  border-top: 1px solid #39251d;
+  border-top: 1px solid var(--color-border-mid);
 }
 .secondary-wallet strong {
   color: #eadfd4;
@@ -2709,7 +2794,7 @@ select:focus-visible {
   }
   .footer-newsletter {
     grid-column: 1 / -1;
-    border-top: 1px solid #57311e;
+    border-top: 1px solid var(--color-border-deep);
   }
   .footer-bar {
     grid-template-columns: 1fr 1fr;
@@ -2791,7 +2876,7 @@ select:focus-visible {
     margin-top: -1px;
     padding: 22px 17px 18px;
     border-radius: 0 0 22px 22px;
-    background: #251612;
+    background: var(--color-bg-surface);
   }
   .detail-title-row {
     align-items: center;
@@ -2866,9 +2951,9 @@ select:focus-visible {
   }
   .order-meta-item {
     padding: 14px;
-    border: 1px solid #3a2215;
+    border: 1px solid var(--color-border-mid);
     border-radius: 10px;
-    background: #1c100c;
+    background: var(--color-bg-surface);
   }
   .order-meta-item strong {
     font-size: 0.86rem;
@@ -2991,7 +3076,7 @@ select:focus-visible {
 .auth-scene-copy strong {
   display: block;
   margin-top: 15px;
-  color: #f0e5d9;
+  color: var(--color-text-alt);
   font:
     600 clamp(2rem, 4vw, 4.2rem) / 1.05 'DM Mono',
     monospace;
@@ -3059,7 +3144,7 @@ select:focus-visible {
   width: min(100% - 32px, 355px);
   margin: 34px auto;
   padding: 22px 25px 25px;
-  background: #2a1812;
+  background: var(--color-border-mid);
   border: 1px solid #493025;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
   color: #cdb29d;
@@ -3069,7 +3154,7 @@ select:focus-visible {
   outline: 0;
 }
 .auth-modal :focus-visible {
-  outline: 2px solid #f0b66e;
+  outline: 2px solid var(--color-accent-hover);
   outline-offset: 3px;
 }
 .auth-modal-backdrop {
@@ -3106,19 +3191,19 @@ select:focus-visible {
   transition: color 0.15s;
 }
 .auth-modal-close:hover {
-  color: #f2eee8;
+  color: var(--color-text);
 }
 .auth-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #f1e4d8;
+  color: var(--color-text-alt);
   font-size: 0.64rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
 }
 .auth-modal-header a {
-  color: #c18d58;
+  color: var(--color-accent-2);
   font-size: 1.1rem;
 }
 .auth-tabs {
@@ -3130,7 +3215,7 @@ select:focus-visible {
 .auth-tabs a,
 .auth-tabs button {
   padding: 0 5px 10px;
-  color: #c18d58;
+  color: var(--color-accent-2);
   font-size: 0.68rem;
   background: none;
   border: none;
@@ -3140,8 +3225,8 @@ select:focus-visible {
 }
 .auth-tabs a.is-active,
 .auth-tabs button.is-active {
-  color: #e8a15a;
-  border-bottom: 1px solid #e8a15a;
+  color: var(--color-accent-2);
+  border-bottom: 1px solid var(--color-accent-2);
 }
 .auth-modal-description {
   margin: 15px 0 18px;
@@ -3167,7 +3252,7 @@ select:focus-visible {
 .auth-modal .auth-field input {
   min-height: 34px;
   padding-inline: 10px;
-  border-color: #4a2d21;
+  border-color: var(--color-border-mid);
   background: #21130f;
   font-size: 0.64rem;
 }
@@ -3190,7 +3275,7 @@ select:focus-visible {
   align-items: center;
   gap: 10px;
   margin: 18px 0 10px;
-  color: #9d7d68;
+  color: var(--color-text-muted);
   font-size: 0.56rem;
 }
 .auth-social-divider::before,
@@ -3198,7 +3283,7 @@ select:focus-visible {
   content: '';
   flex: 1;
   height: 1px;
-  background: #4a2d21;
+  background: var(--color-border-mid);
 }
 .auth-socials {
   display: grid;
@@ -3274,7 +3359,7 @@ select:focus-visible {
   }
   .auth-tabs a,
   .auth-tabs button {
-    color: #f2e7dc;
+    color: var(--color-text-alt);
     border: 0;
     font-size: 1.15rem;
     font-weight: 600;
@@ -3304,7 +3389,7 @@ select:focus-visible {
   }
   .auth-social-divider {
     margin-top: 42px;
-    color: #eadfd5;
+    color: var(--color-text-alt);
     font-size: 0.65rem;
   }
   .auth-socials button {
@@ -3340,7 +3425,7 @@ select:focus-visible {
     justify-content: space-around;
     height: 62px;
     border-radius: 24px;
-    background: #2a1813;
+    background: var(--color-bg-surface);
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4);
   }
   .mobile-bottom-nav a {
@@ -3348,13 +3433,13 @@ select:focus-visible {
     place-items: center;
     width: 40px;
     height: 40px;
-    color: #c9ae91;
+    color: var(--color-text-muted);
   }
   .mobile-bottom-nav a.is-active {
     color: #eaa35b;
   }
   .mobile-bottom-nav .mobile-search {
-    color: #c9ae91;
+    color: var(--color-text-muted);
   }
 }
 
@@ -3385,8 +3470,8 @@ select:focus-visible {
   white-space: nowrap;
 }
 .catalog-mobile-tabs button.is-active {
-  border-color: #e9a35d;
-  color: #e9a35d;
+  border-color: var(--color-accent-2);
+  color: var(--color-accent-2);
 }
 .card-favorite {
   position: absolute;
@@ -3396,7 +3481,7 @@ select:focus-visible {
   place-items: center;
   width: 28px;
   height: 28px;
-  border: 1px solid #9a673e;
+  border: 1px solid var(--color-text-muted);
   border-radius: 50%;
   background: rgba(31, 18, 13, 0.8);
   color: #e4a15b;
@@ -3418,7 +3503,7 @@ select:focus-visible {
 }
 .section-heading h2 {
   margin: 0;
-  color: #f2e4d8;
+  color: var(--color-text-alt);
   font-size: clamp(1.35rem, 2.5vw, 2.05rem);
   font-weight: 500;
   letter-spacing: -0.04em;
@@ -3434,7 +3519,7 @@ select:focus-visible {
   white-space: nowrap;
 }
 .section-note {
-  color: #9e8270;
+  color: var(--color-text-muted);
   font:
     0.58rem 'DM Mono',
     monospace;
@@ -3462,7 +3547,7 @@ select:focus-visible {
   padding: 0;
 }
 .price-filter legend {
-  color: #a8978b;
+  color: var(--color-text-muted);
   font:
     0.62rem 'DM Mono',
     monospace;
@@ -3478,7 +3563,7 @@ select:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #b6a190;
+  color: var(--color-text-muted);
   font:
     0.78rem 'DM Mono',
     monospace;
@@ -3488,11 +3573,11 @@ select:focus-visible {
   min-width: 72px;
   min-height: 32px;
   padding: 4px 6px;
-  color: #f1e4d7;
-  background: #21140f;
+  color: var(--color-text-alt);
+  background: var(--color-bg-surface);
   border: 1px solid #704c35;
   border-radius: 2px;
-  accent-color: #e99a45;
+  accent-color: var(--color-accent);
   font-size: 0.78rem;
 }
 .price-range-values {
@@ -3508,7 +3593,7 @@ select:focus-visible {
   display: grid;
   gap: 7px;
   margin-top: 14px;
-  color: #a8978b;
+  color: var(--color-text-muted);
   font:
     0.78rem 'DM Mono',
     monospace;
@@ -3518,8 +3603,8 @@ select:focus-visible {
 .trait-filter input {
   width: 100%;
   min-height: 34px;
-  border: 1px solid #3c2d24;
-  background: #171210;
+  border: 1px solid var(--color-border-mid);
+  background: var(--color-bg-card);
   color: #e9ddd2;
   padding: 6px 8px;
   font:
@@ -3578,7 +3663,7 @@ select:focus-visible {
     border: 0;
     outline: 0;
     background: transparent;
-    color: #f2e6dc;
+    color: var(--color-text-alt);
     font:
       0.72rem 'DM Mono',
       monospace;
@@ -3594,7 +3679,7 @@ select:focus-visible {
     border: 0;
     border-radius: 11px;
     background: #e69a50;
-    color: #24140d;
+    color: var(--color-accent-fg);
     cursor: pointer;
   }
   .market-hero {
@@ -3614,7 +3699,7 @@ select:focus-visible {
     padding: 0;
   }
   .hero-copy .eyebrow {
-    color: #f1d1ac;
+    color: var(--color-accent-hover);
     margin-bottom: 12px;
     font-size: 0.65rem;
   }
@@ -3639,7 +3724,7 @@ select:focus-visible {
   }
   .hero-copy .primary-button {
     background: transparent;
-    color: #f1ad64;
+    color: var(--color-accent-2);
     padding: 6px 0;
     font-size: 0.72rem;
   }
@@ -3741,14 +3826,14 @@ select:focus-visible {
     display: none;
   }
   .nft-card-price strong {
-    color: #e9a45f;
+    color: var(--color-accent-2);
     font-size: 0.67rem;
   }
   .nft-card-footer {
     display: none;
   }
   .edition-badge {
-    background: #e99a45;
+    background: var(--color-accent);
     border: 0;
     color: #26150d;
     border-radius: 0 0 5px 0;
@@ -3782,7 +3867,7 @@ select:focus-visible {
   padding: 0;
   border: 0;
   background: transparent;
-  color: #e9a45f;
+  color: var(--color-accent-2);
   cursor: pointer;
 }
 
@@ -3906,7 +3991,7 @@ select:focus-visible {
 
 .limited-featured-card > strong {
   margin-top: 4px;
-  color: #f0e0d3;
+  color: var(--color-text-alt);
 }
 
 .limited-featured-card:hover {
@@ -3944,7 +4029,7 @@ select:focus-visible {
 }
 
 .limited-featured-meta strong {
-  color: #f2c184;
+  color: var(--color-accent-hover);
 }
 
 .home-reference .home-section {
@@ -4005,7 +4090,7 @@ select:focus-visible {
 
 .editorial-feature-card h3 {
   margin: 8px 0 0;
-  color: #f2e7dc;
+  color: var(--color-text-alt);
   font:
     600 0.96rem 'DM Mono',
     monospace;
@@ -4158,11 +4243,11 @@ select:focus-visible {
   place-items: center;
   width: 28px;
   height: 28px;
-  color: #c9bdb2;
+  color: var(--color-text-sub);
 }
 
 .header-search-link:hover {
-  color: #e99a45;
+  color: var(--color-accent);
 }
 
 .footer-newsletter :disabled {
@@ -4182,11 +4267,11 @@ select:focus-visible {
   min-width: 0;
 }
 .wallet-choice-copy strong {
-  color: #f0e5d9;
+  color: var(--color-text-alt);
   font-weight: 500;
 }
 .wallet-choice-copy small {
-  color: #9b806d;
+  color: var(--color-text-muted);
   overflow-wrap: anywhere;
 }
 .checkout-mobile-heading {
@@ -4232,7 +4317,7 @@ select:focus-visible {
   .checkout-mobile-heading h1 {
     flex: 1;
     margin: 0;
-    color: #f0e5d9;
+    color: var(--color-text-alt);
     font-size: 1.1rem;
     line-height: 1.2;
   }
@@ -4242,7 +4327,7 @@ select:focus-visible {
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: #2a1813;
+    background: var(--color-bg-surface);
   }
   .checkout-change-wallet {
     color: #e3a05c;
@@ -4257,7 +4342,7 @@ select:focus-visible {
   .checkout-wallet-heading {
     order: 1;
     margin: 28px 28px 10px !important;
-    color: #eee0d4 !important;
+    color: var(--color-text-alt) !important;
     font-size: 1.05rem !important;
     letter-spacing: 0.01em;
   }
@@ -4269,9 +4354,9 @@ select:focus-visible {
     min-height: 80px;
     margin: 8px 28px;
     padding: 18px 20px;
-    border: 1px solid #493027;
+    border: 1px solid var(--color-border-mid);
     border-radius: 14px;
-    background: #251713;
+    background: var(--color-bg-surface);
     font-size: 0.96rem;
   }
   .wallet-choice > span {
@@ -4284,7 +4369,7 @@ select:focus-visible {
   .wallet-choice > input {
     width: 20px;
     height: 20px;
-    accent-color: #e99a45;
+    accent-color: var(--color-accent);
     flex-shrink: 0;
     margin-top: 4px;
   }
@@ -4293,7 +4378,7 @@ select:focus-visible {
   }
   .wallet-choice-copy strong {
     font-size: 1rem;
-    color: #f0e5d9;
+    color: var(--color-text-alt);
   }
   .checkout-add-wallet-link {
     order: 2;
@@ -4318,7 +4403,7 @@ select:focus-visible {
     font-size: 1.1rem;
   }
   .checkout-breakdown .total dd {
-    color: #e6a15c;
+    color: var(--color-accent-2);
     font-size: 1.15rem;
   }
   .checkout-confirm {
@@ -4376,9 +4461,9 @@ select:focus-visible {
   width: 100%;
   min-height: 56px;
   padding: 10px 14px;
-  border: 1px solid #493027;
+  border: 1px solid var(--color-border-mid);
   border-radius: 12px;
-  background: #251713;
+  background: var(--color-bg-surface);
   color: #e7d8ca;
   text-align: left;
   cursor: pointer;
@@ -4414,17 +4499,17 @@ select:focus-visible {
   border-radius: 50%;
 }
 .wallet-provider.is-selected .wallet-provider-radio {
-  border-color: #e99a45;
+  border-color: var(--color-accent);
 }
 .wallet-provider.is-selected .wallet-provider-radio::after {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #e99a45;
+  background: var(--color-accent);
   content: '';
 }
 .wallet-provider:focus-visible {
-  outline: 2px solid #e99a45;
+  outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 @media (max-width: 760px) {
@@ -4454,7 +4539,7 @@ select:focus-visible {
   .checkout-provider-heading {
     order: 3;
     margin: 24px 28px 10px !important;
-    color: #eee0d4 !important;
+    color: var(--color-text-alt) !important;
     font-size: 1.05rem !important;
   }
   .wallet-providers {
@@ -4494,9 +4579,9 @@ select:focus-visible {
     gap: 12px;
     padding: 16px 18px;
     margin: 0 28px;
-    border: 1px solid #493027;
+    border: 1px solid var(--color-border-mid);
     border-radius: 12px;
-    background: #21140f;
+    background: var(--color-bg-surface);
     font-size: 0.94rem;
     line-height: 1.5;
   }
@@ -4554,14 +4639,14 @@ select:focus-visible {
     width: 42px;
     height: 42px;
     padding: 0;
-    border: 1px solid #39251d;
+    border: 1px solid var(--color-border-mid);
     border-radius: 50%;
-    background: #211511;
+    background: var(--color-bg-surface);
     color: #dfaa72;
   }
   .cart-mobile-header h1 {
     margin: 0;
-    color: #f1e4d8;
+    color: var(--color-text-alt);
     font-size: 1rem;
     text-align: center;
     white-space: nowrap;
@@ -4613,19 +4698,19 @@ select:focus-visible {
   }
   .cart-line-name strong {
     overflow: hidden;
-    color: #f0e4d9;
+    color: var(--color-text-alt);
     font-size: 0.86rem;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   .cart-line-name small {
-    color: #ad9685;
+    color: var(--color-text-muted);
     font-size: 0.72rem;
   }
   .cart-line-price {
     grid-area: price;
     align-self: end;
-    color: #ad9685;
+    color: var(--color-text-muted);
     font-size: 0.72rem;
   }
   .cart-line .quantity {
@@ -4668,7 +4753,7 @@ select:focus-visible {
     max-height: calc(100dvh - 80px);
     overflow-y: auto;
     transform: translateX(-50%);
-    border: 1px solid #4f3528;
+    border: 1px solid var(--color-border-mid);
     border-radius: 22px;
     padding: 15px 16px 13px;
     background: #1a100e;
@@ -4741,12 +4826,12 @@ select:focus-visible {
     margin: 0 0 14px;
   }
   .detail-mobile-header > button {
-    color: #dfa05a;
+    color: var(--color-accent-2);
     cursor: pointer;
   }
   .detail-mobile-header > button[aria-pressed='true'] {
     border-color: #d9954e;
-    color: #e9a45c;
+    color: var(--color-accent-2);
   }
   .detail-page {
     padding-top: 12px;
@@ -4834,7 +4919,7 @@ select:focus-visible {
   cursor: pointer;
 }
 .auth-password-toggle:focus-visible {
-  outline: 2px solid #f0b66e;
+  outline: 2px solid var(--color-accent-hover);
   outline-offset: 2px;
 }
 .auth-modal .auth-password-control input {
@@ -4842,7 +4927,7 @@ select:focus-visible {
   padding-right: 42px;
 }
 .auth-modal .auth-password-toggle {
-  color: #c18d58;
+  color: var(--color-accent-2);
 }
 @media (max-width: 620px) {
   .auth-modal .auth-tabs {
@@ -4851,7 +4936,7 @@ select:focus-visible {
   .auth-mobile-title {
     display: block;
     margin: 65px 0 0;
-    color: #f2e7dc;
+    color: var(--color-text-alt);
     font-size: 1.08rem;
     font-weight: 600;
     line-height: 1.35;
@@ -4866,7 +4951,7 @@ select:focus-visible {
     clip: auto;
     white-space: normal;
     font-size: 0.78rem;
-    color: #c9bdb2;
+    color: var(--color-text-sub);
     letter-spacing: 0.04em;
   }
   .auth-screen .auth-modal .auth-field {
@@ -4895,7 +4980,7 @@ select:focus-visible {
     min-height: 0;
     padding: 20px 20px 22px;
     border-right: 0;
-    border-bottom: 1px solid #57311e;
+    border-bottom: 1px solid var(--color-border-deep);
     gap: 14px;
   }
   .footer-benefits article > span {
@@ -4909,7 +4994,7 @@ select:focus-visible {
   .footer-benefits p {
     font-size: 0.78rem;
     line-height: 1.55;
-    color: #c2a48e;
+    color: var(--color-text-muted);
   }
   .footer-newsletter {
     grid-column: auto;
@@ -4921,7 +5006,7 @@ select:focus-visible {
   }
   .footer-newsletter p {
     font-size: 0.78rem;
-    color: #c2a48e;
+    color: var(--color-text-muted);
   }
   .footer-bar {
     grid-template-columns: 1fr;
@@ -4945,7 +5030,7 @@ select:focus-visible {
     bottom: 0;
     z-index: 10;
     padding: 14px 0 16px;
-    background: #100d0c;
+    background: var(--color-bg);
   }
   .detail-actions .primary-button {
     min-height: 52px;
@@ -4957,4 +5042,94 @@ select:focus-visible {
     padding: 0 16px;
     font-size: 0.92rem;
   }
+}
+
+
+/* ── Light mode supplemental overrides ──────────────────────────────────── */
+/* Covers dark-hardcoded backgrounds not captured by CSS vars.               */
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    color-scheme: light;
+  }
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .nft-card,
+  :root:not([data-theme='dark']) .hero-art,
+  :root:not([data-theme='dark']) .detail-gallery-thumb,
+  :root:not([data-theme='dark']) .detail-aside,
+  :root:not([data-theme='dark']) .cart-summary,
+  :root:not([data-theme='dark']) .checkout-breakdown,
+  :root:not([data-theme='dark']) .auth-screen .auth-card,
+  :root:not([data-theme='dark']) .auth-screen .auth-socials button,
+  :root:not([data-theme='dark']) .select-wrap,
+  :root:not([data-theme='dark']) .catalog-search,
+  :root:not([data-theme='dark']) .order-card,
+  :root:not([data-theme='dark']) .profile-card,
+  :root:not([data-theme='dark']) .wallet-card {
+    background: var(--color-bg-card);
+  }
+}
+
+:root[data-theme='light'] .nft-card,
+:root[data-theme='light'] .hero-art,
+:root[data-theme='light'] .detail-gallery-thumb,
+:root[data-theme='light'] .detail-aside,
+:root[data-theme='light'] .cart-summary,
+:root[data-theme='light'] .checkout-breakdown,
+:root[data-theme='light'] .auth-screen .auth-card,
+:root[data-theme='light'] .auth-screen .auth-socials button,
+:root[data-theme='light'] .select-wrap,
+:root[data-theme='light'] .catalog-search,
+:root[data-theme='light'] .order-card,
+:root[data-theme='light'] .profile-card,
+:root[data-theme='light'] .wallet-card {
+  background: var(--color-bg-card);
+}
+
+/* Footer and marketing section light overrides */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .marketing-footer,
+  :root:not([data-theme='dark']) .footer-benefits,
+  :root:not([data-theme='dark']) .footer-benefits article,
+  :root:not([data-theme='dark']) .footer-newsletter,
+  :root:not([data-theme='dark']) .footer-bar {
+    background: #f0ebe4;
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+  :root:not([data-theme='dark']) .hero-section {
+    background: #f0ebe4;
+  }
+  :root:not([data-theme='dark']) .market-hero {
+    border-bottom-color: var(--color-border);
+  }
+  :root:not([data-theme='dark']) .shimmer {
+    background: linear-gradient(90deg, #e8e0d8 25%, #f5f0ea 50%, #e8e0d8 75%);
+    background-size: 200% 100%;
+  }
+}
+
+:root[data-theme='light'] .marketing-footer,
+:root[data-theme='light'] .footer-benefits,
+:root[data-theme='light'] .footer-benefits article,
+:root[data-theme='light'] .footer-newsletter,
+:root[data-theme='light'] .footer-bar {
+  background: #f0ebe4;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+:root[data-theme='light'] .hero-section {
+  background: #f0ebe4;
+}
+:root[data-theme='light'] .market-hero {
+  border-bottom-color: var(--color-border);
+}
+:root[data-theme='light'] .shimmer {
+  background: linear-gradient(90deg, #e8e0d8 25%, #f5f0ea 50%, #e8e0d8 75%);
+  background-size: 200% 100%;
 }

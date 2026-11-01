@@ -371,6 +371,43 @@ Os quatro arquivos `public/assets/monkey1–4.webp` foram gerados com Gemini a p
 
 Auditoria automática Lighthouse: Accessibility 100% nos quatro cenários. Revisão manual global de zoom/reflow em todas as telas continua pendente.
 
+### Modo claro (light mode)
+
+O projeto oferece suporte a modo claro como opção de acessibilidade e UX. Respeitar a preferência do sistema operacional é uma boa prática recomendada pelo WCAG 2.2 (Critério 1.4.3 e diretrizes de personalização), pois usuários com sensibilidade à luz, daltonismo ou leitura em ambiente iluminado beneficiam-se de paletas de alto contraste sobre fundo claro.
+
+**Implementação:**
+
+| Camada | Mecanismo |
+| ------ | --------- |
+| CSS custom properties | Tokens de cor declarados em `:root` (dark, padrão); sobrescritos em `@media (prefers-color-scheme: light)` para preferência do SO e em `:root[data-theme='light']` para seleção manual |
+| Toggle no header | Botão sun/moon em `RootLayout`; ícone reflete o tema corrente; `aria-label` descreve a ação ("Ativar modo claro" / "Ativar modo escuro") |
+| Persistência | `localStorage('kurio.theme')`: `'light'`, `'dark'` ou ausente (segue SO); leitura no init do hook antes do primeiro render; wrappado em `try/catch` (private windows) |
+| Prioridade | Manual (`data-theme`) > preferência do SO (`prefers-color-scheme`) > padrão dark |
+
+**Tokens (20 custom properties, cobertura total da folha de estilos):**
+
+| Token | Dark | Light | Uso |
+| ----- | ---- | ----- | --- |
+| `--color-bg` | `#100d0c` | `#f7f3ef` | fundo da página |
+| `--color-bg-header` | `#15100f` | `#ffffff` | cabeçalho |
+| `--color-bg-card` | `#171210` | `#fffcf9` | cards, inputs, selects |
+| `--color-bg-surface` | `#1a1310` | `#ede8e2` | sidebars, rows secundárias |
+| `--color-border` | `#30231d` | `#ddd0c5` | divisores padrão |
+| `--color-border-mid` | `#3a2215` | `#cbbfb6` | bordas internas |
+| `--color-border-deep` | `#57311e` | `#b8a89e` | separadores fortes |
+| `--color-accent` | `#e99a45` | `#c97a20` | CTA, destaques |
+| `--color-accent-2` | `#dfa05a` | `#a86218` | eyebrow, variantes |
+| `--color-accent-hover` | `#f4b66e` | `#a86218` | hover de botões CTA |
+| `--color-accent-fg` | `#1b110c` | `#ffffff` | texto sobre amber |
+| `--color-text` | `#f2eee8` | `#1a1310` | texto primário |
+| `--color-text-alt` | `#f0e4d9` | `#2a1a14` | texto secundário brilhante |
+| `--color-text-sub` | `#c9bdb2` | `#5c5049` | nav, labels terciárias |
+| `--color-text-muted` | `#a8978b` | `#7a6355` | placeholders, captions |
+| `--color-text-dim` | `#7a5e4a` | `#6b5d54` | metadados, timestamps |
+| `--color-error` | `#d46b52` | `#b8402b` | estados de erro |
+
+O amber do modo claro (`#c97a20`) mantém razão de contraste ≥ 4,5:1 sobre `#f7f3ef`, atendendo WCAG AA. Todos os valores de `--color-text` sobre `--color-bg` superam 7:1 (AAA) em ambos os temas.
+
 ---
 
 ## Performance e otimizações

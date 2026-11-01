@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search, ShoppingCart, UserRound } from 'lucide-react';
+import { Moon, Search, ShoppingCart, Sun, UserRound } from 'lucide-react';
 import { Link, Outlet, useRouterState } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLogoutMutation, useSessionQuery } from '@/features/auth/queries';
@@ -34,10 +34,46 @@ function RealtimeBridge({ userId }: { userId: string }) {
   return null;
 }
 
+function useTheme() {
+  const [theme, setTheme] = useState<'dark' | 'light' | null>(() => {
+    try {
+      return (localStorage.getItem('kurio.theme') as 'dark' | 'light') ?? null;
+    } catch {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme) {
+      root.setAttribute('data-theme', theme);
+      try { localStorage.setItem('kurio.theme', theme); } catch { /* noop */ }
+    } else {
+      root.removeAttribute('data-theme');
+      try { localStorage.removeItem('kurio.theme'); } catch { /* noop */ }
+    }
+  }, [theme]);
+
+  const toggle = () =>
+    setTheme((prev) => {
+      if (prev === 'light') return 'dark';
+      if (prev === 'dark') return null;
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return prefersDark ? 'light' : 'dark';
+    });
+
+  const isDark =
+    theme === 'dark' ||
+    (theme === null && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  return { theme, isDark, toggle };
+}
+
 export function RootLayout() {
   const sessionQuery = useSessionQuery();
   const logoutMutation = useLogoutMutation();
   const [authModal, setAuthModal] = useState<'login' | 'register' | null>(null);
+  const { isDark, toggle: toggleTheme } = useTheme();
   useEffect(() => {
     const handler = (e: Event) => {
       const mode = (e as CustomEvent<{ mode: 'login' | 'register' }>).detail?.mode ?? 'login';
@@ -88,6 +124,15 @@ export function RootLayout() {
           >
             <Search size={15} aria-hidden="true" />
           </a>
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={toggleTheme}
+            aria-label={isDark ? 'Ativar modo claro' : 'Ativar modo escuro'}
+            title={isDark ? 'Modo claro' : 'Modo escuro'}
+          >
+            {isDark ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
+          </button>
           <Link to="/cart" className="header-icon-link" aria-label="Carrinho">
             <ShoppingCart size={16} aria-hidden="true" />
           </Link>
