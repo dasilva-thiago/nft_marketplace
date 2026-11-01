@@ -1,0 +1,3 @@
+# Lighthouse HTML reports are generated audit artifacts, not application source.
+reports/lighthouse/*.html linguist-generated=true
+reports/lighthouse/**/*.html linguist-generated=true
