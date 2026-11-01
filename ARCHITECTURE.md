@@ -360,6 +360,8 @@ Derivados responsivos gerados por `scripts/prepare-responsive-images.py`: `320/4
 - **Feedback de mutations:** regiões `aria-live="polite"` (header da sessão, favoritos, adição ao carrinho, confirmação de pedido).
 - **Movimento reduzido:** `@media (prefers-reduced-motion: reduce)` desativa todas as transições CSS do projeto.
 - **Reflow 320px:** `@media (max-width: 320px)` força layouts em coluna única sem overflow horizontal.
+- **Reflow zoom 200% (≈640px lógico):** `@media (max-width: 680px) and (min-width: 521px)` colapsa detalhe/carrinho para coluna única e retira `position: fixed` do resumo do carrinho.
+- **`aria-live` no resumo do carrinho:** `<aside aria-live="polite" aria-atomic="false">` anuncia mudanças de cotação ao aplicar cupom.
 - **Contraste verificado (WCAG AA/AAA):**
 
 | Par de cores                          | Ratio   |
@@ -422,7 +424,7 @@ Deploy público aguarda autorização e acesso à conta do provedor.
 
 A suíte Playwright executa em Chromium desktop (1440px) e mobile (390px) com MSW ativo. 110 casos totais: 104 aprovados e 6 skips intencionais por viewport. A fixture aguarda a promise real de `worker.start()`, o controller e os handlers de health/reset antes de prosseguir. Baselines visuais versionadas em `e2e/visual-regression.spec.ts-snapshots/` para início, detalhe, carrinho e pagamento em ambos os perfis.
 
-Cobertura: catálogo/URL/histórico, sessão (cadastro/login/expiração/logout/troca), favoritos com rollback, carrinho visitante/autenticado/merge, compra/recibo/recusa/idempotência/timeout, perfil/carteiras, eventos realtime/reconexão, teclado/foco, skeleton/falha/retry, responsividade sem overflow em 768px.
+Cobertura: catálogo/URL/histórico, sessão (cadastro/login/expiração/logout/troca), favoritos com rollback, carrinho visitante/autenticado/merge, compra/recibo/recusa/idempotência/timeout, perfil/carteiras, eventos realtime/reconexão, teclado/foco, skeleton/falha/retry, responsividade sem overflow em 768px. Baselines visuais para tablet (768×1024) em projeto `chromium-tablet`: home, detalhe e carrinho.
 
 ---
 

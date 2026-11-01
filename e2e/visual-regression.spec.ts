@@ -81,14 +81,65 @@ test('carrinho: visual baseline com quatro NFTs e cotação real do mock', async
 test('pagamento: visual baseline com carteira e quote carregadas', async ({ page }) => {
   await seedCart(page, ['emerald-ape-042']);
   await page.goto('/checkout');
-  const isMobile = (page.viewportSize()?.width ?? 1440) <= 520;
+  const vw = page.viewportSize()?.width ?? 1440;
+  const isMobileLayout = vw <= 520;
   await expect(
     page.getByRole('heading', {
-      name: isMobile ? 'Pagamento com carteira' : 'Perfil do colecionador',
+      name: isMobileLayout ? 'Pagamento com carteira' : 'Perfil do colecionador',
     }),
   ).toBeVisible();
   await expect(page.locator('.checkout-breakdown .total dd')).not.toHaveText('—');
-  await expect(page.getByRole('radio')).toHaveCount(isMobile ? 2 : 1);
+  await expect(page.getByRole('radio')).toHaveCount(isMobileLayout ? 2 : 1);
   await page.evaluate(() => document.fonts.ready);
   await expectScreenshot(page, 'payment.png');
+});
+
+test('tablet 768px: home sem overflow horizontal', async ({ page }) => {
+  test.skip(
+    (page.viewportSize()?.width ?? 1440) !== 768,
+    'Apenas no projeto chromium-tablet',
+  );
+  await expect(
+    page.getByRole('heading', { name: 'SEJA DONO DO FUTURO DA ARTE DIGITAL' }),
+  ).toBeVisible();
+  await page.locator('.nft-grid .nft-card').first().waitFor();
+  const bodyWidth = await page.evaluate(() => document.body.scrollWidth);
+  const vw = page.viewportSize()!.width;
+  expect(bodyWidth).toBeLessThanOrEqual(vw + 2);
+  await expectScreenshot(page, 'home-tablet.png', false);
+});
+
+test('tablet 768px: detalhe sem overflow horizontal', async ({ page }) => {
+  test.skip(
+    (page.viewportSize()?.width ?? 1440) !== 768,
+    'Apenas no projeto chromium-tablet',
+  );
+  await page.goto('/nft/emerald-ape-042');
+  await expect(page.getByRole('heading', { name: 'Emerald Ape #042' })).toBeVisible();
+  await page.locator('.detail-main-image').waitFor();
+  const bodyWidth = await page.evaluate(() => document.body.scrollWidth);
+  const vw = page.viewportSize()!.width;
+  expect(bodyWidth).toBeLessThanOrEqual(vw + 2);
+  await expectScreenshot(page, 'detail-tablet.png');
+});
+
+test('tablet 768px: carrinho sem overflow horizontal', async ({ page }) => {
+  test.skip(
+    (page.viewportSize()?.width ?? 1440) !== 768,
+    'Apenas no projeto chromium-tablet',
+  );
+  const nfts = await page.evaluate(async () => {
+    const response = await fetch('/api/nfts?page=1&pageSize=2&sort=priceEth&sortOrder=asc');
+    if (!response.ok) throw new Error(`Catálogo indisponível: ${response.status}`);
+    const result = (await response.json()) as { items: Array<{ id: string }> };
+    return result.items.map(({ id }) => id);
+  });
+  await seedCart(page, nfts);
+  await page.goto('/cart');
+  await expect(page.getByRole('heading', { name: 'Carrinho de NFTs' })).toBeVisible();
+  await expect(page.locator('.cart-line')).toHaveCount(2);
+  const bodyWidth = await page.evaluate(() => document.body.scrollWidth);
+  const vw = page.viewportSize()!.width;
+  expect(bodyWidth).toBeLessThanOrEqual(vw + 2);
+  await expectScreenshot(page, 'cart-tablet.png');
 });

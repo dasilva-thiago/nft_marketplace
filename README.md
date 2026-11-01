@@ -136,6 +136,10 @@ Performance não alcança a meta de 90 em nenhum dos quatro cenários. A causa �
 
 A sessão simulada mantém apenas um handle opaco em `sessionStorage`; senhas não são armazenadas no navegador nem retornadas nas respostas. Os dados de catálogo, carrinho, favoritos, perfil, carteiras e pedidos são isolados por usuário no estado MSW.
 
+## Autor
+
+Thiago da Silva — [GitHub](https://github.com/dasilva-thiago) · [LinkedIn](https://www.linkedin.com/in/dasilva-thiago/) · [Portfólio](https://www.dasilva-thiago.dev/)
+
 ## Documentação técnica
 
 - [`ARCHITECTURE.md`](ARCHITECTURE.md): arquitetura, camadas, contratos REST, eventos Socket.IO, política de sessão, estado do carrinho, estratégia de cache, reconciliação REST/Socket.IO, decisões de UX, desvios do Figma, acessibilidade, performance e deploy;

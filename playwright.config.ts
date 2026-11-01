@@ -20,6 +20,10 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 1000 } },
     },
     {
+      name: 'chromium-tablet',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 768, height: 1024 } },
+    },
+    {
       name: 'chromium-mobile',
       use: {
         ...devices['Desktop Chrome'],

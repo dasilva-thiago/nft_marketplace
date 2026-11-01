@@ -148,7 +148,7 @@ export function CartPage() {
           {cartQuery.isPending ? (
             <CartSummarySkeleton />
           ) : (
-            <aside className="cart-summary">
+            <aside className="cart-summary" aria-label="Resumo do carrinho" aria-live="polite" aria-atomic="false">
               <h2>Resumo da carteira</h2>
               <dl>
                 <div>
