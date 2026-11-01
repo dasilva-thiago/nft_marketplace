@@ -343,7 +343,10 @@ Os quatro arquivos `public/assets/monkey1–4.webp` foram gerados com Gemini a p
 | Perfil mobile                | Sem frame                           | Adaptação responsiva do desktop                       | Sem referência Figma mobile                 |
 | Carteiras mobile             | Sem frame                           | Adaptação responsiva do desktop                       | Sem referência Figma mobile                 |
 | `/checkout/collector`        | Dados do colecionador dentro do checkout | Tela própria pré-checkout                        | Separação de responsabilidades; UX mais clara |
-| Fidelidade fina tipografia   | Frames 390/768/1440px               | Auditoria parcial; proporções e espaçamentos revisados | Auditoria completa ainda pendente           |
+| Modo claro (light mode)      | Apenas tema escuro no Figma         | Sistema de tokens CSS completo + toggle sun/moon no header | Acessibilidade (WCAG 1.4.3); preferência do SO respeitada |
+| Hero overlay no modo claro   | N/A (Figma só dark)                 | Gradiente e texto fixos em cores escuras independente do tema | Overlay é sempre escuro; texto claro hardcoded garante legibilidade |
+| Transições de tema           | N/A                                 | `transition: background-color 0.25s, color 0.2s` em elementos estruturais, com guard `prefers-reduced-motion` | Experiência mais suave; motion desabilitado para quem configurou no SO |
+| Toggle de tema no header     | N/A                                 | Botão sun/moon entre busca e carrinho no header       | Acesso rápido; posição conveniente sem poluir a nav principal |
 
 ---
 
