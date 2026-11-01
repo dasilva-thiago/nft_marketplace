@@ -45,10 +45,6 @@ const skDetailSkeleton =
   `<button style="width:100px;height:40px;background:#2a2018;border:none;border-radius:8px;margin-top:16px;cursor:default;color:#4a3a2a;font-size:12px"> </button>` +
   `</div></div>`;
 
-// Known LCP image assets per route (keep in sync with public/assets/)
-const LCP_HOME = '/assets/monkey4-480.webp';
-const LCP_DETAIL = '/assets/monkey3-480.webp';
-
 const skScript =
   `<script>` +
   `(function(){` +
@@ -57,8 +53,10 @@ const skScript =
   `var p=location.pathname;` +
   `var isDetail=/^\\/nft\\//.test(p);` +
   `r.innerHTML=isDetail?` +
-  JSON.stringify(skDetailSkeleton) + `:` +
-  JSON.stringify(skHomeSkeleton) + `;` +
+  JSON.stringify(skDetailSkeleton) +
+  `:` +
+  JSON.stringify(skHomeSkeleton) +
+  `;` +
   `})();` +
   `</script>`;
 
@@ -112,7 +110,11 @@ export default defineConfig({
           // Validation
           if (nm.includes('/zod/') || nm.includes('/zod@')) return 'vendor-zod';
           // HTTP client
-          if (nm.includes('/axios/') || nm.includes('follow-redirects') || nm.includes('proxy-from-env'))
+          if (
+            nm.includes('/axios/') ||
+            nm.includes('follow-redirects') ||
+            nm.includes('proxy-from-env')
+          )
             return 'vendor-axios';
           // Font files: let Vite handle them through CSS pipeline
           if (nm.includes('@fontsource/')) return;
@@ -127,7 +129,8 @@ export default defineConfig({
           )
             return;
           // Icons
-          if (nm.includes('/lucide-react/') || nm.includes('/lucide-react@')) return 'vendor-lucide';
+          if (nm.includes('/lucide-react/') || nm.includes('/lucide-react@'))
+            return 'vendor-lucide';
           // Small UI utilities that are definitely in the sync critical path
           if (
             nm.includes('/clsx/') ||
