@@ -67,9 +67,11 @@ const criticalCssPlugin: Plugin = {
     handler(html) {
       const critical =
         `<style>` +
-        `:root{background:#100d0c;color:#f2eee8;font-family:'Space Grotesk',system-ui,sans-serif}` +
-        `body{margin:0;min-height:100vh;background:#100d0c}` +
-        `#root{min-height:100vh;background:#100d0c}` +
+        `:root{--color-bg:#100d0c;--color-text:#f2eee8;background:var(--color-bg);color:var(--color-text);font-family:'Space Grotesk',system-ui,sans-serif}` +
+        `@media(prefers-color-scheme:light){:root:not([data-theme=dark]){--color-bg:#f7f3ef;--color-text:#1a1310}}` +
+        `:root[data-theme=light]{--color-bg:#f7f3ef;--color-text:#1a1310}` +
+        `body{margin:0;min-height:100vh;background:var(--color-bg)}` +
+        `#root{min-height:100vh;background:var(--color-bg)}` +
         `@keyframes sk-pulse{0%,100%{opacity:.6}50%{opacity:1}}` +
         `#root>div>div>div{animation:sk-pulse 1.4s ease-in-out infinite}` +
         `</style>`;
