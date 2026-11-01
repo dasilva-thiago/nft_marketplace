@@ -3750,7 +3750,7 @@ select:focus-visible {
   .hero-description {
     max-width: 185px;
     margin: 13px 0 6px;
-    color: #e2c6ae;
+    color: var(--color-text-sub);
     font-size: 0.78rem;
     line-height: 1.5;
   }
