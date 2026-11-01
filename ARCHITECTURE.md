@@ -63,12 +63,12 @@ A suíte Playwright final lista 110 execuções Chromium desktop/mobile: 104 apr
 
 A matriz Lighthouse final usou build de produção com MSW default, três medições por rota/perfil, sem PSI remoto. Os relatórios HTML/JSON individuais e o resumo integral estão em `reports/lighthouse/`; versões e ambiente estão no topo de `reports/lighthouse/summary.md`.
 
-| Perfil  | Rota                   | Performance | Accessibility | Best Practices |  SEO |     LCP |   CLS |    TBT |
-| ------- | ---------------------- | ----------: | ------------: | -------------: | ---: | ------: | ----: | -----: |
-| mobile  | `/`                    |         87% |          100% |            96% | 100% | 3780 ms | 0.001 |  89 ms |
-| mobile  | `/nft/emerald-ape-042` |         87% |          100% |            96% | 100% | 3846 ms | 0.013 |  38 ms |
-| desktop | `/`                    |         68% |          100% |           100% | 100% | 3676 ms | 0.015 |  70 ms |
-| desktop | `/nft/emerald-ape-042` |         68% |          100% |           100% | 100% | 3701 ms | 0.020 |  48 ms |
+| Perfil  | Rota                   | Performance | Accessibility | Best Practices |  SEO |     LCP |   CLS |   TBT |
+| ------- | ---------------------- | ----------: | ------------: | -------------: | ---: | ------: | ----: | ----: |
+| mobile  | `/`                    |         87% |          100% |            96% | 100% | 3780 ms | 0.001 | 89 ms |
+| mobile  | `/nft/emerald-ape-042` |         87% |          100% |            96% | 100% | 3846 ms | 0.013 | 38 ms |
+| desktop | `/`                    |         68% |          100% |           100% | 100% | 3676 ms | 0.015 | 70 ms |
+| desktop | `/nft/emerald-ape-042` |         68% |          100% |           100% | 100% | 3701 ms | 0.020 | 48 ms |
 
 Performance está abaixo da meta de 90 em todos os perfis; não foram reduzidos thresholds nem desativados recursos para aumentar a nota. A causa é estrutural: o elemento LCP é a primeira imagem de NFT, carregada após o ciclo React bootstrap → MSW lazy init (~340 KB) → primeira chamada de API, resultando em LCP ≥ 3,6 s. Sem SSR ou pré-geração estática, esse teto não é eliminável.
 

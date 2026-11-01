@@ -118,12 +118,12 @@ A última execução completa do Playwright listou 55 casos por projeto Chromium
 
 A matriz abaixo usa build otimizado com MSW default e três medições por rota/perfil. A mediana é reportada; as três rodadas, versões e ambiente estão em [`reports/lighthouse/summary.md`](reports/lighthouse/summary.md), junto aos relatórios HTML/JSON individuais.
 
-| Perfil  | Rota                   | Performance | Accessibility | Best Practices |  SEO |     LCP |   CLS |    TBT |
-| ------- | ---------------------- | ----------: | ------------: | -------------: | ---: | ------: | ----: | -----: |
-| mobile  | `/`                    |         87% |          100% |            96% | 100% | 3780 ms | 0.001 |  89 ms |
-| mobile  | `/nft/emerald-ape-042` |         87% |          100% |            96% | 100% | 3846 ms | 0.013 |  38 ms |
-| desktop | `/`                    |         68% |          100% |           100% | 100% | 3676 ms | 0.015 |  70 ms |
-| desktop | `/nft/emerald-ape-042` |         68% |          100% |           100% | 100% | 3701 ms | 0.020 |  48 ms |
+| Perfil  | Rota                   | Performance | Accessibility | Best Practices |  SEO |     LCP |   CLS |   TBT |
+| ------- | ---------------------- | ----------: | ------------: | -------------: | ---: | ------: | ----: | ----: |
+| mobile  | `/`                    |         87% |          100% |            96% | 100% | 3780 ms | 0.001 | 89 ms |
+| mobile  | `/nft/emerald-ape-042` |         87% |          100% |            96% | 100% | 3846 ms | 0.013 | 38 ms |
+| desktop | `/`                    |         68% |          100% |           100% | 100% | 3676 ms | 0.015 | 70 ms |
+| desktop | `/nft/emerald-ape-042` |         68% |          100% |           100% | 100% | 3701 ms | 0.020 | 48 ms |
 
 Performance não alcança a meta de 90 em nenhum dos quatro cenários. A causa é estrutural: o LCP é a primeira imagem de NFT carregada após o ciclo React bootstrap → MSW lazy init → chamada de API, resultando em LCP ≥ 3,6 s sem SSR. FCP melhorou para 2,1 s com skeleton loader e chunk splitting; TBT caiu de ~200 ms para 40–90 ms. Os demais scores atingem ou superam as metas do desafio. A otimização permanece registrada como pendência, sem redução de thresholds.
 
