@@ -83,11 +83,11 @@ test('pagamento: visual baseline com carteira e quote carregadas', async ({ page
   await page.goto('/checkout');
   const vw = page.viewportSize()?.width ?? 1440;
   const isMobileLayout = vw <= 520;
-  await expect(
-    page.getByRole('heading', {
-      name: isMobileLayout ? 'Pagamento com carteira' : 'Perfil do colecionador',
-    }),
-  ).toBeVisible();
+  if (isMobileLayout) {
+    await expect(page.getByRole('heading', { name: 'Pagamento com carteira' })).toBeVisible();
+  } else {
+    await expect(page.locator('.checkout-items-heading')).toBeVisible();
+  }
   await expect(page.locator('.checkout-breakdown .total dd')).not.toHaveText('—');
   await expect(page.getByRole('radio')).toHaveCount(isMobileLayout ? 2 : 1);
   await page.evaluate(() => document.fonts.ready);

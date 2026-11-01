@@ -464,3 +464,15 @@ Cobertura: catálogo/URL/histórico, sessão (cadastro/login/expiração/logout/
 ## Precisão decimal ETH
 
 `priceEth`, valores da cotação, taxas e totais são strings decimais em contratos, estado e persistência. Cálculos usam `big.js`; quantidades são inteiros. Não converter valor para `number` para calcular preço, desconto ou total. Formatação local é a única fronteira em que se admite conversão segura para apresentação.
+
+---
+
+## Ferramentas de IA utilizadas no desenvolvimento
+
+O assistente Claude AI (Anthropic) foi utilizado como apoio durante o desenvolvimento deste projeto. A seguir, os contextos em que foi empregado:
+
+- **Modo claro (light mode):** o sistema de tokens CSS, a lógica do hook `useTheme`, a escrita dos overrides de tema e a identificação de valores hardcoded no stylesheet foram desenvolvidos com assistência do Claude. O código foi revisado, testado e ajustado manualmente antes de cada commit.
+- **Documentação:** partes das seções deste arquivo (`ARCHITECTURE.md`) foram redigidas com sugestão do Claude e revisadas pelo autor do projeto antes de serem incorporadas ao repositório.
+- **Correções de testes E2E:** a correção do teste de baseline visual de pagamento (`visual-regression.spec.ts`) e a atualização dos snapshots foram conduzidas com apoio do Claude.
+
+Todo o conteúdo gerado com auxílio de IA foi revisado, validado e é de responsabilidade do autor.
