@@ -452,7 +452,7 @@ Arquivos de configuração em `public/` (copiados para `dist/` pelo Vite):
 - **`_redirects`:** `/* /index.html 200` — fallback SPA para acesso direto e refresh em qualquer rota.
 - **`_headers`:** cabeçalhos de segurança (`X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`) e cache imutável de 1 ano para `/assets/*`, `/*.js`, `/*.css`, `/*.woff2`; `mockServiceWorker.js` com `no-cache`.
 
-Deploy público aguarda autorização e acesso à conta do provedor.
+A aplicação está hospedada em **Cloudflare Pages** sob o domínio **`kurio.dasilvathiago.page`**. O domínio `dasilvathiago.page` é registrado no name.com com DNS gerenciado pelo Cloudflare; o subdomínio `kurio` aponta via CNAME para o projeto Pages.
 
 ---
 
