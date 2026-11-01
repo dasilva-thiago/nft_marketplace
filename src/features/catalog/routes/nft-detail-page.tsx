@@ -30,7 +30,7 @@ export function NftDetailPage() {
 
   async function addToCart() {
     if (!sessionQuery.data) {
-      await navigate({ to: '/login', search: { returnTo: `/nft/${nftId}` } });
+      window.dispatchEvent(new CustomEvent('kurio:open-auth', { detail: { mode: 'login' } }));
       return;
     }
     await addMutation.mutateAsync({ nftId, quantity });
@@ -39,7 +39,7 @@ export function NftDetailPage() {
 
   async function toggleFavorite() {
     if (!sessionQuery.data) {
-      await navigate({ to: '/login', search: { returnTo: `/nft/${nftId}` } });
+      window.dispatchEvent(new CustomEvent('kurio:open-auth', { detail: { mode: 'login' } }));
       return;
     }
     await favoriteMutation.mutateAsync({ nftId, shouldFavorite: !isFavorite });

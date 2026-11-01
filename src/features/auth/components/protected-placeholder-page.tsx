@@ -35,6 +35,13 @@ export function ProtectedPlaceholderPage({ title = 'Área privada', children }: 
       </section>
     );
   if (!sessionQuery.data)
-    return <SessionRequiredPage returnTo={returnTo} />;
+    return (
+      <SessionRequiredPage
+        returnTo={returnTo}
+        onOpenModal={() =>
+          window.dispatchEvent(new CustomEvent('kurio:open-auth', { detail: { mode: 'login' } }))
+        }
+      />
+    );
   return children ?? <PlaceholderPage title={title} />;
 }

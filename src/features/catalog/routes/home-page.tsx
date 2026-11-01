@@ -653,9 +653,14 @@ export function HomePage() {
             <User size={17} />
           </Link>
         ) : (
-          <Link to="/login" search={{ returnTo: '/' }} aria-label="Entrar">
+          <button
+            type="button"
+            className="header-icon-link"
+            aria-label="Entrar"
+            onClick={() => window.dispatchEvent(new CustomEvent('kurio:open-auth', { detail: { mode: 'login' } }))}
+          >
             <User size={17} />
-          </Link>
+          </button>
         )}
       </nav>
     </>
