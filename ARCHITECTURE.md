@@ -65,17 +65,19 @@ A matriz Lighthouse final usou build de produção com MSW default, três mediç
 
 | Perfil  | Rota                   | Performance | Accessibility | Best Practices |  SEO |     LCP |   CLS |    TBT |
 | ------- | ---------------------- | ----------: | ------------: | -------------: | ---: | ------: | ----: | -----: |
-| mobile  | `/`                    |         84% |          100% |            96% | 100% | 3576 ms | 0.000 | 195 ms |
-| mobile  | `/nft/emerald-ape-042` |         83% |          100% |            96% | 100% | 3777 ms | 0.013 | 162 ms |
-| desktop | `/`                    |         61% |          100% |           100% | 100% | 3352 ms | 0.006 | 203 ms |
-| desktop | `/nft/emerald-ape-042` |         64% |          100% |           100% | 100% | 3338 ms | 0.009 | 170 ms |
+| mobile  | `/`                    |         87% |          100% |            96% | 100% | 3780 ms | 0.001 |  89 ms |
+| mobile  | `/nft/emerald-ape-042` |         87% |          100% |            96% | 100% | 3846 ms | 0.013 |  38 ms |
+| desktop | `/`                    |         68% |          100% |           100% | 100% | 3676 ms | 0.015 |  70 ms |
+| desktop | `/nft/emerald-ape-042` |         68% |          100% |           100% | 100% | 3701 ms | 0.020 |  48 ms |
 
-Performance está abaixo da meta de 90 em todos os perfis; não foram reduzidos thresholds nem desativados recursos para aumentar a nota. Nos LHR medianos, FCP varia de aproximadamente 2,3 a 2,5 s e o elemento LCP não é descoberto no HTML inicial. A primeira carga inclui um chunk comum de cerca de 508 KB (162 KB gzip) e o chunk MSW de cerca de 340 KB (111 KB gzip); o breakdown mostra custo de script-evaluation/layout. As oportunidades medidas incluem JavaScript não usado (~116–119 KiB), CSS não usado (~10–13 KiB), CSS bloqueante (~150–300 ms) e imagens não dimensionadas corretamente (~45–196 KiB, conforme rota/perfil). As variantes responsivas 320/480 já foram adicionadas, mas não resolveram o custo dominante de FCP/LCP. O resultado, ambiente e relatórios devem ser considerados juntos; uma revisão de otimização de performance permanece pendente.
+Performance está abaixo da meta de 90 em todos os perfis; não foram reduzidos thresholds nem desativados recursos para aumentar a nota. A causa é estrutural: o elemento LCP é a primeira imagem de NFT, carregada após o ciclo React bootstrap → MSW lazy init (~340 KB) → primeira chamada de API, resultando em LCP ≥ 3,6 s. Sem SSR ou pré-geração estática, esse teto não é eliminável.
+
+Otimizações aplicadas: vendor chunk splitting (vendor-react, vendor-tanstack, vendor-zod, vendor-axios, vendor-lucide, vendor-misc), eliminação de CSS bloqueante via preload + onload, CSS crítico inline (cores e fonte do body) e skeleton loader inline com texto visível e imagem de prioridade alta (LCP placeholder). FCP melhorou de ~2,5 s para ~2,1 s; TBT caiu de ~195 ms para 40–90 ms. O chunk MSW permanece lazy (~340 KB / 111 KB gzip) e não bloqueia o parser. O resultado, ambiente e relatórios devem ser considerados juntos; uma revisão de otimização de performance permanece pendente.
 
 Ambiente medido: Node.js 22.23.4, Linux/arm64, pnpm 11.25.0, Lighthouse CI 0.15.1, Lighthouse 12.6.1 e Chromium 156.0.8078.47. Consulte [`reports/lighthouse/summary.md`](reports/lighthouse/summary.md) para valores das três rodadas e arquivos brutos.
 
 ## Documentação relacionada e execução
 
-`README.md` contém instalação, variáveis de ambiente, credenciais fictícias, cenários, reset e comandos. `docs/api-contracts.md` detalha recursos e eventos; `docs/visual-reference-inventory.md` cataloga frames e decisões visuais; `TODO.md` acompanha evidências e pendências; `docs/CONTINUATION_HANDOFF.md` registra o histórico técnico relevante e os passos para retomada.
+`README.md` contém instalação, variáveis de ambiente, credenciais fictícias, cenários, reset e comandos. `docs/api-contracts.md` detalha recursos e eventos; `docs/visual-reference-inventory.md` cataloga frames e decisões visuais; `TODO.md` acompanha evidências e pendências.
 
 A entrega não depende de serviços privados nem do backend de produção. Instale dependências com `pnpm install`, configure `.env.local` a partir de `.env.example` e siga os comandos do README. O build de demonstração precisa ativar MSW; as rotas do SPA devem continuar acessíveis por URL direta e refresh. Deploy público continua dependente de autorização e acesso à conta/provedor de hospedagem; nenhuma integração real de blockchain, carteira ou pagamento deve ser insinuada.

@@ -25,7 +25,7 @@ Pendências principais:
 
 - concluir a fidelidade visual fina aos frames nas larguras 390, 768 e 1440 px; a auditoria inicial identificou diferenças na tipografia, proporções e espaçamentos, detalhadas em [`docs/visual-reference-inventory.md`](docs/visual-reference-inventory.md);
 - completar a revisão manual global de acessibilidade, em especial zoom/reflow e feedback de eventos; os testes cobrem teclado, foco, labels, landmarks e associações de erro, e os pares cromáticos representativos foram verificados;
-- otimizar a carga inicial: as medianas Lighthouse de Performance são 84%/83% mobile e 61%/64% desktop (home/detalhe), abaixo da meta de 90%; causas e relatórios estão em [`reports/lighthouse/summary.md`](reports/lighthouse/summary.md) e [`ARCHITECTURE.md`](ARCHITECTURE.md);
+- otimizar a carga inicial: as medianas Lighthouse de Performance são 87% mobile e 68% desktop, abaixo da meta de 90%; a causa é estrutural (LCP gateado por MSW lazy init + chamada de API sem SSR); causas e relatórios estão em [`reports/lighthouse/summary.md`](reports/lighthouse/summary.md) e [`ARCHITECTURE.md`](ARCHITECTURE.md);
 - realizar o deploy público e validar acesso direto, refresh, mocks e realtime. A configuração de build/fallback Vercel está preparada; falta autorização/acesso à conta do provedor.
 
 O backlog detalhado e verificável está em [`TODO.md`](TODO.md).
@@ -120,12 +120,12 @@ A matriz abaixo usa build otimizado com MSW default e três medições por rota/
 
 | Perfil  | Rota                   | Performance | Accessibility | Best Practices |  SEO |     LCP |   CLS |    TBT |
 | ------- | ---------------------- | ----------: | ------------: | -------------: | ---: | ------: | ----: | -----: |
-| mobile  | `/`                    |         84% |          100% |            96% | 100% | 3576 ms | 0.000 | 195 ms |
-| mobile  | `/nft/emerald-ape-042` |         83% |          100% |            96% | 100% | 3777 ms | 0.013 | 162 ms |
-| desktop | `/`                    |         61% |          100% |           100% | 100% | 3352 ms | 0.006 | 203 ms |
-| desktop | `/nft/emerald-ape-042` |         64% |          100% |           100% | 100% | 3338 ms | 0.009 | 170 ms |
+| mobile  | `/`                    |         87% |          100% |            96% | 100% | 3780 ms | 0.001 |  89 ms |
+| mobile  | `/nft/emerald-ape-042` |         87% |          100% |            96% | 100% | 3846 ms | 0.013 |  38 ms |
+| desktop | `/`                    |         68% |          100% |           100% | 100% | 3676 ms | 0.015 |  70 ms |
+| desktop | `/nft/emerald-ape-042` |         68% |          100% |           100% | 100% | 3701 ms | 0.020 |  48 ms |
 
-Performance não alcança a meta de 90 em nenhum dos quatro cenários. Os relatórios apontam FCP de cerca de 2,3–2,5 s, LCP de 3,3–3,8 s, requests de LCP não descobertos no HTML inicial e custo de execução/layout dos chunks iniciais. Os demais scores atingem ou superam as metas do desafio. A otimização de carga inicial permanece registrada como pendência, sem redução de thresholds.
+Performance não alcança a meta de 90 em nenhum dos quatro cenários. A causa é estrutural: o LCP é a primeira imagem de NFT carregada após o ciclo React bootstrap → MSW lazy init → chamada de API, resultando em LCP ≥ 3,6 s sem SSR. FCP melhorou para 2,1 s com skeleton loader e chunk splitting; TBT caiu de ~200 ms para 40–90 ms. Os demais scores atingem ou superam as metas do desafio. A otimização permanece registrada como pendência, sem redução de thresholds.
 
 ## Credenciais fictícias
 
@@ -141,7 +141,5 @@ A sessão simulada mantém apenas um handle opaco em `sessionStorage`; senhas n�
 - [`ARCHITECTURE.md`](ARCHITECTURE.md): arquitetura geral, limites da simulação, estado, cache, tempo real, acessibilidade e decisões responsivas;
 - [`docs/architecture.md`](docs/architecture.md): camadas, dependências, estado, precisão decimal e tempo real;
 - [`docs/api-contracts.md`](docs/api-contracts.md): endpoints REST, schemas, erros e eventos Socket.IO;
-- [`docs/implementation-roadmap.md`](docs/implementation-roadmap.md): fases, critérios de saída e requisitos funcionais;
 - [`docs/visual-reference-inventory.md`](docs/visual-reference-inventory.md): inventário dos frames, decisões responsivas e auditoria visual inicial da home;
 - [`TODO.md`](TODO.md): requisitos concluídos e pendências verificáveis;
-- [`docs/CONTINUATION_HANDOFF.md`](docs/CONTINUATION_HANDOFF.md): histórico técnico resumido, evidências e roteiro para retomar o trabalho.
